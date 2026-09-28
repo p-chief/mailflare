@@ -3,6 +3,7 @@ export type CalendarEventInput = {
 	description?: string;
 	location?: string;
 	attendees?: string[];
+	color?: string;
 	startsAt: string;
 	endsAt: string;
 	mailboxId?: string | null;

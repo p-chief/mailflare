@@ -128,6 +128,7 @@ export async function createJmapApiKey(name: string): Promise<string> {
 	});
 	const data = (await res.json()) as { key?: string; error?: unknown };
 	if (!res.ok || !data.key) throw new Error(typeof data.error === "string" ? data.error : "Could not create a key");
+	window.dispatchEvent(new Event("mailflare:api-keys-changed"));
 	return data.key;
 }
 

@@ -1,4 +1,4 @@
-import { eq, and } from "drizzle-orm";
+import { eq, and, ne } from "drizzle-orm";
 import { getDb } from "@/db";
 import { domains, mailboxes } from "@/db/schema";
 import { ensureMailboxDomainRouting } from "@/lib/mailboxes/domain-addresses";
@@ -18,6 +18,8 @@ import { getManualDomainDns } from "@/lib/domains/manual-dns";
 import { rollbackDomainProvisioning } from "@/lib/domains/rollback";
 import type { DomainProvisioningChanges } from "@/lib/domains/types";
 import { findSendingSubdomain } from "@/lib/domains/sending-status";
+import { preflightDomain } from "@/lib/domains/preflight";
+import { hasCloudflareCredentials } from "@/lib/runtime";
 
 export type DomainDnsView = {
 	routing: { records: CfDnsRecord[]; missing: CfDnsRecord[]; status?: string };
@@ -44,8 +46,23 @@ export async function addDomainForUser(
 	dns: DomainDnsView;
 	changes: DomainProvisioningChanges;
 }> {
-	const provisioned = await provisionDomainOnCloudflare(env, hostname, options);
 	const db = getDb(env);
+	const normalizedHostname = hostname.toLowerCase().trim();
+	const [claimedHostname] = await db.select({ userId: domains.userId }).from(domains).where(eq(domains.hostname, normalizedHostname)).limit(1);
+	if (claimedHostname && claimedHostname.userId !== userId) {
+		throw new Error("Domain is already registered");
+	}
+	if (hasCloudflareCredentials(env)) {
+		const { zone } = await preflightDomain(env, normalizedHostname);
+		const [claimedZone] = await db.select({ userId: domains.userId }).from(domains).where(and(
+			eq(domains.zoneId, zone.id),
+			ne(domains.userId, userId),
+		)).limit(1);
+		if (claimedZone) {
+			throw new Error("Cloudflare zone is already registered to another account");
+		}
+	}
+	const provisioned = await provisionDomainOnCloudflare(env, hostname, options);
 	let insertedDomainId: string | null = null;
 	let domain: typeof domains.$inferSelect;
 
@@ -183,7 +200,11 @@ export async function removeDomainForUser(
 		console.warn("deleteEmailRoutingRulesForDomain", err);
 	}
 
-	if (domain.routingEnabled) {
+	const [otherDomainOnZone] = await db.select({ id: domains.id }).from(domains).where(and(
+		eq(domains.zoneId, domain.zoneId),
+		ne(domains.id, domainId),
+	)).limit(1);
+	if (domain.routingEnabled && !otherDomainOnZone) {
 		try {
 			await disableEmailRouting(env, domain.zoneId);
 		} catch (err) {

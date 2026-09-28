@@ -1,6 +1,7 @@
 "use client";
 
 import type { FormEvent } from "react";
+import { Fragment } from "react";
 import { useEffect, useState } from "react";
 import {
   Archive,
@@ -173,11 +174,15 @@ export function DashboardNav({ className }: { className?: string }) {
     <nav className={cn("flex min-h-full flex-col gap-1", className)}>
       <SidebarHeader href="/inbox" />
       {linksWithCounts.map((link, i) => (
-        <NavItem link={link} key={`nav-${link.href || i}`} />
+        <Fragment key={`nav-${link.href || i}`}>
+          <NavItem link={link} />
+          {minimal && i === 0 && <hr className="mx-3 my-2 border-neutral-200/70" />}
+        </Fragment>
       ))}
+      {minimal && <hr className="mx-3 my-2 border-neutral-200/70" />}
       {!minimal && (
         <div className="mt-2 flex h-8 items-center justify-between px-3">
-          <span className="text-xs font-medium uppercase tracking-wide text-neutral-400">
+          <span className="font-medium tracking-wide text-neutral-900 text-sm">
             Folders
           </span>
           {selectedMailbox && (

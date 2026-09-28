@@ -28,15 +28,20 @@ export async function GET(request: Request) {
 	}
 	const conditions: SQL[] = [];
 	if (mailboxId) {
+		if (auth.mailboxIds && !auth.mailboxIds.includes(mailboxId)) {
+			return NextResponse.json({ error: "Mailbox not found" }, { status: 404 });
+		}
 		const access = await getMailboxAccessLevel(db, user, mailboxId);
 		if (!access?.canRead) {
 			return NextResponse.json({ error: "Mailbox not found" }, { status: 404 });
 		}
 		conditions.push(eq(messages.mailboxId, mailboxId));
 	} else {
-		const accessibleMailboxIds = await listAccessibleMailboxIds(db, user);
+		const accessibleMailboxIds = (await listAccessibleMailboxIds(db, user)).filter((id) => !auth.mailboxIds || auth.mailboxIds.includes(id));
 		if (accessibleMailboxIds.length > 0) {
 			conditions.push(inArray(messages.mailboxId, accessibleMailboxIds));
+		} else if (auth.mailboxIds) {
+			return NextResponse.json({ messages: [] });
 		} else {
 			conditions.push(eq(messages.userId, auth.userId));
 		}

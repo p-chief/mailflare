@@ -66,12 +66,13 @@ export const emailSubmissionSet: JmapMethodHandler = async (ctx, args) => {
 	for (const [creationId, value] of Object.entries((args.create ?? {}) as Record<string, Record<string, unknown>>)) {
 		const emailId = ctx.createdIds[String(value.emailId).replace(/^#/, "")] ?? String(value.emailId ?? "");
 		const identity = typeof value.identityId === "string" ? decodeIdentityId(value.identityId) : null;
-		if (!identity) {
+		const accessible = await listJmapMailboxes(ctx);
+		if (!identity || !accessible.some((mailbox) => mailbox.id === identity.mailboxId && mailbox.permission !== "read_only")) {
 			notCreated[creationId] = { type: "invalidProperties", properties: ["identityId"] };
 			continue;
 		}
 		const [draft] = await ctx.db.select().from(messages).where(and(eq(messages.id, emailId), eq(messages.status, "draft"))).limit(1);
-		if (!draft || draft.userId !== ctx.auth.userId) {
+		if (!draft || draft.userId !== ctx.auth.userId || draft.mailboxId !== identity.mailboxId) {
 			notCreated[creationId] = { type: "invalidProperties", properties: ["emailId"], description: "Not a draft of this account" };
 			continue;
 		}
@@ -91,6 +92,7 @@ export const emailSubmissionSet: JmapMethodHandler = async (ctx, args) => {
 				threadId: draft.threadId,
 				mailboxId: identity.mailboxId,
 				attachments,
+				publicOrigin: ctx.origin,
 			});
 			try {
 				await deleteMessageWithObjects(ctx.env, ctx.db, draft.id, draft.rawR2Key);

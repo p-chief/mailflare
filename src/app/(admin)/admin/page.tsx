@@ -1,9 +1,15 @@
 import Link from "next/link";
-import { BadgeDollarSign, Globe2, KeyRound, Mail, Palette, Settings, Users, Webhook } from "lucide-react";
+import { BadgeDollarSign, Bot, Globe2, KeyRound, Mail, Palette, Users } from "lucide-react";
 import { AdminUpdateCard } from "@/components/admin-update-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const sections = [
+	{
+		href: "/agent",
+		title: "Agent",
+		description: "Choose the email assistant's AI provider and model.",
+		icon: Bot,
+	},
 	{
 		href: "/mailboxes",
 		title: "Mailboxes",
@@ -34,12 +40,12 @@ const sections = [
 		description: "Add and manage user accounts with a Team license.",
 		icon: Users,
 	},
-	// {
-	// 	href: "/api-keys",
-	// 	title: "API Keys",
-	// 	description: "Manage API credentials for programmatic access.",
-	// 	icon: KeyRound,
-	// },
+	{
+		href: "/api-keys",
+		title: "Admin API keys",
+		description: "Manage API access to domains, accounts, and mailboxes.",
+		icon: KeyRound,
+	},
 	// {
 	// 	href: "/webhooks",
 	// 	title: "Webhooks",

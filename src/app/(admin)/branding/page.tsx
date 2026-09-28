@@ -35,7 +35,7 @@ export default function BrandingPage() {
 						<CardDescription>This installation continues to use the original Mailflare name, app icon, and favicon.</CardDescription>
 					</CardHeader>
 					<CardContent className="flex flex-col gap-3 pt-6 sm:flex-row">
-						<Button asChild><a href="https://app.paymug.co/buy/mailflare-pro" target="_blank" rel="noopener noreferrer">Buy Pro · $19 <ExternalLink className="h-4 w-4" /></a></Button>
+						<Button asChild><a href="https://app.paymug.co/buy/mailflare-pro" target="_blank" rel="noopener noreferrer">Buy Pro · $29 <ExternalLink className="h-4 w-4" /></a></Button>
 						<Button asChild variant="outline"><a href="https://app.paymug.co/buy/mailflare-team" target="_blank" rel="noopener noreferrer">Buy Team · from $249 <ExternalLink className="h-4 w-4" /></a></Button>
 					</CardContent>
 				</Card>

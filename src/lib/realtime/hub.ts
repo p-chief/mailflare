@@ -1,5 +1,6 @@
 import { DurableObject } from "cloudflare:workers";
-import type { NewMessageNotification } from "./types";
+import { getUserMailRevision } from "./revision";
+import type { NewMessageNotification, AgentDraftNotification, RevisionPing, RevisionNotification } from "./types";
 
 export class RealtimeHub extends DurableObject<CloudflareEnv> {
 	async fetch(request: Request): Promise<Response> {
@@ -13,13 +14,16 @@ export class RealtimeHub extends DurableObject<CloudflareEnv> {
 			const pair = new WebSocketPair();
 			const client = pair[0];
 			const server = pair[1];
+			const userId = request.headers.get("X-Mailflare-Realtime-User");
+			if (!userId) return new Response("Unauthorized", { status: 401 });
 			this.ctx.acceptWebSocket(server);
+			server.serializeAttachment({ userId });
 
 			return new Response(null, { status: 101, webSocket: client });
 		}
 
 		if (url.pathname === "/notify" && request.method === "POST") {
-			const payload = (await request.json()) as NewMessageNotification;
+			const payload = (await request.json()) as NewMessageNotification | AgentDraftNotification;
 			const message = JSON.stringify(payload);
 
 			for (const socket of this.ctx.getWebSockets()) {
@@ -36,7 +40,27 @@ export class RealtimeHub extends DurableObject<CloudflareEnv> {
 		return new Response("Not found", { status: 404 });
 	}
 
-	webSocketMessage(socket: WebSocket, message: string | ArrayBuffer): void {
-		if (message === "ping") socket.send("pong");
+	async webSocketMessage(socket: WebSocket, message: string | ArrayBuffer): Promise<void> {
+		if (message === "ping") {
+			socket.send("pong");
+			return;
+		}
+		if (typeof message !== "string") return;
+		let ping: RevisionPing;
+		try {
+			ping = JSON.parse(message) as RevisionPing;
+		} catch {
+			return;
+		}
+		if (ping.type !== "ping") return;
+		const userId = socket.deserializeAttachment() as { userId?: string } | null;
+		if (!userId?.userId) return;
+		try {
+			const revision = await getUserMailRevision(this.env, userId.userId);
+			const notification: RevisionNotification = { type: "revision", revision, changed: ping.revision !== null && ping.revision !== revision };
+			socket.send(JSON.stringify(notification));
+		} catch {
+			socket.close(1011, "Revision lookup failed");
+		}
 	}
 }

@@ -5,7 +5,7 @@ export function SpamScoreDetails({ score, verdict, signals, analysisError }: Spa
 	if (score == null && !analysisError) return null;
 	const parsedSignals = parseSpamSignals(signals);
 	return (
-		<details className="mx-6 mb-2 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3">
+		<details className="mb-2 rounded-xl border border-neutral-200 bg-neutral-50 px-4 py-3">
 			<summary className="cursor-pointer text-sm font-medium text-neutral-800">
 				{score == null ? "Spam analysis unavailable" : `Spam score: ${score} · ${verdict ?? "inbox"}`}
 			</summary>

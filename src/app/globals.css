@@ -170,3 +170,7 @@ pre {
 .email-quote-content {
 	display: flow-root;
 }
+
+button {
+	cursor: pointer;
+}

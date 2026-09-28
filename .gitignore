@@ -15,6 +15,7 @@
 
 # next.js
 /.next/
+/.next-node/
 /out/
 
 # production
@@ -44,8 +45,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# OpenNext
-/.open-next
+# vinext
+/.vinext
 /src/lib/migrations/bundle.json
 
 # wrangler files
@@ -60,3 +61,4 @@ mailflare-landing
 
 .agents
 skills-lock.json
+/dist/

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { Copy, KeyRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { createJmapApiKey } from "./utils";
 
 /**
- * Settings > Account card for connecting an external mail app over JMAP.
+ * Settings > App passwords card for connecting an external mail app over JMAP.
  * Mints an API key with the `jmap` scope and shows the details once.
  */
 export function EmailClientsSettings() {
@@ -40,7 +41,7 @@ export function EmailClientsSettings() {
 	return (
 		<div className="space-y-4">
 			<p className="text-sm text-neutral-500">
-				Apps that speak JMAP (Mailtemi, Twake Mail, aerc, and others) can read and send your mail. Point the app at this server and sign in with your email address and an API key as the password.
+				App Password for email clients that support JMAP. Point the app at this server and sign in with your email address and an API key as the password.
 			</p>
 			{key ? (
 				<div className="space-y-3 rounded-2xl bg-neutral-50 p-4">
@@ -48,7 +49,7 @@ export function EmailClientsSettings() {
 					<Field label="Username" value="any value" onCopy={copy} copied={copied} />
 					<Field label="Password (API key)" value={key} onCopy={copy} copied={copied} mono />
 					<p className="text-xs text-neutral-500">
-						This key is shown once. It can be revoked from the API keys page. Session discovery is at <code>{server}/.well-known/jmap</code>.
+						This key is shown once. You can revoke it in <Link href="/settings/api-keys" className="text-blue-700 underline">API keys</Link>. Session discovery is at <code>{server}/.well-known/jmap</code>.
 					</p>
 				</div>
 			) : (

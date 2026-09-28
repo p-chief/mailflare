@@ -58,28 +58,25 @@ export function ContactAvatar({
 		setAvatarUrl(null);
 	}, [address, avatarVersion, mailboxId, managedAvatar, managedAvatarUrl]);
 
-	if (avatarUrl && !imageFailed) {
-		return (
-			<ProgressiveAvatarImage
-				src={avatarUrl}
-				alt=""
-				className={cn("h-9 w-9 shrink-0 rounded-full object-cover", className)}
-				onError={() => {
-					if (managedAvatarUrl) setImageFailed(true);
-					else if (managedAvatar) setManagedAvatar(false);
-					else setImageFailed(true);
-				}}
-			/>
-		);
-	}
-
 	return (
 		<span
-			className={cn("flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-200 text-sm font-semibold text-neutral-700", className)}
+			className={cn("relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-neutral-200 text-sm font-semibold text-neutral-700", className)}
 			style={getAvatarColorStyle(normalizeEmailAddress(address) || name)}
 			aria-hidden
 		>
 			{getContactAvatarInitial(name, address)}
+			{avatarUrl && !imageFailed && (
+				<ProgressiveAvatarImage
+					src={avatarUrl}
+					alt=""
+					className="absolute inset-0 h-full w-full object-cover"
+					onError={() => {
+						if (managedAvatarUrl) setImageFailed(true);
+						else if (managedAvatar) setManagedAvatar(false);
+						else setImageFailed(true);
+					}}
+				/>
+			)}
 		</span>
 	);
 }

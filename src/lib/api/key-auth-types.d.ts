@@ -4,5 +4,6 @@ export type ApiAuthResult = {
 	userId: string;
 	email: string;
 	scopes: string[];
+	mailboxIds: string[] | null;
 	user: typeof users.$inferSelect;
 };

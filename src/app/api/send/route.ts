@@ -7,7 +7,7 @@ import { parseSendRequest } from "./utils";
 import { RequestBodyTooLargeError } from "@/lib/http/errors";
 import { getSendErrorStatus } from "./error-utils";
 import { getDb } from "@/db";
-import { messages } from "@/db/schema";
+import { agentDraftMetadata, messages } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { loadMessageAttachmentContents } from "@/lib/email/attachments";
 import { userOwnsDraft } from "@/app/api/drafts/utils";
@@ -36,6 +36,8 @@ export async function POST(request: Request) {
 		if (!userOwnsDraft(draft, user.id)) {
 			return NextResponse.json({ error: "Draft not found" }, { status: 404 });
 		}
+		const [agent] = await db.select({ draftId: agentDraftMetadata.draftId }).from(agentDraftMetadata).where(eq(agentDraftMetadata.draftId, draftId)).limit(1);
+		if (agent) return NextResponse.json({ error: "Review and confirm this AI draft before sending" }, { status: 409 });
 		attachments.push(...(await loadMessageAttachmentContents(env, draftId)));
 	}
 
@@ -44,6 +46,7 @@ export async function POST(request: Request) {
 			userId: user.id,
 			...parsed.data,
 			attachments,
+			publicOrigin: new URL(request.url).origin,
 		});
 		return NextResponse.json(result);
 	} catch (err) {

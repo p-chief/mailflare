@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { getEnv } from "@/lib/cloudflare";
 import { getDb } from "@/db";
 import { domains } from "@/db/schema";
-import { authenticateApiKey, requireScope } from "@/lib/api/auth";
+import { authenticateAdminApiKey } from "@/lib/api/admin-auth";
 import { getDomainForUser } from "@/lib/domains/service";
 import { getDomainDnsView } from "@/lib/domains/dns-view";
 import type { DnsAuthRecord } from "@/lib/domains/dns-audit";
@@ -15,8 +15,8 @@ const DNS_RECORDS: DnsAuthRecord[] = ["mx", "spf", "dkim", "dmarc"];
 
 export async function POST(request: Request, { params }: Params) {
 	const env = getEnv();
-	const auth = await authenticateApiKey(env, request.headers.get("authorization"));
-	if (!auth || !requireScope(auth.scopes, "domains")) {
+	const auth = await authenticateAdminApiKey(env, request, "domains");
+	if (!auth) {
 		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 	}
 

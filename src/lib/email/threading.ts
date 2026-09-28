@@ -3,14 +3,11 @@ import type { getDb } from "@/db";
 import { messages } from "@/db/schema";
 import { newId } from "@/lib/ids";
 import type { ResolveThreadInput } from "@/lib/email/threading-types";
+import { normalizeMessageId, selectThreadLookupIds } from "@/lib/email/thread-lookup";
+
+export { normalizeMessageId } from "@/lib/email/thread-lookup";
 
 type Db = ReturnType<typeof getDb>;
-
-/** RFC 5322 Message-IDs are compared without their angle brackets or surrounding space. */
-export function normalizeMessageId(value: string | null | undefined): string | null {
-	const trimmed = (value ?? "").trim().replace(/^<|>$/g, "").trim();
-	return trimmed || null;
-}
 
 /** A References header is a whitespace (occasionally comma) separated list of Message-IDs. */
 export function parseMessageIdList(value: string | null | undefined): string[] {
@@ -50,14 +47,11 @@ export function buildReplyReferences(parentReferences: string[], parentMessageId
  * its own Message-ID so later replies can find it.
  */
 export async function resolveThreadId(db: Db, input: ResolveThreadInput): Promise<string> {
-	const candidates = new Set<string>();
-	for (const id of [normalizeMessageId(input.inReplyTo), ...(input.references ?? [])]) {
-		if (id) candidates.add(id);
-	}
+	const candidates = selectThreadLookupIds(input.inReplyTo, input.references ?? []);
 
-	if (input.mailboxId && candidates.size > 0) {
+	if (input.mailboxId && candidates.length > 0) {
 		// Stored Message-IDs may or may not include their angle brackets.
-		const variants = Array.from(candidates).flatMap((id) => [id, `<${id}>`]);
+		const variants = candidates.flatMap((id) => [id, `<${id}>`]);
 		const [parent] = await db
 			.select({ threadId: messages.threadId, providerMessageId: messages.providerMessageId })
 			.from(messages)

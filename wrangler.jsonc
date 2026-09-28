@@ -10,7 +10,7 @@
 	],
 	"assets": {
 		"binding": "ASSETS",
-		"directory": ".open-next/assets",
+		"not_found_handling": "none",
 	},
 	"images": {
 		"binding": "IMAGES",
@@ -38,7 +38,7 @@
 		},
 	],
 	"triggers": {
-		"crons": ["0 2 * * *"],
+		"crons": ["0 2 * * *", "*/5 * * * *"],
 	},
 	"ratelimits": [
 		{
@@ -48,6 +48,11 @@
 				"limit": 20,
 				"period": 60,
 			},
+		},
+		{
+			"name": "AGENT_RATE_LIMIT",
+			"namespace_id": "1002",
+			"simple": { "limit": 120, "period": 60 },
 		},
 	],
 	"observability": {
@@ -60,6 +65,7 @@
 			"remote": false,
 		},
 	],
+	"ai": { "binding": "AI", "remote": true },
 	"d1_databases": [
 		{
 			"binding": "DB",
@@ -83,6 +89,10 @@
 				"binding": "OUTBOUND_QUEUE",
 				"queue": "mailflare-outbound",
 			},
+			{
+				"binding": "AGENT_QUEUE",
+				"queue": "mailflare-agent",
+			},
 		],
 		"consumers": [
 			{
@@ -93,6 +103,11 @@
 			{
 				"queue": "mailflare-outbound",
 				"max_batch_size": 5,
+				"max_retries": 3,
+			},
+			{
+				"queue": "mailflare-agent",
+				"max_batch_size": 1,
 				"max_retries": 3,
 			},
 		],

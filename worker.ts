@@ -1,5 +1,4 @@
-// @ts-ignore — generated at build time
-import { default as nextHandler } from "./.open-next/worker.js";
+import vinextHandler from "vinext/server/fetch-handler";
 import {
 	processInboundMessage,
 	storeRawToR2,
@@ -11,11 +10,15 @@ import { processWebhookRetry, type WebhookRetryMessage } from "./src/lib/email/w
 import { resolveIncomingMail, forwardMessage } from "./src/lib/email/incoming";
 import { getUserFromSession } from "./src/lib/auth/session";
 import { getSessionTokenFromRequest } from "./src/lib/realtime/utils";
+import { inboundAttachmentLimitReasonFromRaw } from "./src/lib/email/inbound-attachments";
+import { hasValidSessionMutationOrigin } from "./src/lib/auth/origin";
 import {
 	getAccountForwardingDestination,
 	MAILFLARE_FORWARDED_HEADER,
 } from "./src/lib/email/account-forwarding";
 import { runScheduledDatabaseBackup } from "./src/lib/backups/runner";
+import { processAgentDraftJob } from "./src/lib/agent/jobs/utils";
+import { runAgentMaintenance } from "./src/lib/agent/maintenance";
 export { RealtimeHub } from "./src/lib/realtime/hub";
 
 export default {
@@ -25,6 +28,9 @@ export default {
 			if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket") {
 				return new Response("Expected WebSocket upgrade", { status: 426 });
 			}
+			if (!hasValidSessionMutationOrigin(request)) {
+				return new Response("Invalid origin", { status: 403 });
+			}
 
 			const user = await getUserFromSession(env, getSessionTokenFromRequest(request));
 			if (!user || user.disabled) {
@@ -32,20 +38,32 @@ export default {
 			}
 
 			const hub = env.REALTIME.getByName(user.id);
-			return hub.fetch(new Request("https://mailflare-realtime/connect", request));
+			const hubRequest = new Request("https://mailflare-realtime/connect", request);
+			hubRequest.headers.set("X-Mailflare-Realtime-User", user.id);
+			return hub.fetch(hubRequest);
 		}
 
-		return nextHandler.fetch(request, env, ctx);
+		return vinextHandler.fetch(request, env, ctx);
 	},
 
 	async email(message: ForwardableEmailMessage, env: CloudflareEnv, ctx: ExecutionContext) {
 		try {
+			if (message.rawSize > 25 * 1024 * 1024) {
+				message.setReject("Message rejected: raw email exceeds the 25 MiB receiving limit. Send a download link instead.");
+				return;
+			}
 			// Domain routing rules are resolved here rather than in the queue because reject and
 			// forward can only be actioned on the live ForwardableEmailMessage.
 			const decision = await resolveIncomingMail(env, message.from, message.to);
 
 			if (decision?.action === "reject") {
 				message.setReject(decision.rejectReason ?? "Message rejected by routing rule");
+				return;
+			}
+			const raw = await new Response(message.raw).arrayBuffer();
+			const attachmentLimitReason = await inboundAttachmentLimitReasonFromRaw(raw);
+			if (attachmentLimitReason) {
+				message.setReject(attachmentLimitReason);
 				return;
 			}
 
@@ -62,7 +80,7 @@ export default {
 					await forwardMessage(message, forwardingDestination);
 				}
 			}
-			const rawR2Key = await storeRawToR2(env, message.from, message.to, message.raw);
+			const rawR2Key = await storeRawToR2(env, message.from, message.to, raw);
 			const payload: InboundQueueMessage = {
 				from: message.from,
 				to: message.to,
@@ -81,20 +99,30 @@ export default {
 			try {
 				if (isInboundQueueMessage(msg.body)) {
 					await processInboundMessage(env, msg.body);
+				} else if (typeof msg.body === "object" && msg.body !== null && (msg.body as { kind?: unknown }).kind === "agent.draft" && typeof (msg.body as { jobId?: unknown }).jobId === "string") {
+					await processAgentDraftJob(env, (msg.body as { jobId: string }).jobId);
 				} else if (isWebhookRetryMessage(msg.body)) {
 					await processWebhookRetry(env, msg.body as WebhookRetryMessage);
-				} else {
+				} else if (typeof msg.body === "object" && msg.body !== null && (msg.body as { kind?: unknown }).kind === "email.scheduled") {
 					await processOutboundQueue(env, msg.body as OutboundQueueMessage);
+				} else {
+					throw new Error("Unknown queue message type");
 				}
 				msg.ack();
 			} catch (err) {
-				console.error("Queue processing failed", err);
+				console.error("Queue processing failed", {
+					rawR2Key: isInboundQueueMessage(msg.body) ? msg.body.rawR2Key : undefined,
+					recipient: isInboundQueueMessage(msg.body) ? msg.body.to : undefined,
+					attempts: msg.attempts,
+					error: err,
+				});
 				msg.retry({ delaySeconds: 10 });
 			}
 		}
 	},
 
 	async scheduled(controller: ScheduledController, env: CloudflareEnv, ctx: ExecutionContext) {
-		ctx.waitUntil(runScheduledDatabaseBackup(env, new Date(controller.scheduledTime)));
+		if (controller.cron === "0 2 * * *") ctx.waitUntil(runScheduledDatabaseBackup(env, new Date(controller.scheduledTime)));
+		ctx.waitUntil(runAgentMaintenance(env));
 	},
 } satisfies ExportedHandler<CloudflareEnv>;

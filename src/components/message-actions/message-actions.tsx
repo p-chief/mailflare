@@ -223,9 +223,9 @@ export function MessageActions({
 	const moveActions = getMoveMessageActions(status, direction);
 
 	return (
-		<div className="flex items-center gap-3 text-neutral-600">
+		<div className="flex flex-wrap items-center justify-end gap-3 text-neutral-600">
 			{error && <span className="text-xs text-red-600">{error}</span>}
-			<div className="flex items-center gap-2">
+			<div className="flex flex-wrap items-center justify-end gap-1 sm:gap-2">
 				<Tooltip label={shortcutsEnabled ? "Reply (r)" : "Reply"}>
 					<Button
 						type="button"
@@ -235,7 +235,7 @@ export function MessageActions({
 						disabled={disabled}
 						onClick={() => handleReply("reply")}
 					>
-						<Reply className="h-5 w-5" />
+						<Reply size={18} />
 					</Button>
 				</Tooltip>
 				{canReplyAll && (
@@ -248,7 +248,7 @@ export function MessageActions({
 							disabled={disabled}
 							onClick={() => handleReply("replyAll")}
 						>
-							<ReplyAll className="h-5 w-5" />
+							<ReplyAll size={18} />
 						</Button>
 					</Tooltip>
 				)}
@@ -262,7 +262,7 @@ export function MessageActions({
 							disabled={disabled}
 							onClick={() => void handleForward()}
 						>
-							<Forward className="h-5 w-5" />
+							<Forward size={18} />
 						</Button>
 					</Tooltip>
 				)}
@@ -274,7 +274,7 @@ export function MessageActions({
 						disabled={disabled || status === "archived"}
 						onClick={() => runAction("archive")}
 					>
-						<Archive className="h-5 w-5" />
+						<Archive size={18} />
 					</Button>
 				</Tooltip>
 				<Tooltip label={shortcutsEnabled ? "Report spam (!)" : "Report spam"}>
@@ -285,7 +285,7 @@ export function MessageActions({
 						disabled={disabled || status === "spam" || direction !== "inbound"}
 						onClick={() => runAction("spam")}
 					>
-						<ShieldAlert className="h-5 w-5" />
+						<ShieldAlert size={18} />
 					</Button>
 				</Tooltip>
 				<Tooltip label={shortcutsEnabled ? "Delete (#)" : "Delete"}>
@@ -296,7 +296,7 @@ export function MessageActions({
 						disabled={disabled || status === "trash"}
 						onClick={() => runAction("trash")}
 					>
-						<Trash2 className="h-5 w-5" />
+						<Trash2 size={18} />
 					</Button>
 				</Tooltip>
 				<Tooltip label={read ? "Mark as unread" : "Mark as read"}>
@@ -307,7 +307,7 @@ export function MessageActions({
 						disabled={disabled}
 						onClick={() => runAction(markAction)}
 					>
-						{read ? <Mail className="h-5 w-5" /> : <MailOpen className="h-5 w-5" />}
+						{read ? <Mail size={18} /> : <MailOpen size={18} />}
 					</Button>
 				</Tooltip>
 				<div className="relative">
@@ -321,7 +321,7 @@ export function MessageActions({
 							disabled={disabled}
 							onClick={() => setMoreOpen((open) => !open)}
 						>
-							<MoreVertical className="h-5 w-5" />
+							<MoreVertical size={18} />
 						</Button>
 					</Tooltip>
 					{moreOpen && (

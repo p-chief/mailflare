@@ -11,6 +11,7 @@ export function useMessageThread(messageId: string, threadId: string | null | un
 	useEffect(() => {
 		if (!threadId) return;
 		let cancelled = false;
+		let refreshTimer: number | null = null;
 		async function load() {
 			setLoading(true);
 			try {
@@ -24,10 +25,19 @@ export function useMessageThread(messageId: string, threadId: string | null | un
 			}
 		}
 		void load();
-		window.addEventListener("mailflare:messages-changed", load);
+		function scheduleLoad() {
+			if (document.visibilityState !== "visible") return;
+			if (refreshTimer) window.clearTimeout(refreshTimer);
+			refreshTimer = window.setTimeout(() => {
+				refreshTimer = null;
+				void load();
+			}, 150);
+		}
+		window.addEventListener("mailflare:messages-changed", scheduleLoad);
 		return () => {
 			cancelled = true;
-			window.removeEventListener("mailflare:messages-changed", load);
+			window.removeEventListener("mailflare:messages-changed", scheduleLoad);
+			if (refreshTimer) window.clearTimeout(refreshTimer);
 		};
 	}, [messageId, threadId]);
 

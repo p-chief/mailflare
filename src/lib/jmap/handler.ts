@@ -106,30 +106,34 @@ function eventSource(ctx: JmapContext, url: URL): Response {
 	const closeAfter = url.searchParams.get("closeafter") === "state";
 	const encoder = new TextEncoder();
 	let last = "";
-	let timer: ReturnType<typeof setInterval> | null = null;
+	let timer: ReturnType<typeof setTimeout> | null = null;
+	let stopped = false;
 
 	const stream = new ReadableStream<Uint8Array>({
 		async start(controller) {
 			const emit = async () => {
-				const [mailbox, email] = await Promise.all([getMailboxState(ctx), getEmailState(ctx)]);
+				const email = await getEmailState(ctx);
+				const mailbox = await getMailboxState(ctx, email);
+				if (stopped) return;
 				const state = `${mailbox}|${email}`;
 				if (state === last) {
 					controller.enqueue(encoder.encode(`event: ping\ndata: {"interval": ${ping}}\n\n`));
-					return;
+				} else {
+					last = state;
+					const changed = { [ctx.accountId]: { Mailbox: mailbox, Email: email, Thread: email } };
+					controller.enqueue(encoder.encode(`event: state\ndata: ${JSON.stringify({ "@type": "StateChange", changed })}\n\n`));
+					if (closeAfter) {
+						stopped = true;
+						controller.close();
+					}
 				}
-				last = state;
-				const changed = { [ctx.accountId]: { Mailbox: mailbox, Email: email, Thread: email } };
-				controller.enqueue(encoder.encode(`event: state\ndata: ${JSON.stringify({ "@type": "StateChange", changed })}\n\n`));
-				if (closeAfter) {
-					controller.close();
-					if (timer) clearInterval(timer);
-				}
+				if (!stopped) timer = setTimeout(() => void emit().catch(() => { stopped = true; }), ping * 1000);
 			};
 			await emit();
-			if (!closeAfter) timer = setInterval(() => void emit().catch(() => timer && clearInterval(timer)), ping * 1000);
 		},
 		cancel() {
-			if (timer) clearInterval(timer);
+			stopped = true;
+			if (timer) clearTimeout(timer);
 		},
 	});
 	return new Response(stream, { headers: { "Content-Type": "text/event-stream", "Cache-Control": "no-store", Connection: "keep-alive", ...corsHeaders() } });

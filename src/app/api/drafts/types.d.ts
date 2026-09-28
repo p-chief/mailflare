@@ -7,6 +7,7 @@ export type DraftPayload = {
 	subject?: string;
 	text?: string;
 	html?: string;
+	scheduledAt?: string | null;
 	/** Set when the draft is a reply, so the send carries the threading headers. */
 	inReplyTo?: string | null;
 	references?: string | null;

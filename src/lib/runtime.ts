@@ -1,6 +1,6 @@
 /**
  * Where the app is running. On Cloudflare Workers the bindings come from
- * OpenNext; the self-hosted Node server builds an equivalent env object and
+ * cloudflare:workers; the self-hosted Node server builds an equivalent env object and
  * publishes it on globalThis before Next starts, so route handlers reach it
  * the same way.
  */

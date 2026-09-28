@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSelectedMailbox } from "@/components/mailbox-provider";
+import { isHtmlSignature, signatureToHtml } from "@/components/compose/rich-text-utils";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -58,9 +59,18 @@ export function MailboxSignatureForm() {
 					disabled={!canManage || saving}
 				/>
 				<p className="text-xs leading-5 text-neutral-500">
-					This signature is added when composing from the selected inbox.
+					This signature is added when composing from the selected inbox. Plain text or HTML is supported; HTML is sanitized.
 				</p>
 			</div>
+			{isHtmlSignature(signature) && (
+				<div className="space-y-2">
+					<p className="text-xs font-medium text-neutral-500">Preview</p>
+					<div
+						className="rounded-md border border-neutral-200 bg-white p-4 text-sm text-neutral-900"
+						dangerouslySetInnerHTML={{ __html: signatureToHtml(signature) }}
+					/>
+				</div>
+			)}
 			<div className="flex items-center gap-3">
 				<Button type="submit" disabled={!canManage || saving || signature.trim() === savedSignature}>
 					{saving ? "Saving..." : "Save signature"}

@@ -4,6 +4,8 @@
  * a single source of truth for what the message says.
  */
 
+import { sanitizeEmailHtml } from "@/app/(dashboard)/inbox/[messageId]/email-html-sanitizer";
+
 export const QUOTE_ATTRIBUTE = "data-mailflare-quote";
 const QUOTE_OPEN = `<div class="mailflare-quote" ${QUOTE_ATTRIBUTE}="1">`;
 const SIGNATURE_ATTRIBUTE = "data-mailflare-signature";
@@ -46,9 +48,23 @@ export function hasMeaningfulHtml(html: string): boolean {
 	return htmlToPlainText(html).trim().length > 0 || /<img\b/i.test(html);
 }
 
-function signatureBlock(signature: string | null | undefined): string {
+/** Distinguish stored HTML markup from existing plain-text signatures. */
+export function isHtmlSignature(signature: string | null | undefined): boolean {
+	return /<\/?[a-z][a-z0-9]*[\s>/]/i.test(signature ?? "");
+}
+
+export function signatureToHtml(signature: string | null | undefined): string {
 	const value = signature?.trim() ?? "";
-	return value ? `<div ${SIGNATURE_ATTRIBUTE}="1"><br><br>${textToHtml(value).replace(/^<div>|<\/div>$/g, "")}</div>` : "";
+	if (!value) return "";
+	if (isHtmlSignature(value) && typeof DOMParser !== "undefined") {
+		return sanitizeEmailHtml(value, { forOutgoing: true }) ?? "";
+	}
+	return textToHtml(value).replace(/^<div>|<\/div>$/g, "");
+}
+
+function signatureBlock(signature: string | null | undefined): string {
+	const html = signatureToHtml(signature);
+	return html ? `<div ${SIGNATURE_ATTRIBUTE}="1"><br><br>${html}</div>` : "";
 }
 
 /** Swap or append the mailbox signature, mirroring the plain-text behaviour. */

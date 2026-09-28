@@ -23,14 +23,16 @@ Want to support the mailflare? <a target="_blank" href="https://store.paymug.co/
 
 ## What you can do
 
-- Connect domains and set up Cloudflare Email Routing from the dashboard.
-- Create personal and shared mailboxes with delegated access.
-- Send and receive email with attachments, rich formatting, signatures, and automatic replies.
-- Organize mail with search, custom folders, stars, snoozing, archive, spam, and trash.
-- Create routing rules to store, forward, reject, or categorize incoming messages.
-- Get real-time inbox updates and new-message notifications.
-- Import and export mail, manage contacts, and block unwanted senders.
-- Manage accounts, permissions, API keys, webhooks, audit logs, and database backups.
+- **Domain setup**: Connect domains and set up Cloudflare Email Routing from the dashboard.
+- **Mailboxes**: Create personal and shared mailboxes with delegated access.
+- **Email**: Send and receive email with attachments, rich formatting, signatures, and automatic replies.
+- **Inbox organization**: Organize mail with search, custom folders, stars, snoozing, archive, spam, and trash.
+- **Routing rules**: Create routing rules to store, forward, reject, or categorize incoming messages.
+- **Notifications**: Get real-time inbox updates and new-message notifications.
+- **Mail and contacts**: Import and export mail, manage contacts, and block unwanted senders.
+- **Administration**: Manage accounts, permissions, API keys, webhooks, audit logs, and database backups.
+- **Email AI Assistant**: Use an AI assistant to search mail, work with threads, and prepare drafts for a selected mailbox.
+- **MCP access**: Connect external AI clients through MCP with mailbox or admin permissions chosen for each key.
 
 ## How it works
 
@@ -78,10 +80,15 @@ npm run dev
 
 Add your Cloudflare credentials to `.dev.vars`, then open [http://localhost:3000](http://localhost:3000). For sample local data, run `npm run db:seed` while the development server is running.
 
+The Cloudflare app uses vinext and the Cloudflare Vite plugin, including local D1, R2, Queues, and Durable Objects. Remote bindings are disabled by default. To use Workers AI locally, authenticate with Wrangler, select your account with `CLOUDFLARE_ACCOUNT_ID`, and run `CLOUDFLARE_REMOTE_BINDINGS=true npm run dev`.
+
+`npm run build` builds the complete Worker; `npm run start` previews that build locally. `npm run deploy` builds and deploys it. The separate Node/Docker runtime still uses Next.js and the existing `build:node`, `start:node`, and `dev:node` commands.
+
 ## Documentation
 
 - [Deployment and configuration](docs/deployment.md)
 - [API and integrations](docs/api.md)
+- [Email assistant and MCP](docs/email-assistant-and-mcp.md)
 - [Troubleshooting](docs/troubleshooting.md)
 
 ## License

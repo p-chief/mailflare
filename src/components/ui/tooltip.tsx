@@ -30,6 +30,8 @@ export function Tooltip({ label, children, className, placement = "auto" }: Tool
 		};
 	}, [label, open, placement]);
 
+	if (!label) return children
+
 	return (
 		<span
 			ref={triggerRef}

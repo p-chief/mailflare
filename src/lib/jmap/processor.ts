@@ -3,7 +3,7 @@ import { JmapError } from "./errors";
 import { mailboxChanges, mailboxGet, mailboxQuery, mailboxSet } from "./mailboxes";
 import { emailChanges, emailGet, emailImport, emailQuery, emailQueryChanges, emailSet, emailUnsupported, searchSnippetGet, threadChanges, threadGet } from "./emails";
 import { emailSubmissionChanges, emailSubmissionGet, emailSubmissionQuery, emailSubmissionSet, identityChanges, identityGet, identitySet } from "./identities";
-import { getEmailState, getMailboxState } from "./state";
+import { getEmailState } from "./state";
 import type { JmapContext, JmapInvocation, JmapMethodHandler, JmapRequest, JmapResponse } from "./types";
 
 const METHODS: Record<string, JmapMethodHandler> = {
@@ -123,7 +123,7 @@ export async function processRequest(ctx: JmapContext, request: JmapRequest): Pr
 }
 
 export async function sessionState(ctx: JmapContext): Promise<string> {
-	return `${await getMailboxState(ctx)}:${(await getEmailState(ctx)).split(".")[0]}`;
+	return getEmailState(ctx);
 }
 
 export function validateRequest(body: unknown): JmapRequest {

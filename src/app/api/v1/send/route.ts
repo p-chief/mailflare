@@ -17,7 +17,7 @@ export async function POST(request: Request) {
 
 	let body: unknown;
 	try {
-		body = await readJsonBody(request, 30 * 1024 * 1024);
+		body = await readJsonBody(request, 40 * 1024 * 1024);
 	} catch (error) {
 		const status = error instanceof RequestBodyTooLargeError ? 413 : 400;
 		return NextResponse.json({ error: "Invalid send request" }, { status });
@@ -26,12 +26,16 @@ export async function POST(request: Request) {
 	if (!parsed.success) {
 		return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
 	}
+	if (auth.mailboxIds && !auth.mailboxIds.includes(parsed.data.mailboxId)) {
+		return NextResponse.json({ error: "Mailbox not found" }, { status: 404 });
+	}
 
 	try {
 		const { attachments, ...fields } = parsed.data;
 		const result = await sendEmail(env, {
 			userId: auth.userId,
 			...fields,
+			publicOrigin: new URL(request.url).origin,
 			attachments: attachments?.map((attachment) => ({
 				filename: attachment.filename,
 				type: attachment.type,

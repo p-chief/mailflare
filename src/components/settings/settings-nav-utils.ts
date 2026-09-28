@@ -13,6 +13,18 @@ export const settingsNavSections: SettingsNavSection[] = [
 				label: "Inbox",
 			},
 			{
+				href: "/settings/security",
+				label: "Security",
+			},
+			{
+				href: "/settings/api-keys",
+				label: "API keys",
+			},
+			{
+				href: "/settings/app-passwords",
+				label: "App passwords",
+			},
+			{
 				href: "/settings/rules",
 				label: "Rules & Routing",
 			},

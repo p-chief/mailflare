@@ -53,9 +53,13 @@ export async function dispatchWebhooks(
 		if (!hook.enabled) continue;
 		if (!parseWebhookEvents(hook.events).includes(eventType)) continue;
 
-		const body = JSON.stringify({ type: eventType, data: payload });
-		const delivery = await createDelivery(db, hook.id, eventType, body);
-		await attemptDelivery(env, db, hook, delivery);
+		try {
+			const body = JSON.stringify({ type: eventType, data: payload });
+			const delivery = await createDelivery(db, hook.id, eventType, body);
+			await attemptDelivery(env, db, hook, delivery);
+		} catch (error) {
+			console.error(`Webhook dispatch failed for ${hook.id}`, error);
+		}
 	}
 }
 

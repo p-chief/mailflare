@@ -72,13 +72,16 @@ and the DNS page shows what to set by hand.
 | `APP_URL` | request origin | Public URL behind a proxy |
 | `SMTP_INBOUND_PORT` | `25` | Inbound SMTP; `0` disables |
 | `MAIL_HOSTNAME` | `mail.<domain>` | Host the MX record points at; SMTP banner |
-| `SMTP_MAX_SIZE` | 25 MiB | Largest inbound message |
+| `SMTP_MAX_SIZE` | 36 MiB | Largest raw inbound message; allows for encoding overhead on up to 25 MB of attachments. Oversized mail receives an SMTP rejection, which the sender's mail provider can report as a delivery failure. |
 | `SMTP_TLS_KEY`, `SMTP_TLS_CERT` | unset | STARTTLS certificate for the listener |
 | `SMTP_URL` | unset | Outbound relay |
 | `SMTP_TLS_REJECT_UNAUTHORIZED` | `true` | Trust self-signed relay certificates when `false` |
 | `CF_ACCOUNT_ID`, `CF_TOKEN` | unset | Cloudflare Email Sending, and zone management if the token allows |
 | `INBOUND_WEBHOOK_SECRET` | unset | Enables `/api/inbound` for the relay Worker |
 | `TURNSTILE_SECRET_KEY` | unset | Bot protection on login and reset forms (`NEXT_PUBLIC_TURNSTILE_SITE_KEY` at build time) |
+| `AI_BASE_URL` | unset | OpenAI-compatible model API base URL for the assistant |
+| `AI_API_KEY` | unset | Server-only key for that model API |
+| `AI_MODEL` | `gpt-4o-mini` | Model ID supported by the configured API |
 
 ## Operations
 
@@ -91,6 +94,12 @@ and the DNS page shows what to set by hand.
 - **Queues.** Jobs are held in memory. Inbound mail is written to the volume
   before it is queued, so a restart never loses a message; at worst one
   stays unparsed until it is re-imported.
+
+## Email assistant and MCP
+
+Set `AI_BASE_URL`, `AI_API_KEY`, and `AI_MODEL` in the container environment to configure the built-in assistant. These values stay on the server. Assistant chat is available by default when a provider is configured; a mailbox manager can change its writing instructions and availability through the settings button in the assistant panel. Automatic reply drafts remain off until enabled there. Auto-draft work is recorded in SQLite and retried after a restart by the local scheduler. AI failure does not reject inbound mail. Out-of-office auto-replies and AI auto-drafts are separate features; turn off out-of-office replies before enabling auto-drafts for a mailbox.
+
+The MCP endpoint is `/mcp`. Create a dedicated mailbox-scoped Bearer key in **Assistant → MCP** and give the key to a client that supports custom HTTP headers. The endpoint uses Streamable HTTP; `request_send` gives the client a review URL, and only an authenticated Mailflare browser session can confirm delivery. MCP read and draft tools remain available when no AI model is configured.
 
 ## Running without Docker
 

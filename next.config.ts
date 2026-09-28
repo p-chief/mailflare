@@ -2,8 +2,12 @@ import type { NextConfig } from "next";
 import { getSecurityHeaders } from "./src/lib/security/headers";
 
 const nextConfig: NextConfig = {
+	distDir: process.env.MAILFLARE_RUNTIME === "node" ? ".next-node" : undefined,
 	turbopack: {
 		root: import.meta.dirname,
+		resolveAlias: process.env.MAILFLARE_RUNTIME === "node" ? {
+			"cloudflare:workers": "./server/runtime/cloudflare-workers.ts",
+		} : {},
 	},
   allowedDevOrigins: ['mail.dev'],
 	typescript: {
@@ -25,9 +29,3 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
-
-// Enable calling `getCloudflareContext()` in `next dev`. The self-hosted
-// runtime provides its own env, so it skips this.
-// See https://opennext.js.org/cloudflare/bindings#local-access-to-bindings.
-import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
-if (process.env.MAILFLARE_RUNTIME !== "node") initOpenNextCloudflareForDev();

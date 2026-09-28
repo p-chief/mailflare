@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getEnv } from "@/lib/cloudflare";
 import { intakeIncomingMail } from "@/lib/email/intake";
 import { verifyInboundSignature } from "@/lib/email/intake-signature";
+import { inboundAttachmentLimitReasonFromRaw } from "@/lib/email/inbound-attachments";
 
 export const dynamic = "force-dynamic";
 
@@ -17,13 +18,15 @@ export async function POST(request: Request) {
 	if (!secret) return NextResponse.json({ error: "INBOUND_WEBHOOK_SECRET is not configured" }, { status: 503 });
 
 	const raw = await request.arrayBuffer();
-	if (raw.byteLength > 25 * 1024 * 1024) return NextResponse.json({ error: "Message too large" }, { status: 413 });
+	if (raw.byteLength > 25 * 1024 * 1024) return NextResponse.json({ error: "Message exceeds the 25 MiB receiving limit" }, { status: 413 });
 	const from = request.headers.get("x-mailflare-from") ?? "";
 	const to = request.headers.get("x-mailflare-to") ?? "";
 	const signature = request.headers.get("x-mailflare-signature") ?? "";
 	if (!from || !to || !(await verifyInboundSignature(secret, signature, raw, from, to))) {
 		return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
 	}
+	const attachmentLimitReason = await inboundAttachmentLimitReasonFromRaw(raw);
+	if (attachmentLimitReason) return NextResponse.json({ action: "reject", reason: attachmentLimitReason });
 
 	let headers: Record<string, string> = {};
 	try {

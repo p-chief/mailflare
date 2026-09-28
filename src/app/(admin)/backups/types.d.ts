@@ -1,3 +1,5 @@
+import type { BackupTableGroupId } from "@/lib/backups/types";
+
 export type BackupScheduleType = "daily" | "weekly" | "monthly";
 export type BackupStatus = "queued" | "running" | "completed" | "failed";
 
@@ -8,6 +10,7 @@ export type BackupSettings = {
 	scheduleValue: number | null;
 	retentionEnabled: boolean;
 	retentionDays: number;
+	excludedTableGroups: BackupTableGroupId[];
 	updatedAt: string;
 };
 

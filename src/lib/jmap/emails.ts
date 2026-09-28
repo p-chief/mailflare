@@ -72,7 +72,7 @@ async function insertDraft(ctx: JmapContext, row: DraftRow): Promise<string> {
 
 async function scope(ctx: JmapContext) {
 	const ids = Array.from(await listAccessibleMailboxIdSet(ctx));
-	return { ids, condition: ids.length ? inArray(messages.mailboxId, ids) : eq(messages.userId, ctx.auth.userId) };
+	return { ids, condition: ids.length ? inArray(messages.mailboxId, ids) : ctx.auth.mailboxIds ? sql`1 = 0` : eq(messages.userId, ctx.auth.userId) };
 }
 
 export async function loadMessages(ctx: JmapContext, ids: string[]): Promise<MessageRow[]> {

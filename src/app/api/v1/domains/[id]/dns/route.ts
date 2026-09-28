@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getEnv } from "@/lib/cloudflare";
-import { authenticateApiKey, requireScope } from "@/lib/api/auth";
+import { authenticateAdminApiKey } from "@/lib/api/admin-auth";
 import { getDomainForUser } from "@/lib/domains/service";
 import { getDomainDnsView } from "@/lib/domains/dns-view";
 
@@ -8,8 +8,8 @@ type Params = { params: Promise<{ id: string }> };
 
 export async function GET(request: Request, { params }: Params) {
 	const env = getEnv();
-	const auth = await authenticateApiKey(env, request.headers.get("authorization"));
-	if (!auth || !requireScope(auth.scopes, "domains")) {
+	const auth = await authenticateAdminApiKey(env, request, "domains");
+	if (!auth) {
 		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 	}
 

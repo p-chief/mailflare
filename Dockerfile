@@ -15,7 +15,7 @@ FROM deps AS build
 COPY . .
 ARG NEXT_PUBLIC_TURNSTILE_SITE_KEY
 ENV NEXT_PUBLIC_TURNSTILE_SITE_KEY=$NEXT_PUBLIC_TURNSTILE_SITE_KEY
-RUN npm run build:node && rm -rf .next/cache
+RUN npm run build:node && rm -rf .next-node/cache
 
 # Production dependencies only. The Workers toolchain arrives as transitive
 # dependencies of the Cloudflare adapter and is never loaded here, so it goes.
@@ -26,7 +26,7 @@ RUN npm prune --omit=dev --ignore-scripts \
 FROM base AS runtime
 ENV NODE_ENV=production DATA_DIR=/data PORT=3000 SMTP_INBOUND_PORT=25
 COPY --chown=node:node --from=prod-deps /app/node_modules ./node_modules
-COPY --chown=node:node --from=build /app/.next ./.next
+COPY --chown=node:node --from=build /app/.next-node ./.next-node
 COPY --chown=node:node --from=build /app/dist ./dist
 COPY --chown=node:node --from=build /app/public ./public
 COPY --chown=node:node --from=build /app/drizzle ./drizzle

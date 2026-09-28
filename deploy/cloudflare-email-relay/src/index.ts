@@ -24,6 +24,10 @@ async function sign(secret: string, raw: ArrayBuffer, from: string, to: string):
 
 export default {
 	async email(message: ForwardableEmailMessage, env: Env) {
+		if (message.rawSize > 25 * 1024 * 1024) {
+			message.setReject("Message rejected: raw email exceeds the 25 MiB receiving limit. Send a download link instead.");
+			return;
+		}
 		const raw = await new Response(message.raw).arrayBuffer();
 		const headers = Object.fromEntries(message.headers);
 		let decision: Decision;
@@ -39,6 +43,10 @@ export default {
 				},
 				body: raw,
 			});
+			if (response.status === 413) {
+				message.setReject("Message rejected: receiving server says the email is too large. Send a download link instead.");
+				return;
+			}
 			if (!response.ok) throw new Error(`Mailflare answered ${response.status}`);
 			decision = (await response.json()) as Decision;
 		} catch (error) {

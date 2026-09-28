@@ -60,6 +60,14 @@ export default function WebhooksPage() {
 		mutationFn: (hook: Webhook) => updateWebhook(hook.id, { enabled: !hook.enabled }),
 		onSuccess: invalidate,
 	});
+	const rotate = useMutation({
+		mutationFn: (id: string) => updateWebhook(id, { rotateSecret: true }),
+		onSuccess: (result) => {
+			setSecret(result.secret ?? null);
+			setError(null);
+		},
+		onError: (cause: Error) => setError(cause.message),
+	});
 
 	const remove = useMutation({ mutationFn: deleteWebhook, onSuccess: invalidate });
 
@@ -112,6 +120,7 @@ export default function WebhooksPage() {
 					</CardContent>
 				</Card>
 			)}
+			{error && !dialogOpen && <p role="alert" className="text-sm text-red-600">{error}</p>}
 
 			{webhooks.isLoading ? (
 				<SectionRowSkeleton />
@@ -199,6 +208,16 @@ export default function WebhooksPage() {
 										disabled={runTest.isPending}
 									>
 										<Send className="h-4 w-4" /> Test
+									</Button>
+									<Button
+										variant="ghost"
+										size="sm"
+										onClick={() => {
+											if (window.confirm("Rotate this signing secret? The previous secret will stop signing new deliveries immediately.")) rotate.mutate(hook.id);
+										}}
+										disabled={rotate.isPending}
+									>
+										<RefreshCw className="h-4 w-4" /> Rotate secret
 									</Button>
 									<Button
 										variant="ghost"

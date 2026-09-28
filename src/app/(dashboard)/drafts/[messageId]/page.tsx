@@ -1,3 +1,8 @@
-import Page from "@/app/(dashboard)/inbox/[messageId]/page"
+import DraftsPage from "../page";
+import { OpenDraftOnRoute } from "./open-draft-on-route";
+import type { DraftRoutePageProps } from "./types";
 
-export default Page;
+export default async function DraftMessagePage({ params }: DraftRoutePageProps) {
+	const { messageId } = await params;
+	return <><DraftsPage /><OpenDraftOnRoute draftId={messageId} /></>;
+}

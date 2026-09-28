@@ -1,3 +1,5 @@
+import type { SanitizeEmailHtmlOptions } from "./email-html-sanitizer-types";
+
 const ALLOWED_TAGS = new Set([
 	"a",
 	"abbr",
@@ -127,33 +129,33 @@ const ALLOWED_STYLE_PROPERTIES = new Set([
 ]);
 const APP_FONT_FALLBACK = "var(--font-geist-sans), system-ui, sans-serif";
 
-function isSafeLinkUrl(value: string): boolean {
+function isSafeLinkUrl(value: string, options: SanitizeEmailHtmlOptions): boolean {
 	try {
-		const url = new URL(value, window.location.origin);
+		const url = options.forOutgoing ? new URL(value) : new URL(value, window.location.origin);
 		return ["http:", "https:", "mailto:", "tel:"].includes(url.protocol);
 	} catch {
 		return false;
 	}
 }
 
-function isSafeImageUrl(value: string): boolean {
-	if (value.startsWith("/api/messages/")) return true;
+function isSafeImageUrl(value: string, options: SanitizeEmailHtmlOptions): boolean {
+	if (!options.forOutgoing && value.startsWith("/api/messages/")) return true;
 	if (/^data:image\/(?:gif|jpeg|png|webp);base64,/i.test(value)) return true;
 	try {
-		const url = new URL(value, window.location.origin);
-		return url.protocol === "http:" || url.protocol === "https:";
+		const url = options.forOutgoing ? new URL(value) : new URL(value, window.location.origin);
+		return options.forOutgoing ? url.protocol === "https:" : url.protocol === "http:" || url.protocol === "https:";
 	} catch {
 		return false;
 	}
 }
 
-function sanitizeStyle(element: HTMLElement): void {
+function sanitizeStyle(element: HTMLElement, options: SanitizeEmailHtmlOptions): void {
 	const safeDeclarations: string[] = [];
 	for (const property of Array.from(element.style)) {
 		if (!ALLOWED_STYLE_PROPERTIES.has(property)) continue;
 		const value = element.style.getPropertyValue(property);
 		if (/url\s*\(|expression\s*\(|javascript:|@import|behavior\s*:|-moz-binding/i.test(value)) continue;
-		const safeValue = property === "font-family"
+		const safeValue = property === "font-family" && !options.forOutgoing
 			? `${value}, ${APP_FONT_FALLBACK}`
 			: value;
 		safeDeclarations.push(`${property}: ${safeValue}`);
@@ -165,7 +167,7 @@ function sanitizeStyle(element: HTMLElement): void {
 	}
 }
 
-function sanitizeElement(element: Element): void {
+function sanitizeElement(element: Element, options: SanitizeEmailHtmlOptions): void {
 	const tag = element.tagName.toLowerCase();
 	if (!ALLOWED_TAGS.has(tag)) {
 		if (DROP_CONTENT_TAGS.has(tag)) {
@@ -182,11 +184,11 @@ function sanitizeElement(element: Element): void {
 		if (!allowed || name.startsWith("on")) element.removeAttribute(attribute.name);
 	}
 
-	if (element instanceof HTMLElement) sanitizeStyle(element);
+	if (element instanceof HTMLElement) sanitizeStyle(element, options);
 
 	if (tag === "a") {
 		const href = element.getAttribute("href");
-		if (!href || !isSafeLinkUrl(href)) {
+		if (!href || !isSafeLinkUrl(href, options)) {
 			element.removeAttribute("href");
 		} else {
 			element.setAttribute("target", "_blank");
@@ -196,7 +198,7 @@ function sanitizeElement(element: Element): void {
 
 	if (tag === "img") {
 		const src = element.getAttribute("src");
-		if (!src || !isSafeImageUrl(src)) {
+		if (!src || !isSafeImageUrl(src, options)) {
 			element.remove();
 			return;
 		}
@@ -205,7 +207,7 @@ function sanitizeElement(element: Element): void {
 	}
 }
 
-export function sanitizeEmailHtml(html: string | null): string | null {
+export function sanitizeEmailHtml(html: string | null, options: SanitizeEmailHtmlOptions = {}): string | null {
 	if (!html) return null;
 	const document = new DOMParser().parseFromString(html, "text/html");
 	for (const blockquote of Array.from(document.body.querySelectorAll("blockquote"))) {
@@ -220,7 +222,7 @@ export function sanitizeEmailHtml(html: string | null): string | null {
 		}
 	}
 	for (const element of Array.from(document.body.querySelectorAll("*"))) {
-		sanitizeElement(element);
+		sanitizeElement(element, options);
 	}
 	return document.body.innerHTML;
 }

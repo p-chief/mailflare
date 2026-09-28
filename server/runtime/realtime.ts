@@ -1,4 +1,6 @@
 import type { WebSocket } from "ws";
+import { getUserMailRevision } from "@/lib/realtime/revision";
+import type { RevisionPing, RevisionNotification } from "@/lib/realtime/types";
 
 /**
  * Per-user WebSocket fan-out, standing in for the RealtimeHub Durable
@@ -8,13 +10,30 @@ import type { WebSocket } from "ws";
  */
 export class RealtimeHubRegistry {
 	private readonly sockets = new Map<string, Set<WebSocket>>();
+	private env: CloudflareEnv | null = null;
+
+	bindEnv(env: CloudflareEnv) {
+		this.env = env;
+	}
 
 	attach(userId: string, socket: WebSocket) {
 		const set = this.sockets.get(userId) ?? new Set();
 		set.add(socket);
 		this.sockets.set(userId, set);
 		socket.on("message", (data) => {
-			if (data.toString() === "ping") socket.send("pong");
+			const message = data.toString();
+			if (message === "ping") {
+				socket.send("pong");
+				return;
+			}
+			void (async () => {
+				let ping: RevisionPing;
+				try { ping = JSON.parse(message) as RevisionPing; } catch { return; }
+				if (ping.type !== "ping" || !this.env) return;
+				const revision = await getUserMailRevision(this.env, userId);
+				const notification: RevisionNotification = { type: "revision", revision, changed: ping.revision !== null && ping.revision !== revision };
+				socket.send(JSON.stringify(notification));
+			})().catch(() => socket.close(1011, "Revision lookup failed"));
 		});
 		socket.on("close", () => {
 			set.delete(socket);

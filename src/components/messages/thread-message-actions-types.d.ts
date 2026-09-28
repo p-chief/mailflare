@@ -5,4 +5,5 @@ export type ThreadMessageActionsProps = {
 	mailboxId: string | null;
 	ownAddress?: string | null;
 	ownAddresses?: string[];
+	starOnly?: boolean;
 };

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getEnv } from "@/lib/cloudflare";
-import { authenticateApiKey, requireScope } from "@/lib/api/auth";
+import { authenticateAdminApiKey } from "@/lib/api/admin-auth";
 import { addDomainSchema } from "@/lib/validators";
 import { addDomainForUser, listUserDomains } from "@/lib/domains/service";
 import { getDomainDnsView, summariseDomainDns } from "@/lib/domains/dns-view";
@@ -13,8 +13,8 @@ function ownerId(user: { id: string; canManageMailboxes: boolean; createdByUserI
 
 export async function GET(request: Request) {
 	const env = getEnv();
-	const auth = await authenticateApiKey(env, request.headers.get("authorization"));
-	if (!auth || !requireScope(auth.scopes, "domains")) {
+	const auth = await authenticateAdminApiKey(env, request, "domains");
+	if (!auth) {
 		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 	}
 
@@ -36,8 +36,8 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
 	const env = getEnv();
-	const auth = await authenticateApiKey(env, request.headers.get("authorization"));
-	if (!auth || !requireScope(auth.scopes, "domains")) {
+	const auth = await authenticateAdminApiKey(env, request, "domains");
+	if (!auth) {
 		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 	}
 

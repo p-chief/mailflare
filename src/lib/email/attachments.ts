@@ -10,8 +10,8 @@ import type {
 	StoredAttachment,
 } from "./attachment-types";
 
-export const MAX_ATTACHMENT_SIZE = 10 * 1024 * 1024;
-export const MAX_TOTAL_ATTACHMENT_SIZE = 20 * 1024 * 1024;
+export const MAX_ATTACHMENT_SIZE = 25_000_000;
+export const MAX_TOTAL_ATTACHMENT_SIZE = 25_000_000;
 export const MAX_ATTACHMENT_COUNT = 10;
 
 export function decodeBase64Content(content: string): ArrayBuffer {
@@ -49,13 +49,13 @@ export function validateAttachments(attachments: AttachmentContent[]): void {
 	for (const attachment of attachments) {
 		const size = attachment.content.byteLength;
 		if (size > MAX_ATTACHMENT_SIZE) {
-			throw new Error(`${attachment.filename} exceeds the 10 MB attachment limit`);
+			throw new Error(`${attachment.filename} exceeds the 25 MB attachment limit`);
 		}
 		totalSize += size;
 	}
 
 	if (totalSize > MAX_TOTAL_ATTACHMENT_SIZE) {
-		throw new Error("Attachments exceed the 20 MB total limit");
+		throw new Error("Attachments exceed the 25 MB total limit");
 	}
 }
 
@@ -166,6 +166,7 @@ export async function loadMessageAttachmentContents(
 		const object = await env.BUCKET.get(row.r2Key);
 		if (!object) continue;
 		result.push({
+			storageId: row.id,
 			filename: row.filename,
 			type: row.contentType,
 			content: await object.arrayBuffer(),

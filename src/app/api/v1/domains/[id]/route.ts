@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 import { getEnv } from "@/lib/cloudflare";
-import { authenticateApiKey, requireScope } from "@/lib/api/auth";
+import { authenticateAdminApiKey } from "@/lib/api/admin-auth";
 import { getDomainForUser, removeDomainForUser } from "@/lib/domains/service";
 
 type Params = { params: Promise<{ id: string }> };
 
 async function authorize(request: Request) {
 	const env = getEnv();
-	const auth = await authenticateApiKey(env, request.headers.get("authorization"));
-	if (!auth || !requireScope(auth.scopes, "domains")) return null;
+	const auth = await authenticateAdminApiKey(env, request, "domains");
+	if (!auth) return null;
 	return auth;
 }
 

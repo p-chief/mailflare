@@ -7,7 +7,7 @@ import type { AccessibleMailbox, JmapContext } from "./types";
 /** Every Mailflare mailbox the key's user can read, in a JMAP-shaped record. */
 export async function listJmapMailboxes(ctx: JmapContext): Promise<AccessibleMailbox[]> {
 	const rows = await listAccessibleMailboxes(ctx.db, ctx.auth.user);
-	return rows.map((row) => ({
+	return rows.filter((row) => !ctx.auth.mailboxIds || ctx.auth.mailboxIds.includes(row.id)).map((row) => ({
 		id: row.id,
 		userId: row.userId,
 		localPart: row.localPart,

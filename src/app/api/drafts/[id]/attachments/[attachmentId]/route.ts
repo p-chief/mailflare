@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { getEnv } from "@/lib/cloudflare";
 import { getDb } from "@/db";
-import { messages } from "@/db/schema";
+import { agentDraftMetadata, messages } from "@/db/schema";
 import { requireUser } from "@/lib/auth/cookies";
 import { deleteMessageAttachment } from "@/lib/email/attachments";
 import { userOwnsDraft } from "../../../utils";
@@ -27,5 +27,6 @@ export async function DELETE(request: Request, { params }: DraftAttachmentRouteP
 	if (!removed) {
 		return NextResponse.json({ error: "Attachment not found" }, { status: 404 });
 	}
+	await db.update(agentDraftMetadata).set({ revision: sql`${agentDraftMetadata.revision} + 1`, humanEditedAt: new Date() }).where(eq(agentDraftMetadata.draftId, id));
 	return NextResponse.json({ ok: true });
 }

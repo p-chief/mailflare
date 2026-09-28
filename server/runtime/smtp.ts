@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { SMTPServer } from "smtp-server";
 import type { SMTPServerSession } from "smtp-server";
 import { intakeIncomingMail } from "@/lib/email/intake";
+import { inboundAttachmentLimitReasonFromRaw } from "@/lib/email/inbound-attachments";
 import type { Mailer } from "./mailer";
 
 /**
@@ -34,6 +35,18 @@ export function startSmtpListener(
 					return;
 				}
 				const raw = Buffer.concat(chunks);
+				let attachmentLimitReason: string | null;
+				try {
+					attachmentLimitReason = await inboundAttachmentLimitReasonFromRaw(toArrayBuffer(raw));
+				} catch (error) {
+					console.error("SMTP attachment inspection failed", error);
+					callback(Object.assign(new Error("Temporary failure, try again later"), { responseCode: 451 }));
+					return;
+				}
+				if (attachmentLimitReason) {
+					callback(Object.assign(new Error(attachmentLimitReason), { responseCode: 552 }));
+					return;
+				}
 				const from = session.envelope.mailFrom ? session.envelope.mailFrom.address : "";
 				const headers = parseHeaders(raw);
 				let rejectReason: string | null = null;

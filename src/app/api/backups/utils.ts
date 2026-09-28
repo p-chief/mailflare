@@ -1,4 +1,5 @@
 import type { BackupSettingsInput } from "./types";
+import { BACKUP_TABLE_GROUPS } from "@/lib/backups/table-groups";
 
 const SCHEDULE_TYPES = new Set(["daily", "weekly", "monthly"]);
 
@@ -8,6 +9,11 @@ export function parseBackupSettingsInput(value: unknown): BackupSettingsInput | 
 	if (typeof input.enabled !== "boolean") return null;
 	if (typeof input.scheduleType !== "string" || !SCHEDULE_TYPES.has(input.scheduleType)) return null;
 	if (typeof input.retentionEnabled !== "boolean") return null;
+	if (!Array.isArray(input.excludedTableGroups)) return null;
+	const groupIds = new Set(BACKUP_TABLE_GROUPS.map((group) => group.id));
+	if (!input.excludedTableGroups.every((id) => typeof id === "string" && groupIds.has(id))) return null;
+	const excludedTableGroups = [...new Set(input.excludedTableGroups)] as BackupSettingsInput["excludedTableGroups"];
+	if (excludedTableGroups.length === BACKUP_TABLE_GROUPS.length) return null;
 
 	const retentionDays = Number(input.retentionDays);
 	if (!Number.isInteger(retentionDays) || retentionDays < 1 || retentionDays > 3650) return null;
@@ -28,5 +34,6 @@ export function parseBackupSettingsInput(value: unknown): BackupSettingsInput | 
 		scheduleValue,
 		retentionEnabled: input.retentionEnabled,
 		retentionDays,
+		excludedTableGroups,
 	};
 }

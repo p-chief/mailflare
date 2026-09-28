@@ -71,6 +71,7 @@ export function getEmailPageTitleCount(total: number, unread: number): number {
 }
 
 export function formatEmailPageTitle({ location, total, unread, emailAddress }: EmailPageTitleInput): string {
+	if (location === "Inbox") return unread > 0 ? `Inbox (${unread})` : "Inbox";
 	const count = getEmailPageTitleCount(total, unread);
 	const suffix = emailAddress ? ` - ${emailAddress}` : "";
 	return `${location} (${count})${suffix}`;

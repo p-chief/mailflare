@@ -47,4 +47,5 @@ export type UpdateWebhookInput = {
 	events?: WebhookEvent[];
 	enabled?: boolean;
 	maxAttempts?: number;
+	rotateSecret?: true;
 };

@@ -10,6 +10,7 @@ import { newId } from "@/lib/ids";
 import { webhookSchema } from "@/lib/validators";
 import { readJsonBody } from "@/lib/http/request";
 import { RequestBodyTooLargeError } from "@/lib/http/errors";
+import { hasValidSessionMutationOrigin } from "@/lib/auth/origin";
 
 export async function GET(request: Request) {
 	const env = getEnv();
@@ -53,6 +54,7 @@ export async function POST(request: Request) {
 	const auth = await requireSessionUser(env, request);
 	if (auth.error) return auth.error;
 	const user = auth.user;
+	if (!hasValidSessionMutationOrigin(request)) return NextResponse.json({ error: "Invalid origin" }, { status: 403 });
 	let body: unknown;
 	try {
 		body = await readJsonBody(request, 16 * 1024);

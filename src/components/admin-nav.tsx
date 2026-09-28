@@ -11,6 +11,8 @@ import {
   Users,
   Route,
   Webhook,
+  KeyRound,
+  Bot,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavItem } from "./components-nav";
@@ -36,6 +38,9 @@ const sections = [
   {
     label: "Administration",
     links: [
+      { href: "/api-keys", label: "API keys", icon: KeyRound },
+      { href: "/general", label: "General", icon: Settings },
+      { href: "/agent", label: "Agent", icon: Bot },
       { href: "/accounts", label: "Accounts", icon: Users },
       { href: "/activity", label: "Activity", icon: Activity },
       { href: "/backups", label: "Backups", icon: DatabaseBackup },
@@ -46,7 +51,6 @@ const sections = [
     links: [
       { href: "/branding", label: "Branding", icon: Palette },
       { href: "/licenses", label: "Licenses", icon: BadgeDollarSign },
-      // { href: "/api-keys", label: "API Keys", icon: KeyRound },
     ],
   },
 ];
@@ -58,8 +62,8 @@ export function AdminNav({ className }: { className?: string }) {
   return (
     <nav className={cn("flex min-h-full flex-col gap-1", className)}>
       <SidebarHeader href="/inbox" label="Admin" />
-      <div className={cn("space-y-4", minimal && "space-y-2")}>
-        {sections.map((section) => {
+      <div className={cn("space-y-4", minimal && "space-y-2 pl-1")}>
+        {sections.map((section, sectionIndex) => {
           const links = section.links.filter(
             (link) =>
               link.href !== "/branding" || branding.canCustomizeBranding,
@@ -69,6 +73,7 @@ export function AdminNav({ className }: { className?: string }) {
           return (
             // The first section has no label, so fall back to its first href for a stable key.
             <section key={section.label ?? links[0].href}>
+              {minimal && sectionIndex > 0 && <hr className="mx-3 mb-3 border-neutral-200/70" />}
               {!minimal && section.label && (
                 <p className="mb-1 px-3 text-[11px] font-semibold uppercase tracking-wider text-neutral-400">
                   {section.label}

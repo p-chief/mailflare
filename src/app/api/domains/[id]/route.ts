@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getEnv } from "@/lib/cloudflare";
 import { requireUser } from "@/lib/auth/cookies";
 import { getDomainForUser, removeDomainForUser } from "@/lib/domains/service";
+import { hasValidSessionMutationOrigin } from "@/lib/auth/origin";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -18,6 +19,8 @@ export async function DELETE(request: Request, { params }: Params) {
 	const { id } = await params;
 	const env = getEnv();
 	const user = await requireUser(env, request);
+	if (user.role !== "admin") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+	if (!hasValidSessionMutationOrigin(request)) return NextResponse.json({ error: "Invalid origin" }, { status: 403 });
 	try {
 		await removeDomainForUser(env, user.id, id);
 		return NextResponse.json({ ok: true });

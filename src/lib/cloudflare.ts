@@ -1,10 +1,10 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { env } from "cloudflare:workers";
 import { getNodeEnv } from "@/lib/runtime";
 
 export function getEnv(): CloudflareEnv {
-	return getNodeEnv() ?? (getCloudflareContext().env as CloudflareEnv);
+	return getNodeEnv() ?? (env as CloudflareEnv);
 }
 
 export async function getEnvAsync(): Promise<CloudflareEnv> {
-	return getNodeEnv() ?? ((await getCloudflareContext({ async: true })).env as CloudflareEnv);
+	return getEnv();
 }

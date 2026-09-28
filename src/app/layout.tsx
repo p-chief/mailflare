@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Providers } from "@/components/providers";
+import { sidebarBootstrapScript } from "@/components/sidebar-state-utils";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 	return (
 		<html lang="en">
 			<head>
+				<script dangerouslySetInnerHTML={{ __html: sidebarBootstrapScript }} />
 				<link rel="icon" href="/api/branding/icon"></link>
 			</head>
 			<body className={`${geistSans.variable} ${geistMono.variable} antialiased light`}>

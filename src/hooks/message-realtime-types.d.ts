@@ -11,3 +11,9 @@ export interface MessageRealtimeState {
 	dismissNotification: () => void;
 	notification: NewMessageEvent | null;
 }
+
+export type RealtimeChannelMessage =
+	| { type: "status"; connected: boolean }
+	| { type: "status_request" }
+	| { type: "notification"; payload: string }
+	| { type: "refresh" };

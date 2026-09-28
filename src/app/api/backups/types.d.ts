@@ -1,4 +1,4 @@
-import type { BackupScheduleType } from "@/lib/backups/types";
+import type { BackupScheduleType, BackupTableGroupId } from "@/lib/backups/types";
 
 export type BackupSettingsInput = {
 	enabled: boolean;
@@ -6,4 +6,5 @@ export type BackupSettingsInput = {
 	scheduleValue: number | null;
 	retentionEnabled: boolean;
 	retentionDays: number;
+	excludedTableGroups: BackupTableGroupId[];
 };

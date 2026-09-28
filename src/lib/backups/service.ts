@@ -2,8 +2,9 @@ import { and, desc, eq, gte, inArray, lt } from "drizzle-orm";
 import { getDb } from "@/db";
 import { backups, backupSettings } from "@/db/schema";
 import { newId } from "@/lib/ids";
-import type { BackupScheduleType } from "./types";
+import type { BackupScheduleType, BackupTableGroupId } from "./types";
 import { BACKUP_SETTINGS_ID, getUtcDayBounds, isBackupDue } from "./utils";
+import { parseExcludedBackupTableGroups } from "./table-groups";
 
 export async function getBackupSettings(env: CloudflareEnv) {
 	const db = getDb(env);
@@ -12,7 +13,7 @@ export async function getBackupSettings(env: CloudflareEnv) {
 		.from(backupSettings)
 		.where(eq(backupSettings.id, BACKUP_SETTINGS_ID))
 		.limit(1);
-	return settings;
+	return settings ? { ...settings, excludedTableGroups: parseExcludedBackupTableGroups(settings.excludedTableGroups) } : undefined;
 }
 
 export async function listBackups(env: CloudflareEnv) {
@@ -63,11 +64,13 @@ export async function updateBackupSettings(
 		scheduleValue: number | null;
 		retentionEnabled: boolean;
 		retentionDays: number;
+		excludedTableGroups: BackupTableGroupId[];
 	},
 ) {
+	const { excludedTableGroups, ...settings } = input;
 	await getDb(env)
 		.update(backupSettings)
-		.set({ ...input, updatedAt: new Date() })
+		.set({ ...settings, excludedTableGroups: JSON.stringify(excludedTableGroups), updatedAt: new Date() })
 		.where(eq(backupSettings.id, BACKUP_SETTINGS_ID));
 }
 

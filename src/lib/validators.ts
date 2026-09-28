@@ -320,4 +320,5 @@ export const webhookUpdateSchema = z.object({
 		.optional(),
 	enabled: z.boolean().optional(),
 	maxAttempts: z.number().int().min(1).max(10).optional(),
+	rotateSecret: z.literal(true).optional(),
 });

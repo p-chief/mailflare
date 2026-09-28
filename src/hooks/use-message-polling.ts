@@ -6,6 +6,7 @@ import {
 import type {
 	MessageRealtimeState,
 	NewMessageEvent,
+	RealtimeChannelMessage,
 } from "./message-realtime-types";
 import {
 	getRealtimeWebSocketUrl,
@@ -22,36 +23,83 @@ export function useMessagePolling(): MessageRealtimeState {
 
 	useEffect(() => {
 		let socket: WebSocket | null = null;
+		let channel: BroadcastChannel | null = null;
+		let lockAbort: AbortController | null = null;
+		let releaseLeader: (() => void) | null = null;
 		let reconnectTimer: number | null = null;
 		let heartbeatTimer: number | null = null;
 		let fallbackTimer: number | null = null;
 		let reconnectAttempt = 0;
+		let revision: string | null = null;
+		let connected = false;
+		let leader = false;
+		let sessionToken = getClientSessionToken();
 		let stopped = false;
 
 		function dispatchMessagesChanged() {
-			window.dispatchEvent(new Event("mailflare:messages-changed"));
+			window.dispatchEvent(new CustomEvent("mailflare:messages-changed", { detail: { realtime: true } }));
 		}
 
 		function clearConnectionTimers() {
 			if (reconnectTimer) window.clearTimeout(reconnectTimer);
 			if (heartbeatTimer) window.clearInterval(heartbeatTimer);
-			if (fallbackTimer) window.clearInterval(fallbackTimer);
 			reconnectTimer = null;
 			heartbeatTimer = null;
-			fallbackTimer = null;
 		}
 
 		function startFallbackRefresh() {
 			if (fallbackTimer) return;
-			fallbackTimer = window.setInterval(
-				dispatchMessagesChanged,
-				REALTIME_FALLBACK_INTERVAL_MS,
-			);
+			fallbackTimer = window.setInterval(() => {
+				if (!connected && document.visibilityState === "visible") dispatchMessagesChanged();
+			}, REALTIME_FALLBACK_INTERVAL_MS);
+		}
+
+		function setConnected(value: boolean) {
+			connected = value;
+			if (value) {
+				if (fallbackTimer) window.clearInterval(fallbackTimer);
+				fallbackTimer = null;
+			} else {
+				startFallbackRefresh();
+			}
+			if (leader) channel?.postMessage({ type: "status", connected: value } satisfies RealtimeChannelMessage);
+		}
+
+		function handleNotification(payload: string, fromSocket: boolean) {
+			try {
+				const parsed = JSON.parse(payload) as { type?: string; revision?: string; changed?: boolean; draftId?: string; mailboxId?: string };
+				if (parsed.type === "revision" && typeof parsed.revision === "string") {
+					revision = parsed.revision;
+					if (parsed.changed) {
+						dispatchMessagesChanged();
+						if (fromSocket) channel?.postMessage({ type: "refresh" } satisfies RealtimeChannelMessage);
+					}
+					return;
+				}
+				if (parsed.type === "agent_draft" && parsed.draftId && parsed.mailboxId) {
+					window.dispatchEvent(new CustomEvent("mailflare:agent-draft", { detail: parsed }));
+					dispatchMessagesChanged();
+					if (fromSocket) channel?.postMessage({ type: "notification", payload } satisfies RealtimeChannelMessage);
+					return;
+				}
+			} catch { return; }
+			const event = parseNewMessageEvent(payload);
+			if (!event) return;
+			dispatchMessagesChanged();
+			setNotification(event);
+			if (fromSocket) {
+				showBrowserNewMessageNotification(event);
+				channel?.postMessage({ type: "notification", payload } satisfies RealtimeChannelMessage);
+			}
+		}
+
+		function sendHeartbeat() {
+			if (socket?.readyState === WebSocket.OPEN) socket.send(JSON.stringify({ type: "ping", revision }));
 		}
 
 		function scheduleReconnect() {
-			if (stopped || !getClientSessionToken()) return;
-			startFallbackRefresh();
+			setConnected(false);
+			if (stopped || !leader || !getClientSessionToken()) return;
 			const delay = getReconnectDelay(reconnectAttempt);
 			reconnectAttempt += 1;
 			reconnectTimer = window.setTimeout(connect, delay);
@@ -59,46 +107,119 @@ export function useMessagePolling(): MessageRealtimeState {
 
 		function connect() {
 			clearConnectionTimers();
-			if (stopped || !getClientSessionToken()) return;
+			if (stopped || !leader || !getClientSessionToken()) return;
 
 			socket = new WebSocket(getRealtimeWebSocketUrl());
 			socket.onopen = () => {
 				reconnectAttempt = 0;
-				heartbeatTimer = window.setInterval(() => {
-					if (socket?.readyState === WebSocket.OPEN) socket.send("ping");
-				}, REALTIME_HEARTBEAT_INTERVAL_MS);
+				revision = null;
+				setConnected(true);
+				dispatchMessagesChanged();
+				sendHeartbeat();
+				heartbeatTimer = window.setInterval(sendHeartbeat, REALTIME_HEARTBEAT_INTERVAL_MS);
 			};
 			socket.onmessage = (message) => {
 				if (message.data === "pong" || typeof message.data !== "string") return;
-				const event = parseNewMessageEvent(message.data);
-				if (!event) return;
-				dispatchMessagesChanged();
-				setNotification(event);
-				showBrowserNewMessageNotification(event);
+				handleNotification(message.data, true);
 			};
 			socket.onerror = () => socket?.close();
-			socket.onclose = scheduleReconnect;
+			socket.onclose = () => {
+				clearConnectionTimers();
+				scheduleReconnect();
+			};
+		}
+
+		function requestLeadership() {
+			if (stopped || !getClientSessionToken()) return;
+			if (!channel || !navigator.locks) {
+				leader = true;
+				connect();
+				return;
+			}
+			lockAbort = new AbortController();
+			void navigator.locks.request("mailflare:realtime", { signal: lockAbort.signal }, async () => {
+				if (stopped || !getClientSessionToken()) return;
+				await new Promise<void>((resolve) => {
+					releaseLeader = resolve;
+					leader = true;
+					connect();
+				});
+				leader = false;
+				releaseLeader = null;
+			}).catch(() => {});
 		}
 
 		function restartForSessionChange() {
+			sessionToken = getClientSessionToken();
 			if (socket) {
 				socket.onclose = null;
 				socket.close(1000, "Session changed");
 				socket = null;
 			}
 			clearConnectionTimers();
+			setConnected(false);
+			lockAbort?.abort();
+			releaseLeader?.();
+			leader = false;
 			reconnectAttempt = 0;
+			revision = null;
 			setNotification(null);
-			if (getClientSessionToken()) connect();
+			requestLeadership();
 		}
 
+		function onChannelMessage(event: MessageEvent<RealtimeChannelMessage>) {
+			const message = event.data;
+			if (message?.type === "status_request" && leader) {
+				channel?.postMessage({ type: "status", connected } satisfies RealtimeChannelMessage);
+			} else if (message?.type === "status" && !leader) {
+				setConnected(message.connected);
+				if (message.connected) dispatchMessagesChanged();
+			} else if (message?.type === "notification" && !leader) {
+				handleNotification(message.payload, false);
+			} else if (message?.type === "refresh") {
+				dispatchMessagesChanged();
+			}
+		}
+
+		function onLocalMessagesChanged(event: Event) {
+			if ((event as CustomEvent<{ realtime?: boolean }>).detail?.realtime) return;
+			channel?.postMessage({ type: "refresh" } satisfies RealtimeChannelMessage);
+		}
+
+		function onVisibilityChange() {
+			if (document.visibilityState === "visible") dispatchMessagesChanged();
+		}
+
+		function onStorageChange() {
+			if (sessionToken !== getClientSessionToken()) restartForSessionChange();
+		}
+
+		if (typeof BroadcastChannel !== "undefined") {
+			channel = new BroadcastChannel("mailflare:realtime");
+			channel.onmessage = onChannelMessage;
+			channel.postMessage({ type: "status_request" } satisfies RealtimeChannelMessage);
+		}
 		window.addEventListener(AUTH_SESSION_CHANGED_EVENT, restartForSessionChange);
-		connect();
+		window.addEventListener("storage", onStorageChange);
+		window.addEventListener("mailflare:messages-changed", onLocalMessagesChanged);
+		document.addEventListener("visibilitychange", onVisibilityChange);
+		window.addEventListener("focus", onVisibilityChange);
+		startFallbackRefresh();
+		requestLeadership();
 
 		return () => {
 			stopped = true;
 			window.removeEventListener(AUTH_SESSION_CHANGED_EVENT, restartForSessionChange);
+			window.removeEventListener("storage", onStorageChange);
+			window.removeEventListener("mailflare:messages-changed", onLocalMessagesChanged);
+			document.removeEventListener("visibilitychange", onVisibilityChange);
+			window.removeEventListener("focus", onVisibilityChange);
+			if (leader) channel?.postMessage({ type: "status", connected: false } satisfies RealtimeChannelMessage);
+			lockAbort?.abort();
+			releaseLeader?.();
 			clearConnectionTimers();
+			if (fallbackTimer) window.clearInterval(fallbackTimer);
+			channel?.close();
 			if (socket) {
 				socket.onclose = null;
 				socket.close(1000, "Client closed");

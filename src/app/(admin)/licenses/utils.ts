@@ -7,7 +7,7 @@ import type { ActivatableLicensePlan, LicenseAction, LicenseResponse } from "./t
 export const LICENSE_PLANS: LicensePlan[] = [
 	{
 		name: "Pro",
-		price: 19,
+		price: 29,
 		originalPrice: 39,
 		description: "A one-time license for one account, including one year of product updates.",
 		features: ["Custom branding", "All future Pro features", "Keep the licensed version forever"],

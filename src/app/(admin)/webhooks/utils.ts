@@ -52,7 +52,7 @@ export async function createWebhook(input: CreateWebhookInput) {
 }
 
 export async function updateWebhook(id: string, input: UpdateWebhookInput) {
-	return readJson(
+	return readJson<{ ok: boolean; secret?: string }>(
 		await authFetch(`/api/webhooks/${id}`, {
 			method: "PATCH",
 			headers: { "Content-Type": "application/json" },
