@@ -1,6 +1,8 @@
 # Hằng số & giới hạn
 
-> Thuộc nhóm: Nền tảng. Tất cả giá trị đều lấy từ code hiện tại.
+> **[CƠ BẢN]** · Nhóm: Nền tảng · Liên quan: [02-kien-truc-cloudflare.md](02-kien-truc-cloudflare.md), [06-quy-uoc-chung.md](06-quy-uoc-chung.md)
+>
+> Các giá trị dưới đây là yêu cầu của hệ thống; file chức năng tham chiếu về đây.
 
 ## 1. Xác thực
 | Hằng số | Giá trị | Nơi dùng |
@@ -8,8 +10,9 @@
 | Hạn session | 30 ngày | cookie `ep_session` (`HttpOnly; SameSite=Lax; Path=/; Max-Age=2592000; Secure` khi production) |
 | Rate limit | 20 lần / 60 s / IP (`cf-connecting-ip`) | login, MFA verify |
 | `Retry-After` khi 429 | 60 | |
-| bcrypt | 12 (mật khẩu), 10 (API key) | |
-| Mật khẩu | tối thiểu 8; đổi/reset/admin đặt: tối đa 128 | |
+| Hash mật khẩu | bcrypt cost 12 (thay thế: PBKDF2-SHA256 100 000 vòng) | |
+| Hash API key | SHA-256 toàn bộ key, `prefix` 12 ký tự để tra | |
+| Mật khẩu | 8–128 ký tự | register, đổi, reset, admin đặt |
 | Username / localPart | 1–64, `^[a-zA-Z0-9._%+-]+$` | register, tạo tài khoản, alias, account mailbox |
 | Token reset mật khẩu | 30 phút, dùng 1 lần | |
 | Login challenge MFA | 5 phút | |
@@ -30,7 +33,7 @@
 | `references` | chuỗi ≤ 5000 hoặc mảng ≤ 50 phần tử ≤ 998 |
 | Body text / html | ≤ 2 MB mỗi phần |
 | Attachment gửi | ≤ 10 file, ≤ 10 MB/file, ≤ 20 MB tổng; base64 (API) ≤ 14 MB chuỗi |
-| Attachment nhận | không kiểm tra trong app |
+| Attachment nhận | giới hạn bởi kích thước thư tối đa của Email Routing (25 MiB mỗi thư) |
 | Filename attachment (API) | 1–255 |
 | Snippet | 200 ký tự |
 | References giữ lại | 30 id |
@@ -41,7 +44,15 @@
 | Hẹn giờ gửi | delay mỗi bước ≤ 86 400 s |
 | Queue retry | 10 s, tối đa 3 lần |
 
-## 3. Tổ chức & tự động
+## 3. Dọn dẹp định kỳ (cron)
+| Hằng số | Giá trị |
+|---|---|
+| Tự xoá vĩnh viễn Trash/Spam | sau 30 ngày (quyết định thiết kế, xem [02-kien-truc-cloudflare.md §4.4](02-kien-truc-cloudflare.md)) |
+| Blob `jmap-uploads/` chưa claim | xoá sau 24 giờ |
+| `auto_reply_deliveries` | xoá khi `sent_at` cũ hơn 24 giờ |
+| Kích thước lô xoá thư | ≤ 500 thư / lần chạy |
+
+## 4. Tổ chức & tự động
 | Hằng số | Giá trị |
 |---|---|
 | Tên folder | 1–80 (trim) |
@@ -54,7 +65,7 @@
 | Auto-reply chống lặp | 24 giờ / người gửi / mailbox |
 | displayName mailbox / tên user / tên liên hệ | ≤ 100 |
 
-## 4. Spam
+## 5. Spam
 | Hằng số | Giá trị |
 |---|---|
 | Ngưỡng | suspicious ≥ 40, spam ≥ 70 |
@@ -65,7 +76,7 @@
 | Reputation tối thiểu | 3 phản hồi |
 | Văn bản phân tích tối đa | 250 000 ký tự; ≤ 50 domain URL |
 
-## 5. Tích hợp
+## 6. Tích hợp
 | Hằng số | Giá trị |
 |---|---|
 | Webhook timeout | 10 s |
@@ -77,7 +88,7 @@
 | API key scopes | `send`, `read`, `jmap`, `domains` (`*` = tất cả) |
 | DoH timeout | 5 s |
 
-## 6. Giao diện
+## 7. Giao diện
 | Hằng số | Giá trị |
 |---|---|
 | Autosave nháp | debounce 900 ms |

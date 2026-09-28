@@ -1,8 +1,10 @@
 # Mô hình dữ liệu
 
-> Thuộc nhóm: Nền tảng · Nguồn: `src/db/schema/index.ts`, `drizzle/migrations/0000…0031`.
-> Kiểu `ts` = integer Unix **giây** (drizzle `mode: "timestamp"`). `bool` = integer 0/1.
-> Cột **Nhãn** cho biết bảng thuộc nhóm chức năng nào; MVP chỉ cần các bảng CƠ BẢN.
+> **[CƠ BẢN]** · Nhóm: Nền tảng · Liên quan: [03-thuat-ngu-trang-thai.md](03-thuat-ngu-trang-thai.md), [06-quy-uoc-chung.md](06-quy-uoc-chung.md)
+>
+> Kiểu `ts` = integer Unix **giây**. `bool` = integer 0/1.
+> Nhãn của từng bảng cho biết nhóm chức năng; MVP chỉ cần các bảng CƠ BẢN.
+> Toàn bộ schema được tạo bằng **một migration SQL khởi tạo**; thay đổi về sau là các migration SQL tiếp theo.
 
 ## 1. Sơ đồ quan hệ
 
@@ -33,7 +35,7 @@ messages_fts: FTS5 external-content trên messages
 | `email` | text | NOT NULL UNIQUE | lowercase, = địa chỉ primary mailbox |
 | `reset_email` | text | null | email khôi phục bên ngoài |
 | `forwarding_email` | text | null | NÂNG CAO — chuyển tiếp toàn tài khoản |
-| `password_hash` | text | NOT NULL | bcrypt cost 12 |
+| `password_hash` | text | NOT NULL | bcrypt cost 12 (hoặc PBKDF2 — xem [06-quy-uoc-chung.md §2](06-quy-uoc-chung.md)) |
 | `name` | text | NOT NULL | |
 | `avatar_key` | text | null | R2 key (TÙY CHỌN) |
 | `role` | text | `admin`\|`user`, mặc định `user` | |
@@ -41,16 +43,17 @@ messages_fts: FTS5 external-content trên messages
 | `can_manage_mailboxes` | bool | false | |
 | `keyboard_shortcuts_enabled` | bool | true | TÙY CHỌN |
 | `spam_protection_enabled` | bool | true | NÂNG CAO |
-| `totp_secret` | text | null | NÂNG CAO |
+| `totp_secret` | text | null | NÂNG CAO — đã mã hoá (xem [06-quy-uoc-chung.md §2](06-quy-uoc-chung.md)) |
 | `totp_enabled` | bool | false | NÂNG CAO |
 | `totp_confirmed_at` | ts | null | NÂNG CAO |
+| `totp_last_counter` | int | null | NÂNG CAO — bước thời gian của mã TOTP gần nhất đã chấp nhận (chống dùng lại mã) |
 | `created_by_user_id` | text | FK users, ON DELETE SET NULL | |
 | `created_at` | ts | now | |
 
 ### 2.2 `sessions`
 | Cột | Kiểu | Ghi chú |
 |---|---|---|
-| `id` | text PK | nanoid |
+| `id` | text PK | chuỗi ngẫu nhiên 21 ký tự, không tiền tố |
 | `user_id` | FK users CASCADE | |
 | `token_hash` | text UNIQUE | SHA-256 hex của token `sess_…` |
 | `expires_at` | ts | now + 30 ngày |
@@ -63,13 +66,15 @@ messages_fts: FTS5 external-content trên messages
 | `user_id` | FK users CASCADE | chủ domain |
 | `hostname` | text | UNIQUE (`domains_hostname_idx`), lowercase |
 | `zone_id` | text NOT NULL | hoặc `"manual"` |
-| `status` | `pending`\|`active`\|`error`, mặc định `pending` | |
+| `status` | `pending`\|`active`\|`error`, mặc định `pending` | xem [03-thuat-ngu-trang-thai.md §3](03-thuat-ngu-trang-thai.md) |
 | `routing_status` | text null | chuỗi trạng thái Email Routing (vd `ready`) hoặc `"manual"` |
 | `sending_subdomain_tag` | text null | |
 | `sending_requested` | bool false | người dùng muốn gửi |
-| `sending_enabled` | bool false | subdomain đã bật (có thể lỗi thời — xem file domain) |
+| `sending_enabled` | bool false | ảnh chụp lần ghi gần nhất; khi hiển thị trạng thái DNS luôn đọc trạng thái thật trên zone (xem [01-co-ban/04-quan-ly-domain.md](../01-co-ban/04-quan-ly-domain.md)) |
 | `routing_enabled` | bool false | |
+| `routing_enabled_by_app` | bool false | hệ thống là bên bật Email Routing trên zone lúc provision; chỉ khi true mới được tắt routing khi xoá domain (xem [01-co-ban/04-quan-ly-domain.md](../01-co-ban/04-quan-ly-domain.md)); đã true thì không quay về false khi thêm lại |
 | `created_at` | ts | |
+
 Index: `domains_user_idx(user_id)`.
 
 ### 2.4 `mailboxes`
@@ -89,6 +94,7 @@ Index: `domains_user_idx(user_id)`.
 | `use_all_domains` | bool **true** | NÂNG CAO |
 | `disabled` | bool false | |
 | `created_at` | ts | |
+
 UNIQUE `mailboxes_address_idx(domain_id, local_part)`.
 
 ### 2.5 `messages`
@@ -98,7 +104,7 @@ UNIQUE `mailboxes_address_idx(domain_id, local_part)`.
 | `user_id` | FK users CASCADE NOT NULL | inbound: owner mailbox; outbound: người gửi |
 | `mailbox_id` | FK mailboxes SET NULL | **khoá phân quyền** |
 | `direction` | `inbound`\|`outbound` | |
-| `provider_message_id` | text null | Message-ID. Inbound: như postal-mime trả về (thường **có** `<>`); outbound: Message-ID Cloudflare trả về (**không** `<>`); import: header hoặc `import:<file>:<size>` |
+| `provider_message_id` | text null | Message-ID. Inbound: giá trị header `Message-ID` nguyên dạng (**có** `<>`); outbound: Message-ID Cloudflare trả về (**không** `<>`); import: header hoặc `import:<file>:<size>` |
 | `folder_id` | FK folders SET NULL | |
 | `from_addr` | text NOT NULL | `"Name" <addr>` hoặc `addr` |
 | `to_addr` | text NOT NULL | toàn bộ danh sách, nối `", "` (nháp có thể `""`) |
@@ -106,11 +112,14 @@ UNIQUE `mailboxes_address_idx(domain_id, local_part)`.
 | `subject` | text null | |
 | `snippet` | text null | ≤ 200 ký tự |
 | `text_body`, `html_body` | text null | |
+| `search_text` | text null | văn bản thuần để index tìm kiếm (text + text rút từ HTML), ứng dụng tính mỗi lần ghi body — [01-co-ban/14-tim-kiem.md §4.1](../01-co-ban/14-tim-kiem.md) |
 | `raw_r2_key` | text null | inbound/import/JMAP import; thư gửi từ composer = null |
 | `status` | text NOT NULL, `received` | xem [03-thuat-ngu-trang-thai.md](03-thuat-ngu-trang-thai.md) |
 | `read` | bool false | nháp tạo với `true` |
 | `starred` | bool false | |
 | `snoozed_until` | ts null | NÂNG CAO |
+| `sort_at` | ts null | NÂNG CAO — thời điểm sắp xếp khi thư được đánh thức sau snooze; danh sách sắp `COALESCE(sort_at, created_at) DESC` — [02-nang-cao/06-snooze.md](../02-nang-cao/06-snooze.md) |
+| `trashed_at` | ts null | thời điểm vào `trash`/`spam`, null khi rời hai trạng thái đó; dùng cho tự dọn — [01-co-ban/09-to-chuc-thu.md](../01-co-ban/09-to-chuc-thu.md) |
 | `thread_id` | text null | |
 | `in_reply_to` | text null | không `<>` |
 | `references_header` | text null | các id cách nhau bằng khoảng trắng, không `<>` |
@@ -120,7 +129,8 @@ UNIQUE `mailboxes_address_idx(domain_id, local_part)`.
 | `spam_analyzed_at` | ts null | NÂNG CAO |
 | `spam_analysis_error` | text null (≤300) | NÂNG CAO |
 | `created_at` | ts | thời điểm lưu (import: header Date) |
-Index: `(user_id, created_at)`, `(mailbox_id)`, `(folder_id)`, `(mailbox_id, thread_id)`, `(mailbox_id, provider_message_id)`, `(raw_r2_key)`.
+
+Index: `(user_id, created_at)`, `(mailbox_id)`, `(folder_id)`, `(mailbox_id, thread_id)`, `(mailbox_id, provider_message_id)`, `(mailbox_id, raw_r2_key)`, `(mailbox_id, sort_at)`, `(status, trashed_at)`.
 
 ### 2.6 `message_attachments`
 | Cột | Ghi chú |
@@ -134,7 +144,8 @@ Index: `(user_id, created_at)`, `(mailbox_id)`, `(folder_id)`, `(mailbox_id, thr
 | `content_id` null | cho ảnh inline (`cid:`) |
 | `r2_key` UNIQUE | `attachments/<messageId>/<attachmentId>/<filename>` |
 | `created_at` | |
-Index `(message_id)`. **Lưu ý**: xoá dòng message cascade xoá dòng attachment nhưng **không** xoá object R2 — phải xoá object trước.
+
+Index `(message_id)`. **Quy tắc xoá**: xoá dòng message cascade xoá dòng attachment nhưng **không** xoá object R2 — mọi thao tác xoá thư phải xoá object R2 (attachment và `raw_r2_key`) **trước**, rồi mới xoá dòng.
 
 ### 2.7 `outbound_jobs`
 | Cột | Ghi chú |
@@ -142,23 +153,23 @@ Index `(message_id)`. **Lưu ý**: xoá dòng message cascade xoá dòng attachm
 | `id` PK `job_…` | |
 | `user_id` FK users CASCADE | |
 | `message_id` FK messages SET NULL | |
-| `status` `queued`\|`sent`\|`failed` | |
+| `status` `queued`\|`sending`\|`sent`\|`failed`\|`cancelled` | `queued → sending → sent|failed`; `queued → cancelled` (huỷ hẹn giờ). `sending` = consumer đã giành quyền gửi bằng `UPDATE … WHERE status='queued'` — [02-nang-cao/05-hen-gio-gui.md](../02-nang-cao/05-hen-gio-gui.md) |
 | `payload` text JSON | input gửi đã chuẩn hoá (from, to[], cc[], bcc[], subject, html, text, headers, mailboxId, inReplyTo, references, threadId, scheduledAt, attachments **không có** content) |
 | `error` | thông báo lỗi |
 | `scheduled_at` ts null | |
 | `created_at`, `updated_at` | |
 
-### 2.8 `messages_fts` (migration 0030)
+### 2.8 `messages_fts`
 ```sql
 CREATE VIRTUAL TABLE messages_fts USING fts5(
-  subject, from_addr, to_addr, cc_addr, text_body, html_body,
+  subject, from_addr, to_addr, cc_addr, search_text,
   content='messages', content_rowid='rowid',
   tokenize='unicode61 remove_diacritics 2');
 -- trigger messages_fts_ai (AFTER INSERT), messages_fts_ad (AFTER DELETE),
--- messages_fts_au (AFTER UPDATE OF subject, from_addr, to_addr, cc_addr, text_body, html_body)
+-- messages_fts_au (AFTER UPDATE OF subject, from_addr, to_addr, cc_addr, search_text)
 INSERT INTO messages_fts(messages_fts) VALUES ('rebuild');
 ```
-Ứng dụng không bao giờ ghi FTS trực tiếp. `wrangler d1 export` không chạy với bảng ảo. Khi tách câu lệnh SQL để chạy migration phải giữ nguyên thân trigger (`BEGIN … END;`).
+SQL đầy đủ của ba trigger: [01-co-ban/14-tim-kiem.md §4.2](../01-co-ban/14-tim-kiem.md). Ứng dụng không bao giờ ghi FTS trực tiếp; trigger giữ chỉ mục đồng bộ. `wrangler d1 export` không chạy với bảng ảo (backup JSON của hệ thống không bị ảnh hưởng). Khi tách câu lệnh SQL để chạy migration phải giữ nguyên thân trigger (`BEGIN … END;`).
 
 ## 3. Bảng NÂNG CAO
 
@@ -183,10 +194,10 @@ INSERT INTO messages_fts(messages_fts) VALUES ('rebuild');
 | `id` | `rule_…` hoặc `block:<mailboxId>:<email>` |
 | `user_id` FK CASCADE | người tạo |
 | `domain_id` FK CASCADE NOT NULL | |
-| `scope` | `mailbox`\|`domain`, mặc định `mailbox` — **luôn set tường minh** |
+| `scope` | `mailbox`\|`domain`, mặc định `mailbox` — **luôn set tường minh** khi ghi |
 | `name` | null (chỉ rule domain) |
 | `enabled` | bool true |
-| `pattern` | NOT NULL — bản sao `match_value` (cột cũ) |
+| `pattern` | NOT NULL, ≤ 200 — luôn ghi cùng giá trị với `match_value`; khi so khớp dùng `match_value`, rỗng thì dùng `pattern` |
 | `match_field` | `email`\|`content`\|`title`\|`sender`\|`recipient`, mặc định `email` |
 | `match_operator` | `contains`\|`exact`\|`starts_with`\|`ends_with`\|`regex`, mặc định `contains` |
 | `match_value` | NOT NULL `""` |
@@ -199,6 +210,7 @@ INSERT INTO messages_fts(messages_fts) VALUES ('rebuild');
 | `priority` | int 0 (lớn chạy trước) |
 | `last_matched_at`, `match_count` | thống kê rule domain |
 | `created_at` | tie-break: cũ chạy trước |
+
 Index: `(domain_id, scope, enabled)`, `(mailbox_id)`, `(priority)`.
 
 ### 3.7 `webhooks`
@@ -208,7 +220,7 @@ Index: `(domain_id, scope, enabled)`, `(mailbox_id)`, `(priority)`.
 `id` `whd_…` · `webhook_id` FK CASCADE · `event_type` · `payload` (body JSON đã gửi) · `status` `pending|delivered|failed|retrying|exhausted` · `attempts` · `response_status` · `error` (≤500) · `duration_ms` · `last_attempt_at` · `next_retry_at` · `created_at`. Index `(webhook_id, created_at)`, `(status)`.
 
 ### 3.9 `api_keys`
-`id` `key_…` · `user_id` FK CASCADE · `name` · `prefix` (12 ký tự đầu, index — migration 0021) · `key_hash` (bcrypt 10) · `scopes` JSON · `created_at` · `last_used_at`.
+`id` `key_…` · `user_id` FK CASCADE · `name` · `prefix` (12 ký tự đầu của key, có index — dùng để tra cứu và hiển thị) · `key_hash` (SHA-256 hex của toàn bộ key) · `scopes` JSON · `expires_at` (ts null = không hết hạn) · `created_at` · `last_used_at`.
 
 ### 3.10 `password_reset_tokens`, `mfa_recovery_codes`, `login_challenges`
 | Bảng | Cột |
@@ -218,7 +230,7 @@ Index: `(domain_id, scope, enabled)`, `(mailbox_id)`, `(priority)`.
 | `login_challenges` | `id`, `user_id` FK CASCADE, `token_hash` UNIQUE, `expires_at`, `created_at` |
 
 ### 3.11 `audit_logs`
-`id` `aud_…` · `actor_user_id`, `target_user_id` FK users SET NULL · `mailbox_id` FK SET NULL · `message_id` FK SET NULL · `action` · `metadata` JSON · `created_at`. Index actor, mailbox, created_at.
+`id` `aud_…` · `actor_user_id`, `target_user_id` FK users SET NULL · `mailbox_id` FK SET NULL · `message_id` FK SET NULL · `action` · `metadata` JSON · `created_at`. Index: `(created_at, id)`, `(actor_user_id, created_at)`, `(target_user_id, created_at)`, `(mailbox_id, created_at)`, `(action, created_at)`.
 
 ### 3.12 Bộ lọc spam
 | Bảng | Khoá | Cột |
@@ -229,28 +241,23 @@ Index: `(domain_id, scope, enabled)`, `(mailbox_id)`, `(priority)`.
 
 ## 4. Bảng TÙY CHỌN
 
-| Bảng | Cột chính |
-|---|---|
-| `backup_settings` (1 dòng, id `default`, seed bởi migration 0009) | `enabled`, `schedule_type` `daily|weekly|monthly`, `schedule_value`, `retention_enabled`, `retention_days` (30), `updated_at` |
-| `backups` | `id` `bak_…`, `status` `queued|running|completed|failed`, `trigger` `manual|scheduled`, `r2_key`, `filename`, `size`, `error`, `created_by_user_id`, `created_at`, `started_at`, `completed_at` |
-| `app_settings` (1 dòng) | `app_name` ("Mailflare"), `icon_key`, `updated_at` |
-| `license_settings` (id `default`) | `instance_id` UNIQUE (UUID), `instance_url`, `license_key_hash`, `plan` `community|pro|team`, `state`, `features` JSON, `activated_at`, `validated_at`, `updated_at` |
-| `calendar_events` | `user_id`, `mailbox_id`, `title`, `description`, `location`, `attendees` JSON, `starts_at`, `ends_at`, timestamps |
-| `email_templates` | `user_id`, `name`, `subject`, `text_body` — **chưa được dùng** |
+| Bảng | Nhãn | Cột chính |
+|---|---|---|
+| `backup_settings` (1 dòng, id `default`, seed bởi migration khởi tạo) | [TÙY CHỌN] | `enabled`, `schedule_type` `daily|weekly|monthly`, `schedule_value`, `retention_enabled`, `retention_days` (30), `updated_at` |
+| `backups` | [TÙY CHỌN] | `id` `bak_…`, `status` `queued|running|completed|failed`, `trigger` `manual|scheduled`, `r2_key`, `filename`, `size`, `error`, `created_by_user_id`, `created_at`, `started_at`, `completed_at` |
+| `app_settings` (1 dòng) | [TÙY CHỌN] | `app_name` (mặc định = cấu hình `APP_NAME`), `icon_key`, `updated_at` |
+| `license_settings` (id `default`) | [TÙY CHỌN] — chỉ khi dùng tích hợp máy chủ license | `instance_id` UNIQUE (UUID), `instance_url`, `license_key_hash` (SHA-256 hex), `plan` `community|pro|team`, `state`, `features` JSON, `activated_at`, `validated_at`, `updated_at` |
+| `calendar_events` | [TÙY CHỌN] | `id` `evt_…`, `user_id`, `mailbox_id`, `title`, `description`, `location`, `attendees` JSON, `starts_at`, `ends_at`, timestamps |
+| `email_templates` | [TÙY CHỌN] | `user_id`, `name`, `subject`, `text_body` — xem [03-tuy-chon/06-lich-va-mau-thu.md](../03-tuy-chon/06-lich-va-mau-thu.md) |
 
 ## 5. Bố trí khoá R2
 
 | Tiền tố | Nội dung | Tạo bởi |
 |---|---|---|
-| `inbound/<Date.now()>-<nanoid>.eml` | MIME gốc thư đến (`contentType message/rfc822`, `customMetadata {from,to}`) | email handler |
+| `inbound/<Date.now()>-<id ngẫu nhiên>.eml` | MIME gốc thư đến (`contentType message/rfc822`, `customMetadata {from,to}`) | email handler |
 | `attachments/<messageId>/<attId>/<filename>` | File đính kèm (`customMetadata {filename, messageId}`) | nhận, gửi, forward, import |
 | `imports/<messageId>.eml` | MIME gốc thư import | import |
 | `drafts/<messageId>.eml` | MIME do JMAP client upload | JMAP `Email/import` |
-| `jmap-uploads/…` | Blob tạm của JMAP | JMAP upload |
-| `backups/database/<backupId>/mailflare-<ISO>.json` | Backup JSON | backup runner |
+| `jmap-uploads/…` | Blob tạm của JMAP (xoá khi được claim, hoặc bởi cron sau 24 giờ) | JMAP upload |
+| `backups/database/<backupId>/app-<ISO>.json` | Backup JSON (`format: "app-database-backup"`) | backup runner |
 | avatar key, `<key>:preview` | Ảnh WebP | avatar |
-
-## 6. Lịch sử migration (tham khảo khi thiết kế lại schema)
-`0000` lõi · `0001` reset_email · `0002` read · `0003` contacts · `0004` accounts · `0005` folders · `0006` rule conditions · `0007` shared mailboxes · `0008` attachments · `0009` backups · `0011` folder colors · `0012` app_settings · `0013` license · `0014` account permissions · `0015` forwarding · `0016` snooze · `0017` star · `0018` mailbox domain aliases (useAllDomains) · `0019` gộp bảng body vào messages · `0020` calendar/templates/schedule · `0021` api key prefix index, signature · `0022` auto-reply · `0023` aliases · `0024` routing nâng cao + webhook retry · `0025` threading + cc/bcc · `0026` contact avatars · `0027` sending intent · `0028` shortcuts · `0029` spam · `0030` FTS · `0031` password reset + MFA.
-
-Khi viết lại từ đầu, có thể gộp tất cả thành **một migration khởi tạo** duy nhất.
