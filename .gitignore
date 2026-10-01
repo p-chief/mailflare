@@ -59,6 +59,6 @@ yarn.lock
 wrangler.prod.jsonc
 mailflare-landing
 
-.agents
+#.agents
 skills-lock.json
 /dist/
