@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { assertAdmin } from "@/lib/auth/admin";
+import { assertPrimaryAdmin } from "@/lib/auth/admin";
 import { requireUser } from "@/lib/auth/cookies";
 import type { LicenseKeyRequest } from "./types";
 
@@ -11,7 +11,7 @@ const licenseKeySchema = z.object({
 
 export async function requireLicenseAdmin(env: CloudflareEnv, request: Request): Promise<NextResponse | null> {
 	try {
-		assertAdmin(await requireUser(env, request));
+		assertPrimaryAdmin(await requireUser(env, request));
 		return null;
 	} catch {
 		return NextResponse.json({ error: "Forbidden" }, { status: 403 });

@@ -21,8 +21,7 @@ export async function createSession(env: CloudflareEnv, userId: string): Promise
 	const db = getDb(env);
 	const token = generateSessionToken();
 	const tokenHash = await hashSessionToken(token);
-	const expiresAt = new Date();
-	expiresAt.setDate(expiresAt.getDate() + SESSION_DAYS);
+	const expiresAt = new Date(Date.now() + SESSION_DAYS * 86_400_000);
 
 	await db.insert(sessions).values({
 		id: newId(),

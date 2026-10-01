@@ -119,12 +119,41 @@ export async function saveManagedAccount(account: ManagedAccount): Promise<void>
 			role: account.role,
 			disabled: account.disabled,
 			canManageMailboxes: account.canManageMailboxes,
+			canManageDomains: account.canManageDomains,
+			canManageUsers: account.canManageUsers,
 			forwardingEmail: account.forwardingEmail,
 			password: account.newPassword || undefined,
 		}),
 	});
 	const data = (await response.json()) as { error?: string };
 	if (!response.ok) throw new Error(data.error ?? "Unable to update account");
+}
+
+export type TransferCandidate = {
+	id: string;
+	email: string;
+	name: string;
+	hasAvatar: boolean;
+	disabled: boolean;
+};
+
+export async function fetchTransferCandidates(): Promise<TransferCandidate[]> {
+	const response = await authFetch("/api/accounts");
+	const data = (await response.json()) as { accounts?: Array<{ id: string; email: string; name: string; hasAvatar?: boolean; disabled?: boolean }>; error?: string };
+	if (!response.ok) throw new Error(data.error ?? "Unable to load accounts");
+	return (data.accounts ?? []).map((account) => ({
+		id: account.id,
+		email: account.email,
+		name: account.name,
+		hasAvatar: !!account.hasAvatar,
+		disabled: !!account.disabled,
+	}));
+}
+
+export async function transferPrimaryAdmin(accountId: string): Promise<void> {
+	const response = await authFetch(`/api/accounts/${accountId}/transfer-primary`, { method: "POST" });
+	const data = (await response.json()) as { error?: string };
+	if (!response.ok) throw new Error(data.error ?? "Unable to transfer the primary admin role");
 }
 
 export async function uploadManagedAccountAvatar(accountId: string, file: File): Promise<void> {

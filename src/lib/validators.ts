@@ -123,9 +123,11 @@ export const updateManagedAccountSchema = z.object({
 	role: z.enum(["admin", "user"]),
 	disabled: z.boolean(),
 	canManageMailboxes: z.boolean(),
+	canManageDomains: z.boolean().optional(),
+	canManageUsers: z.boolean().optional(),
 	forwardingEmail: z.preprocess(
 		(value) => (typeof value === "string" ? value.trim() : value),
-		z.string().email().or(z.literal("")).optional().transform((value) => value === undefined ? undefined : value || null),
+		z.string().email().or(z.literal("")).nullable().optional().transform((value) => value === undefined ? undefined : value || null),
 	),
 	/** Set a new password for the account; every session of that user is revoked. */
 	password: z.preprocess(
@@ -145,11 +147,20 @@ export const createAccountSchema = z.object({
 	),
 });
 
+export const createMailboxAliasSchema = z.object({
+	domainId: z.string().min(1),
+	localPart: z.string().trim().min(1).max(64).regex(/^[a-zA-Z0-9._%+-]+$/)
+		.transform((value) => value.toLowerCase()),
+});
+
 export const createUserAccountSchema = z.object({
 	username: z.string().trim().min(1).max(64).regex(/^[a-zA-Z0-9._%+-]+$/),
 	domainId: z.string().min(1),
 	password: z.string().min(8).max(128),
 	role: z.enum(["admin", "user"]).default("user"),
+	// Existing API/MCP clients retain the previous behavior when this is omitted.
+	useAllDomains: z.boolean().default(true),
+	aliases: z.array(createMailboxAliasSchema).default([]),
 });
 
 export const updateAccountSchema = z.object({
@@ -185,17 +196,6 @@ export const updateMailboxSchema = z.object({
 	autoReplySubject: z.string().trim().max(200).optional(),
 	autoReplyBody: z.string().max(10_000).optional(),
 	useAllDomains: z.boolean().optional(),
-});
-
-export const createMailboxAliasSchema = z.object({
-	domainId: z.string().min(1),
-	localPart: z
-		.string()
-		.trim()
-		.min(1)
-		.max(64)
-		.regex(/^[a-zA-Z0-9._%+-]+$/)
-		.transform((value) => value.toLowerCase()),
 });
 
 export const folderSchema = z.object({

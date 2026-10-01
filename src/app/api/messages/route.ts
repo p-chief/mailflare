@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { eq, desc, and, or, count, countDistinct, isNull, isNotNull, inArray, lte, gt, max, notInArray, sql, sum } from "drizzle-orm";
+import { eq, desc, and, or, count, isNull, isNotNull, inArray, lte, gt, notInArray, sql, sum } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import { getEnv } from "@/lib/cloudflare";
 import { getCurrentUser } from "@/lib/auth/cookies";
@@ -7,10 +7,12 @@ import { getDb } from "@/db";
 import { messages } from "@/db/schema";
 import { getContactDisplayNameMap } from "@/lib/contacts/service";
 import { getFirstEmailAddressEntry, normalizeEmailAddress } from "@/lib/email/address";
-import { buildSnippet } from "@/lib/email/parse";
 import { getMailboxAccessLevel, listAccessibleMailboxes } from "@/lib/mailboxes/access";
 import { tracksAccountIdentity } from "@/lib/profile/identity-utils";
 import { buildSearchConditions } from "@/lib/search/conditions";
+import { getRequestTimeZone } from "@/lib/time/utils";
+import { getMessageListColumns, loadConversationPage } from "./utils";
+import type { ListMessage } from "./types";
 
 export async function GET(request: Request) {
 	const env = getEnv();
@@ -80,46 +82,28 @@ export async function GET(request: Request) {
 	if (query || title) {
 		// Operators (from:, has:attachment, before:) and free text go through the
 		// full-text index; `title` is the legacy subject filter and is folded in.
-		conditions.push(...buildSearchConditions(title ? `${query ?? ""} subject:"${title}"` : query ?? ""));
+		conditions.push(...buildSearchConditions(title ? `${query ?? ""} subject:"${title}"` : query ?? "", getRequestTimeZone(request, user.timeZone)));
 	}
 	const where = and(...conditions);
 	// Messages that were never threaded (older rows, drafts) stand alone.
 	const threadKey = sql<string>`coalesce(${messages.threadId}, ${messages.id})`;
 
+	// The list renders `snippet`. Bodies stay on the thread endpoint.
+	const messageListColumns = getMessageListColumns();
+
 	let total = 0;
-	let rows: (typeof messages.$inferSelect)[];
+	let rows: ListMessage[];
 	// Which stored messages each visible row stands for, so acting on a
 	// conversation row acts on the whole conversation within this folder.
 	const threadMessageIds = new Map<string, string[]>();
 	if (groupByThread) {
-		const [totalRow] = await db.select({ total: countDistinct(threadKey) }).from(messages).where(where);
-		total = totalRow?.total ?? 0;
-		const latestPerThread = db
-			.select({ tid: threadKey.as("tid"), latest: max(messages.createdAt).as("latest") })
-			.from(messages)
-			.where(where)
-			.groupBy(threadKey)
-			.as("latest_per_thread");
-		const joined = await db
-			.select({ message: messages })
-			.from(messages)
-			.innerJoin(
-				latestPerThread,
-				and(eq(threadKey, latestPerThread.tid), eq(messages.createdAt, latestPerThread.latest)),
-			)
-			.where(where)
-			.orderBy(desc(messages.createdAt))
-			.limit(limit)
-			.offset(offset);
-		// Two messages in one thread can share a timestamp to the second; keep one row.
-		const seen = new Set<string>();
-		rows = [];
-		for (const { message } of joined) {
-			const key = message.threadId ?? message.id;
-			if (seen.has(key)) continue;
-			seen.add(key);
-			rows.push(message);
-		}
+		const page = await loadConversationPage({ db, where, offset, limit });
+		total = page.total;
+		rows = page.ids.length
+			? await db.select(messageListColumns).from(messages).where(and(where, inArray(messages.id, page.ids)))
+			: [];
+		const rowById = new Map(rows.map((row) => [row.id, row]));
+		rows = page.ids.map((id) => rowById.get(id)).filter((row): row is ListMessage => !!row);
 		const keys = rows.map((row) => row.threadId ?? row.id);
 		if (keys.length > 0) {
 			const members = await db
@@ -136,7 +120,7 @@ export async function GET(request: Request) {
 		const [totalRow] = await db.select({ total: count() }).from(messages).where(where);
 		total = totalRow?.total ?? 0;
 		rows = await db
-			.select()
+			.select(messageListColumns)
 			.from(messages)
 			.where(where)
 			.orderBy(desc(messages.createdAt))
@@ -188,12 +172,15 @@ export async function GET(request: Request) {
 			] as const),
 		),
 	);
+	// `Message.textBody`/`htmlBody` are optional on the wire type and the
+	// reading pane loads them from /api/messages/[id]/thread, so they are
+	// neither selected nor sent here.
 	const enrichedRows = rows.map(({ rawR2Key: _rawR2Key, ...message }) => {
 		const contactMap = contactMapsByUserId.get(message.userId);
 		const accountName = message.mailboxId ? mailboxNameMap.get(message.mailboxId) : null;
 		return {
 			...message,
-			snippet: buildSnippet(message.textBody, message.htmlBody) || message.snippet,
+			snippet: message.snippet,
 			fromContactName:
 				(message.direction === "outbound" ? accountName : null) ??
 				contactMap?.get(normalizeEmailAddress(message.fromAddr)) ??

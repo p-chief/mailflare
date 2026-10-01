@@ -1,4 +1,5 @@
 import { authFetch } from "@/lib/auth/client";
+import { formatUserDate } from "@/lib/time/utils";
 import type { AuthenticationSummary, MessageSourceSummary } from "./message-source-types";
 
 export async function fetchMessageSource(messageId: string, signal: AbortSignal): Promise<string> {
@@ -84,7 +85,7 @@ export function summarizeMessageSource(source: string): MessageSourceSummary {
 	const duration = validDate ? deliveryDuration(headers, validDate) : null;
 	return {
 		messageId: firstHeader(headers, "message-id"),
-		createdAt: validDate ? `${validDate.toLocaleString(undefined, { weekday: "short", month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" })}${duration ? ` (${duration})` : ""}` : date,
+		createdAt: validDate ? `${formatUserDate(validDate, { weekday: "short", month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" })}${duration ? ` (${duration})` : ""}` : date,
 		from: firstHeader(headers, "from"),
 		to: firstHeader(headers, "to"),
 		subject: firstHeader(headers, "subject"),

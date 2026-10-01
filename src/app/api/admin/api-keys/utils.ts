@@ -5,6 +5,7 @@ import { getEnv } from "@/lib/cloudflare";
 import { getDb } from "@/db";
 import { agentSendApprovals, apiKeys } from "@/db/schema";
 import { requireSessionUser } from "@/lib/api/auth";
+import { isPrimaryAdmin } from "@/lib/auth/admin";
 import { generateApiKey, parseScopes, scopesToJson } from "@/lib/api-keys";
 import { ADMIN_API_KEY_SCOPES } from "@/lib/api/scopes";
 import { newId } from "@/lib/ids";
@@ -21,7 +22,7 @@ async function authorize(request: Request) {
 	const env = getEnv();
 	const session = await requireSessionUser(env, request);
 	if (session.error) return { env, user: null, error: session.error };
-	if (session.user.role !== "admin") return { env, user: null, error: NextResponse.json({ error: "Forbidden" }, { status: 403 }) };
+	if (!isPrimaryAdmin(session.user)) return { env, user: null, error: NextResponse.json({ error: "Forbidden" }, { status: 403 }) };
 	return { env, user: session.user, error: null };
 }
 

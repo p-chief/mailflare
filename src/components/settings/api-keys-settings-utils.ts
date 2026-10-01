@@ -7,11 +7,15 @@ export const MCP_KEY_SCOPES: { value: McpKeyScope; label: string; description: s
 	{ value: "mcp:draft", label: "Manage drafts", description: "Create, edit, and discard drafts." },
 	{ value: "mcp:organize", label: "Organize mail", description: "Mark messages read and move them." },
 	{ value: "mcp:request-send", label: "Request send review", description: "Propose a send that you must confirm in Mailflare." },
+	{ value: "mcp:calendar-read", label: "Read calendar", description: "List, search, and inspect events and free time." },
+	{ value: "mcp:calendar-write", label: "Manage calendar", description: "Create, update, and delete events." },
 ];
 
 export const STANDARD_KEY_SCOPES: { value: ApiKeyScope; label: string; description: string }[] = [
 	{ value: "read", label: "Read mail", description: "Read messages through the API." },
 	{ value: "send", label: "Send mail", description: "Send messages directly through the API." },
+	{ value: "calendar:read", label: "Read calendar", description: "Read your calendar events through the API." },
+	{ value: "calendar:write", label: "Manage calendar", description: "Create, update, and delete your calendar events through the API." },
 ];
 
 async function responseData(response: Response): Promise<{ error?: unknown; key?: string; apiKeys?: ManagedApiKey[] }> {

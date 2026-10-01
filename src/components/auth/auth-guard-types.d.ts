@@ -7,4 +7,5 @@ export type AuthGuardProps = {
 	mode?: AuthGuardMode;
 	requireMailbox?: boolean;
 	requireRole?: "admin";
+	requirePrimary?: boolean;
 };

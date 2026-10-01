@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Tooltip } from "@/components/ui/tooltip";
 import type { MessageListRowActionsProps } from "./types";
 import { getSnoozePresets, isMessageSnoozed, snoozeMessage, unsnoozeMessage } from "./message-list-row-actions-utils";
+import { getUserTimeZone } from "@/lib/time/utils";
 
 export function MessageListRowActions({ message, onAction }: MessageListRowActionsProps) {
 	const [snoozeOpen, setSnoozeOpen] = useState(false);
@@ -77,7 +78,7 @@ export function MessageListRowActions({ message, onAction }: MessageListRowActio
 							))}
 						</div>
 						<div className="space-y-2">
-							<label htmlFor={`snooze-until-${message.id}`} className="text-sm font-medium text-neutral-700">Select date and time</label>
+							<label htmlFor={`snooze-until-${message.id}`} className="text-sm font-medium text-neutral-700">Select date and time ({getUserTimeZone()})</label>
 							<Input id={`snooze-until-${message.id}`} type="datetime-local" value={snoozedUntil} onChange={(event) => setSnoozedUntil(event.target.value)} />
 						</div>
 						{error && <p className="text-sm text-red-600">{error}</p>}

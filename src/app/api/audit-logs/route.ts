@@ -3,7 +3,7 @@ import { alias } from "drizzle-orm/sqlite-core";
 import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { auditLogs, domains, mailboxes, users } from "@/db/schema";
-import { assertAdmin } from "@/lib/auth/admin";
+import { assertPrimaryAdmin } from "@/lib/auth/admin";
 import { requireUser } from "@/lib/auth/cookies";
 import { getEnv } from "@/lib/cloudflare";
 
@@ -11,7 +11,7 @@ export async function GET(request: Request) {
 	const env = getEnv();
 	const admin = await requireUser(env, request);
 	try {
-		assertAdmin(admin);
+		assertPrimaryAdmin(admin);
 	} catch {
 		return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 	}

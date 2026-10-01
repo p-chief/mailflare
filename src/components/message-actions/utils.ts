@@ -2,7 +2,7 @@ import type { BulkMessageAction } from "@/app/api/messages/bulk/types";
 import { authFetch } from "@/lib/auth/client";
 import { getEmailAddress, normalizeEmailAddress, splitEmailAddressList } from "@/lib/email/address";
 import { getLatestEmailContent } from "@/lib/email/reply-content-utils";
-import dayjs from "dayjs";
+import { formatUserDate } from "@/lib/time/utils";
 import { sanitizeEmailHtml } from "@/app/(dashboard)/inbox/[messageId]/email-html-sanitizer";
 import { escapeHtml, htmlToPlainText, textToHtml, wrapQuotedHtml } from "@/components/compose/rich-text-utils";
 import type {
@@ -161,7 +161,7 @@ export function buildReplyQuoteHtml(
 ) {
   const original = bodyHtml ? sanitizeEmailHtml(bodyHtml) : textToHtml(bodyText);
   if (!original) return null;
-  const when = sentAt ? dayjs(sentAt).format("ddd, MMM D, YYYY [at] h:mm A") : "an earlier date";
+  const when = sentAt ? formatUserDate(sentAt, { weekday: "short", month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }) : "an earlier date";
   return wrapQuotedHtml(
     `<div style="margin-top:1.4em">On ${escapeHtml(when)}, ${escapeHtml(senderAddress)} wrote:</div><blockquote style="${QUOTE_STYLE}">${original}</blockquote>`,
   );
@@ -236,7 +236,7 @@ export function buildForwardHtml(
 ) {
   const lines = [
     `From: ${message.fromAddr}`,
-    `Date: ${dayjs(message.createdAt).format("ddd, MMM D, YYYY [at] h:mm A")}`,
+    `Date: ${formatUserDate(message.createdAt, { weekday: "short", month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" })}`,
     `Subject: ${message.subject ?? "(no subject)"}`,
     `To: ${message.toAddr}`,
   ];

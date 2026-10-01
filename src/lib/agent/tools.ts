@@ -128,7 +128,7 @@ export async function runEmailTool(context: AgentToolContext, name: EmailToolNam
 		else if (folder === "inbox") conditions.push(eq(messages.status, "received"), isNull(messages.folderId));
 		else if (folder === "archived" || folder === "trash" || folder === "spam") conditions.push(eq(messages.status, folder));
 		else conditions.push(or(eq(messages.userId, context.user.id), eq(messages.direction, "inbound"))!);
-		if (name === "search_emails") conditions.push(...buildSearchConditions(input.query as string));
+		if (name === "search_emails") conditions.push(...buildSearchConditions(input.query as string, context.timeZone));
 		if (input.cursor) {
 			const cursor = await ownMessage(context, input.cursor as string);
 			conditions.push(lt(messages.createdAt, cursor.createdAt));

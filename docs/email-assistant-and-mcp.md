@@ -10,4 +10,6 @@ To connect an external AI client, create a key in **Settings → API keys** and 
 
 MCP clients can use `update_draft` for the same draft fields and attachments, then `request_send` to create a human review for immediate or scheduled delivery. Attachment additions copy an existing file from an email in the key's permitted mailbox; local files are added through the composer.
 
+Calendar access uses separate **Read calendar** and **Manage calendar** MCP permissions. The personal calendar exposes `get_calendars`, `get_schedule`, `search_events`, `get_event`, `find_free_time`, `create_event`, `update_events`, and `delete_events`. Calendar-only keys need no mailbox selection. Calendar writes save immediately. Event updates and deletes use series IDs and affect the entire recurring series; these tools record attendees but do not send invitations or cancellations. Supply absolute ISO 8601 times with offsets. Schedule and availability ranges are limited to 90 days.
+
 For management tools, create a separate MCP key in **Admin → API keys**. Its selected domain, account, and mailbox management permissions do not grant access to mail content. This page also provides copyable AI agent instructions after key creation.

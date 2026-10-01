@@ -1,5 +1,7 @@
 "use client";
 
+import { getUserTimeZone } from "@/lib/time/utils";
+import { clearUserTimeZonePreference } from "@/lib/time/client";
 import type {
 	AuthFetchOptions,
 	AuthSessionChangedDetail,
@@ -26,16 +28,21 @@ export function getClientSessionToken(): string | null {
 export function setClientSessionToken(token: string): void {
 	const previousToken = localStorage.getItem(SESSION_STORAGE_KEY);
 	localStorage.setItem(SESSION_STORAGE_KEY, token);
+	if (previousToken !== token) clearUserTimeZonePreference();
 	if (previousToken !== token) dispatchAuthSessionChanged(true);
 }
 
 export function clearClientSessionToken(): void {
 	localStorage.removeItem(SESSION_STORAGE_KEY);
+	clearUserTimeZonePreference();
 	dispatchAuthSessionChanged(false);
 }
 
 export function getAuthHeaders(headers?: HeadersInit): Headers {
 	const nextHeaders = new Headers(headers);
+	if (typeof window !== "undefined" && !nextHeaders.has("X-Time-Zone")) {
+		nextHeaders.set("X-Time-Zone", getUserTimeZone());
+	}
 	const token = getClientSessionToken();
 	if (token && !nextHeaders.has("Authorization")) {
 		nextHeaders.set("Authorization", `Bearer ${token}`);

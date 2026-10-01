@@ -15,13 +15,23 @@ import {
   Bot,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useCurrentUser } from "@/hooks/use-current-user";
 import { NavItem } from "./components-nav";
 import { SidebarFooter } from "./sidebar-footer";
 import { useBranding } from "./branding-provider";
 import { SidebarHeader } from "./sidebar-header";
 import { useSidebar } from "./sidebar-state";
 
-const sections = [
+type AdminLinkPermission = "primary" | "domains" | "users";
+
+type AdminNavLink = {
+  href: string;
+  label: string;
+  icon: typeof Settings;
+  permission?: AdminLinkPermission;
+};
+
+const sections: { label?: string; links: AdminNavLink[] }[] = [
   {
     // label: "Overview",
     links: [{ href: "/admin", label: "Overview", icon: Settings }],
@@ -30,27 +40,27 @@ const sections = [
     label: "Email",
     links: [
       { href: "/mailboxes", label: "Mailboxes", icon: Mail },
-      { href: "/domains", label: "Domains", icon: Globe2 },
+      { href: "/domains", label: "Domains", icon: Globe2, permission: "domains" },
       { href: "/routing", label: "Routing", icon: Route },
-      { href: "/webhooks", label: "Webhooks", icon: Webhook },
+      { href: "/webhooks", label: "Webhooks", icon: Webhook, permission: "primary" },
     ],
   },
   {
     label: "Administration",
     links: [
-      { href: "/api-keys", label: "API keys", icon: KeyRound },
-      { href: "/general", label: "General", icon: Settings },
-      { href: "/agent", label: "Agent", icon: Bot },
+      { href: "/api-keys", label: "API keys", icon: KeyRound, permission: "primary" },
+      { href: "/general", label: "General", icon: Settings, permission: "primary" },
+      { href: "/agent", label: "Agent", icon: Bot, permission: "primary" },
       { href: "/accounts", label: "Accounts", icon: Users },
-      { href: "/activity", label: "Activity", icon: Activity },
-      { href: "/backups", label: "Backups", icon: DatabaseBackup },
+      { href: "/activity", label: "Activity", icon: Activity, permission: "primary" },
+      { href: "/backups", label: "Backups", icon: DatabaseBackup, permission: "primary" },
     ],
   },
   {
     label: "Product",
     links: [
-      { href: "/branding", label: "Branding", icon: Palette },
-      { href: "/licenses", label: "Licenses", icon: BadgeDollarSign },
+      { href: "/branding", label: "Branding", icon: Palette, permission: "primary" },
+      { href: "/licenses", label: "Licenses", icon: BadgeDollarSign, permission: "primary" },
     ],
   },
 ];
@@ -58,16 +68,23 @@ const sections = [
 export function AdminNav({ className }: { className?: string }) {
   const branding = useBranding();
   const { minimal } = useSidebar();
+  const user = useCurrentUser();
+
+  function canSee(link: AdminNavLink): boolean {
+    if (link.href === "/branding" && !branding.canCustomizeBranding) return false;
+    if (!link.permission) return true;
+    if (!user) return false;
+    if (link.permission === "primary") return user.isPrimaryAdmin;
+    if (link.permission === "domains") return user.isPrimaryAdmin || user.canManageDomains;
+    return user.isPrimaryAdmin || user.canManageUsers;
+  }
 
   return (
     <nav className={cn("flex min-h-full flex-col gap-1", className)}>
       <SidebarHeader href="/inbox" label="Admin" />
       <div className={cn("space-y-4", minimal && "space-y-2 pl-1")}>
         {sections.map((section, sectionIndex) => {
-          const links = section.links.filter(
-            (link) =>
-              link.href !== "/branding" || branding.canCustomizeBranding,
-          );
+          const links = section.links.filter(canSee);
           if (links.length === 0) return null;
 
           return (

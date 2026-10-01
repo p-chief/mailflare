@@ -56,6 +56,32 @@ Getting started takes three steps:
 - All accounts - Email Sending:Edit, DNS Settings:Edit, Email Routing Addresses:Edit
 - All zones - DNS Settings:Edit, Email Routing Rules:Edit, Zone Settings:Edit, DNS:Edit
 
+### Deploy with an AI coding agent
+
+You can paste the prompt below into an agent that has terminal access. Give it the Cloudflare account ID and **two separate scoped API tokens** through the agent's secret input, not in a public chat, repository, or committed file:
+
+- **Deployment token** (used locally by Wrangler as `CLOUDFLARE_API_TOKEN`): scope it to the target account with **Workers Scripts Edit** (or **Workers Admin** if Cloudflare's newer granular roles are shown, since this is a new Worker), **D1 Edit**, **Workers R2 Storage Edit**, **Queues Edit**, and **Account Settings Read**. Add **Workers Routes Edit** for the target zone only if you want the agent to attach a custom domain or route. See Cloudflare's [token permissions](https://developers.cloudflare.com/fundamentals/api/reference/permissions/) and [Workers roles](https://developers.cloudflare.com/workers/authorization/workers/).
+- **Runtime token** (stored as the Worker's `CF_TOKEN` secret): use the domain permissions listed above. Add **Email Sending Edit** if you want to send mail. This token is separate from the deployment token and must cover the zones you will connect in Mailflare.
+
+```text
+Install Mailflare from https://github.com/hieunc229/mailflare in my Cloudflare account.
+Ask me for my Cloudflare account ID, a scoped deployment API token, and a separate
+runtime CF_TOKEN through a secret input. Never print, commit, or place either token
+in a command argument or a tracked file. Use the deployment token only for Wrangler
+authentication (CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID).
+
+Read README.md, docs/deployment.md, and wrangler.jsonc first. Keep the Worker name
+exactly mailflare. In the selected account, create or reuse the D1 database
+mailflare, R2 bucket mailflare-raw, and Queues mailflare-inbound,
+mailflare-outbound, and mailflare-agent. Set the D1 database_id in the local
+Wrangler config without committing that account-specific ID. Install dependencies,
+run npm run deploy, and set the runtime CF_TOKEN as a Worker secret. Do not run
+remote D1 migrations manually; the /setup flow initializes the database.
+
+Give me the deployed URL and any remaining Cloudflare account actions. I will
+open /setup, create the first admin account, and connect my domain there.
+```
+
 See the [deployment guide](docs/deployment.md) for required permissions, manual deployment, backups, and updates.
 
 ### Self-host with Docker instead

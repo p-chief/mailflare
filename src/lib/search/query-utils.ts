@@ -1,4 +1,5 @@
 import type { ParsedSearchQuery, SearchToken } from "./types";
+import { dateFromZonedFields, normalizeTimeZone } from "@/lib/time/utils";
 
 /**
  * Gmail-style search grammar shared by the search box and the API:
@@ -10,7 +11,7 @@ import type { ParsedSearchQuery, SearchToken } from "./types";
  */
 const OPERATOR_RE = /(?:^|\s)(from|to|subject|title|has|is|after|before|newer|older):(?:"([^"]*)"|(\S+))/gi;
 
-export function parseSearchQuery(raw: string): ParsedSearchQuery {
+export function parseSearchQuery(raw: string, timeZone = "UTC"): ParsedSearchQuery {
 	const parsed: ParsedSearchQuery = { text: "", needsFullText: false };
 	let rest = raw ?? "";
 
@@ -37,11 +38,11 @@ export function parseSearchQuery(raw: string): ParsedSearchQuery {
 				break;
 			case "after":
 			case "newer":
-				parsed.after = parseDate(value) ?? parsed.after;
+				parsed.after = parseDate(value, timeZone) ?? parsed.after;
 				break;
 			case "before":
 			case "older":
-				parsed.before = parseDate(value) ?? parsed.before;
+				parsed.before = parseDate(value, timeZone) ?? parsed.before;
 				break;
 		}
 		return " ";
@@ -60,11 +61,13 @@ export function parseSearchQuery(raw: string): ParsedSearchQuery {
 	return parsed;
 }
 
-function parseDate(value: string): Date | undefined {
+function parseDate(value: string, timeZone: string): Date | undefined {
 	const match = value.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
 	if (!match) return undefined;
-	const date = new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])));
-	return Number.isNaN(date.getTime()) ? undefined : date;
+	const date = new Date(0);
+	date.setUTCFullYear(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+	if (date.getUTCFullYear() !== Number(match[1]) || date.getUTCMonth() !== Number(match[2]) - 1 || date.getUTCDate() !== Number(match[3])) return undefined;
+	return dateFromZonedFields(date, normalizeTimeZone(timeZone));
 }
 
 /** Split free text into phrases ("..."), negations (-word) and plain terms. */

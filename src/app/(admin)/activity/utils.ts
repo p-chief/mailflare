@@ -1,4 +1,5 @@
 import { authFetch } from "@/lib/auth/client";
+import { formatUserDate } from "@/lib/time/utils";
 import type { ActivityLog, ActivityMetadata } from "./types";
 
 export async function fetchActivity(): Promise<ActivityLog[]> {
@@ -9,10 +10,10 @@ export async function fetchActivity(): Promise<ActivityLog[]> {
 }
 
 export function formatActivityDate(value: string): string {
-	return new Intl.DateTimeFormat(undefined, {
+	return formatUserDate(value, {
 		dateStyle: "medium",
 		timeStyle: "short",
-	}).format(new Date(value));
+	});
 }
 
 export function getActivityLabel(action: string): string {

@@ -1,14 +1,26 @@
+"use client";
+
 import Link from "next/link";
 import { BadgeDollarSign, Bot, Globe2, KeyRound, Mail, Palette, Users } from "lucide-react";
 import { AdminUpdateCard } from "@/components/admin-update-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useCurrentUser } from "@/hooks/use-current-user";
 
-const sections = [
+type AdminSection = {
+	href: string;
+	title: string;
+	description: string;
+	icon: typeof Bot;
+	permission?: "primary" | "domains" | "users";
+};
+
+const sections: AdminSection[] = [
 	{
 		href: "/agent",
 		title: "Agent",
 		description: "Choose the email assistant's AI provider and model.",
 		icon: Bot,
+		permission: "primary",
 	},
 	{
 		href: "/mailboxes",
@@ -21,18 +33,21 @@ const sections = [
 		title: "Domains",
 		description: "Add Cloudflare domains and inspect DNS state.",
 		icon: Globe2,
+		permission: "domains",
 	},
 	{
 		href: "/branding",
 		title: "Branding",
 		description: "Customize the app name, icon, and favicon.",
 		icon: Palette,
+		permission: "primary",
 	},
 	{
 		href: "/licenses",
 		title: "Licenses",
 		description: "Compare Pro and Team one-time licenses.",
 		icon: BadgeDollarSign,
+		permission: "primary",
 	},
 	{
 		href: "/accounts",
@@ -45,6 +60,7 @@ const sections = [
 		title: "Admin API keys",
 		description: "Manage API access to domains, accounts, and mailboxes.",
 		icon: KeyRound,
+		permission: "primary",
 	},
 	// {
 	// 	href: "/webhooks",
@@ -61,6 +77,16 @@ const sections = [
 ];
 
 export default function AdminSettingsPage() {
+	const user = useCurrentUser();
+
+	function canSee(section: AdminSection): boolean {
+		if (!section.permission) return true;
+		if (!user) return false;
+		if (section.permission === "primary") return user.isPrimaryAdmin;
+		if (section.permission === "domains") return user.isPrimaryAdmin || user.canManageDomains;
+		return user.isPrimaryAdmin || user.canManageUsers;
+	}
+
 	return (
 		<div>
 			<div className="mb-8">
@@ -70,7 +96,7 @@ export default function AdminSettingsPage() {
 				</p>
 			</div>
 			<div className="grid lg:grid-cols-2 gap-4">
-				{sections.map((section) => {
+				{sections.filter(canSee).map((section) => {
 					const Icon = section.icon;
 
 					return (
@@ -90,9 +116,11 @@ export default function AdminSettingsPage() {
 					);
 				})}
 			</div>
-			<div className="mt-8">
-				<AdminUpdateCard />
-			</div>
+			{user?.isPrimaryAdmin && (
+				<div className="mt-8">
+					<AdminUpdateCard />
+				</div>
+			)}
 		</div>
 	);
 }

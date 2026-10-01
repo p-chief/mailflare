@@ -1,6 +1,7 @@
 import { Building2, Sparkles } from "lucide-react";
 import type { LicensePlan } from "./types";
 import { authFetch } from "@/lib/auth/client";
+import { formatUserDate } from "@/lib/time/utils";
 import { LICENSE_STATUS_CHANGED_EVENT } from "@/lib/licenses/constants";
 import type { ActivatableLicensePlan, LicenseAction, LicenseResponse } from "./types";
 
@@ -53,5 +54,5 @@ export function formatLicensePlan(plan: string): string {
 
 export function formatLicenseDate(value: Date | string | null): string | null {
 	if (!value) return null;
-	return new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
+	return formatUserDate(value, { dateStyle: "medium", timeStyle: "short" });
 }

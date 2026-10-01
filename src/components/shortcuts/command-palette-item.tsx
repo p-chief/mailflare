@@ -26,7 +26,7 @@ export function CommandPaletteItem({
       className={`w-full text-left px-3 py-2.5 rounded-xl flex items-center justify-between transition-colors ${
         isActive
           ? "bg-blue-600 text-white"
-          : "text-neutral-800 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800/70"
+          : "text-neutral-800 hover:bg-neutral-100"
       }`}
     >
       <div className="flex items-center gap-3 min-w-0">
@@ -35,7 +35,7 @@ export function CommandPaletteItem({
             className={`w-4 h-4 shrink-0 ${
               isActive
                 ? "text-white"
-                : "text-neutral-500 dark:text-neutral-400"
+                : "text-neutral-500"
             }`}
           />
         )}
@@ -46,7 +46,7 @@ export function CommandPaletteItem({
               className={`ml-2 text-xs truncate ${
                 isActive
                   ? "text-blue-100"
-                  : "text-neutral-400 dark:text-neutral-500"
+                  : "text-neutral-400"
               }`}
             >
               {item.subtitle}
@@ -59,7 +59,7 @@ export function CommandPaletteItem({
           className={`text-xs px-2 py-0.5 rounded-md font-mono font-medium shrink-0 ${
             isActive
               ? "bg-blue-700 text-blue-100"
-              : "bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-700"
+              : "bg-neutral-100 text-neutral-500 border border-neutral-200"
           }`}
         >
           {item.shortcut}

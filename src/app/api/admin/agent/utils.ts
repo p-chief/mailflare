@@ -4,6 +4,7 @@ import { getDb } from "@/db";
 import { agentJobs, agentSendApprovals, appSettings } from "@/db/schema";
 import { getEnv } from "@/lib/cloudflare";
 import { requireSessionUser } from "@/lib/api/auth";
+import { isPrimaryAdmin } from "@/lib/auth/admin";
 import { getAgentEnabled, getAgentProviderConfig, getAgentProviderPublicConfig, resolveAgentBaseUrl } from "@/lib/agent/provider";
 import { AGENT_SETTINGS_ID } from "@/lib/agent/provider-constants";
 import { parseAgentModelIds } from "@/lib/agent/model-ids";
@@ -23,7 +24,7 @@ async function authorize(request: Request) {
 	const env = getEnv();
 	const session = await requireSessionUser(env, request);
 	if (session.error) return { env, error: session.error };
-	if (session.user.role !== "admin") return { env, error: Response.json({ error: "Forbidden" }, { status: 403 }) };
+	if (!isPrimaryAdmin(session.user)) return { env, error: Response.json({ error: "Forbidden" }, { status: 403 }) };
 	return { env, error: null };
 }
 

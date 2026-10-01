@@ -8,6 +8,7 @@ import {
 	users,
 } from "@/db/schema";
 import { hashPassword } from "@/lib/auth/password";
+import { ensureBookingUsername } from "@/lib/booking/username";
 import { upsertContactFromAddress } from "@/lib/contacts/service";
 import { buildSnippet } from "@/lib/email/parse";
 import { newId } from "@/lib/ids";
@@ -240,6 +241,7 @@ export async function ensureDemoUser(env: CloudflareEnv) {
 		passwordHash: hashPassword(demoCredentials.password),
 		name: "Demo User",
 	});
+	await ensureBookingUsername(env, id, demoCredentials.email);
 
 	const [created] = await db.select().from(users).where(eq(users.id, id)).limit(1);
 	return created!;

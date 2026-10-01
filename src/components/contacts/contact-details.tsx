@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import dayjs from "dayjs";
+import { formatUserDate } from "@/lib/time/utils";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -131,7 +131,7 @@ export function ContactDetailsTrigger({
 							<div>
 								<p className="text-xs font-medium uppercase text-neutral-400">Last seen</p>
 								<p className="mt-1 text-neutral-700">
-									{contact?.lastSeenAt ? dayjs(contact.lastSeenAt).format("MMM DD, YYYY") : "Unknown"}
+									{contact?.lastSeenAt ? formatUserDate(contact.lastSeenAt, { month: "short", day: "2-digit", year: "numeric" }) : "Unknown"}
 								</p>
 							</div>
 							{contact?.blocked && (

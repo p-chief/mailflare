@@ -3,11 +3,20 @@ export type ManagedAccount = {
 	email: string;
 	name: string;
 	role: "admin" | "user";
+	isPrimaryAdmin: boolean;
 	disabled: boolean;
 	canManageMailboxes: boolean;
+	canManageDomains: boolean;
+	canManageUsers: boolean;
 	forwardingEmail: string | null;
 	canForwardEmail: boolean;
 	hasAvatar: boolean;
+	/** Whether the signed-in admin may modify this account. */
+	editable: boolean;
+	/** Whether the signed-in admin may change this account's role. */
+	canChangeRole: boolean;
+	/** Whether the signed-in admin may hand the primary role to this account. */
+	canTransferPrimary: boolean;
 	/** Only ever set client-side when an admin types a new password; never returned by the API. */
 	newPassword?: string;
 };

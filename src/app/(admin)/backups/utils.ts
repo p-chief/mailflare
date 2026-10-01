@@ -1,4 +1,5 @@
 import { authFetch } from "@/lib/auth/client";
+import { formatUserDate } from "@/lib/time/utils";
 import type { BackupItem, BackupsResponse, BackupSettings } from "./types";
 
 export const WEEKDAYS = [
@@ -67,10 +68,10 @@ export async function downloadBackup(backup: BackupItem): Promise<void> {
 
 export function formatBackupDate(value: string | null): string {
 	if (!value) return "-";
-	return new Intl.DateTimeFormat(undefined, {
+	return formatUserDate(value, {
 		dateStyle: "medium",
 		timeStyle: "short",
-	}).format(new Date(value));
+	});
 }
 
 export function formatBackupSize(value: number | null): string {

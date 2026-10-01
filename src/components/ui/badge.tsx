@@ -8,9 +8,9 @@ const badgeVariants = cva(
       variant: {
         success: "border-transparent bg-green-600/10 text-green-600",
         default:
-          "border-transparent bg-neutral-900 text-neutral-50 dark:bg-neutral-50 dark:text-neutral-900",
+          "border-transparent bg-neutral-900 text-neutral-50",
         secondary:
-          "border-transparent bg-neutral-100 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-50",
+          "border-transparent bg-neutral-100 text-neutral-900",
         outline: "bg-neutral-100 border-transparent",
       },
     },

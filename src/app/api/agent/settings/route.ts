@@ -6,6 +6,7 @@ import { getEnv } from "@/lib/cloudflare";
 import { getCurrentUser } from "@/lib/auth/cookies";
 import { getMailboxAccessLevel } from "@/lib/mailboxes/access";
 import { getAgentProviderPublicConfig } from "@/lib/agent/provider";
+import { isPrimaryAdmin } from "@/lib/auth/admin";
 import { hasValidSessionMutationOrigin } from "@/lib/auth/origin";
 
 const schema = z.object({ mailboxId: z.string().min(1), enabled: z.boolean(), modelId: z.string().max(200).nullable().optional(), autoDraftEnabled: z.boolean(), reviewerUserId: z.string().nullable().optional(), instructions: z.string().max(4_000), dailyLimit: z.number().int().min(1).max(100) });
@@ -28,7 +29,7 @@ export async function GET(request: Request) {
 	const agentProvider = await getAgentProviderPublicConfig(env);
 	const provider = agentProvider.configured ? { kind: agentProvider.provider === "cloudflare" ? "Cloudflare Workers AI" : agentProvider.preset === "custom" ? "OpenAI-compatible API" : agentProvider.preset, model: agentProvider.model } : null;
 	const modelId = settings?.modelId && agentProvider.models.includes(settings.modelId) ? settings.modelId : agentProvider.models[0] ?? null;
-	return Response.json({ settings: settings ? { ...settings, enabled: true, modelId } : { mailboxId, enabled: true, modelId, autoDraftEnabled: false, reviewerUserId: access.mailbox.userId, instructions: "", dailyLimit: 25 }, models: agentProvider.models, canManage: access.canManage, canConfigureProvider: user.role === "admin", providerConfigured: agentProvider.configured, provider, autoReplyEnabled: access.mailbox.autoReplyEnabled, reviewers });
+	return Response.json({ settings: settings ? { ...settings, enabled: true, modelId } : { mailboxId, enabled: true, modelId, autoDraftEnabled: false, reviewerUserId: access.mailbox.userId, instructions: "", dailyLimit: 25 }, models: agentProvider.models, 		canManage: access.canManage, canConfigureProvider: isPrimaryAdmin(user), providerConfigured: agentProvider.configured, provider, autoReplyEnabled: access.mailbox.autoReplyEnabled, reviewers });
 }
 
 export async function PUT(request: Request) {

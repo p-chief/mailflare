@@ -21,4 +21,5 @@ export type AgentToolContext = {
 	user: SessionUser;
 	mailboxId: string;
 	origin: "chat" | "auto" | "mcp";
+	timeZone?: string;
 };

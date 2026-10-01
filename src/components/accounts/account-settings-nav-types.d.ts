@@ -1,4 +1,4 @@
 export type AccountSettingsNavItem = {
-	segment: "" | "permissions" | "mailboxes";
+	segment: "" | "password" | "permissions" | "mailboxes";
 	label: string;
 };

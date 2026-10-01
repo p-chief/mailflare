@@ -10,6 +10,7 @@ import { requestAgentSend, getAgentSendRequest } from "@/lib/agent/approvals/uti
 import type { EmailToolName } from "@/lib/agent/types";
 import type { McpPrincipal } from "./types";
 import { registerAdminMcpTools } from "./admin-tools";
+import { CALENDAR_TOOL_NAMES, calendarToolDescriptions, calendarToolSchemas, calendarToolScope, runCalendarTool } from "@/lib/calendar/tools";
 
 const scopeByTool: Record<EmailToolName, string> = {
 	list_emails: "mcp:read", get_email: "mcp:read", get_thread: "mcp:read", search_emails: "mcp:read",
@@ -24,6 +25,13 @@ export function createMailflareMcpHandler(env: CloudflareEnv, principal: McpPrin
 	return createMcpHandler(() => {
 		const server = new McpServer({ name: "mailflare", version: "0.1.0" });
 		if (principal.scopes.some((scope) => scope.startsWith("mcp:"))) {
+		for (const name of CALENDAR_TOOL_NAMES) {
+			server.registerTool(name, { description: calendarToolDescriptions[name], inputSchema: calendarToolSchemas[name] }, async (args) => {
+				if (!principal.scopes.includes(calendarToolScope(name))) return output({ error: "Permission denied" }, true);
+				try { return output(await runCalendarTool({ env, user: principal.user }, name, args)); }
+				catch (error) { return output({ error: error instanceof Error ? error.message : "Calendar tool failed" }, true); }
+			});
+		}
 		server.registerTool("list_mailboxes", { description: "List mailboxes allowed for this key", inputSchema: z.object({}) }, async () => {
 			if (!principal.scopes.includes("mcp:read")) return output({ error: "Permission denied" }, true);
 			const accessible = await listAccessibleMailboxes(getDb(env), principal.user);

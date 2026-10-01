@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { assertAdmin } from "@/lib/auth/admin";
+import { assertPrimaryAdmin } from "@/lib/auth/admin";
 import { requireUser } from "@/lib/auth/cookies";
 import { deleteBackup } from "@/lib/backups/service";
 import { getEnv } from "@/lib/cloudflare";
@@ -11,7 +11,7 @@ export async function DELETE(
 	const env = getEnv();
 	try {
 		const user = await requireUser(env, request);
-		assertAdmin(user);
+		assertPrimaryAdmin(user);
 		const { id } = await params;
 		const deleted = await deleteBackup(env, id);
 		if (!deleted) return NextResponse.json({ error: "Backup not found" }, { status: 404 });

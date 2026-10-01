@@ -1,4 +1,5 @@
 import { authFetch } from "@/lib/auth/client";
+import { formatUserDate } from "@/lib/time/utils";
 import type {
 	DomainRule,
 	DomainRuleField,
@@ -102,7 +103,7 @@ export function formatLastMatched(value: DomainRule["lastMatchedAt"]): string {
 	if (!Number.isFinite(numeric)) return "Never";
 	// Drizzle timestamps serialise as seconds when they bypass the mapper.
 	const ms = numeric < 1e12 ? numeric * 1000 : numeric;
-	return new Date(ms).toLocaleString();
+	return formatUserDate(new Date(ms), { dateStyle: "medium", timeStyle: "short" });
 }
 
 export function emptyRuleInput(domainId: string): DomainRuleInput {

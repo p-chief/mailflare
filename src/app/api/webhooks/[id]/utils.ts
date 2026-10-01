@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/db";
 import { webhooks } from "@/db/schema";
 import { requireSessionUser } from "@/lib/api/auth";
+import { isPrimaryAdmin } from "@/lib/auth/admin";
 import { getEnv } from "@/lib/cloudflare";
 
 /** Loads a webhook owned by the caller, or the 404 response to return instead. */
@@ -11,6 +12,7 @@ export async function loadOwnedWebhook(request: Request, id: string) {
 	const auth = await requireSessionUser(env, request);
 	if (auth.error) return { error: auth.error } as const;
 	const user = auth.user;
+	if (!isPrimaryAdmin(user)) return { error: NextResponse.json({ error: "Forbidden" }, { status: 403 }) } as const;
 	const db = getDb(env);
 	const [hook] = await db
 		.select()

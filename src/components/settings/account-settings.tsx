@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ForwardingEmailForm } from "./forwarding-email-form";
 import { MailboxSignatureForm } from "./mailbox-signature-form";
 import { ProfileForm } from "./profile-form";
+import { TimeZoneForm } from "./time-zone-form";
 import type { AccountSettingsResponse } from "./types";
 import { loadAccountSettings } from "./utils";
 
@@ -59,6 +60,8 @@ export function AccountSettings() {
 						initialResetEmail={user.resetEmail ?? ""}
 						email={user.email}
 					/>
+
+					<TimeZoneForm userId={user.id} initialTimeZone={user.timeZone} />
 
 					{user.canForwardEmail && (
 						<div className="space-y-4 rounded-lg bg-white p-6">

@@ -1,7 +1,7 @@
 import type { Message } from "@/hooks/types";
 import { authFetch } from "@/lib/auth/client";
 import { getEmailDisplayName, splitEmailAddressList } from "@/lib/email/address";
-import dayjs from "dayjs";
+import { formatUserDate, getUserTimeZone, zonedDateFields } from "@/lib/time/utils";
 import type { MailboxOption } from "@/components/mailbox-provider";
 import type { EmailPageTitleInput } from "./types";
 import type { MessageFolderConfig } from "./types";
@@ -45,10 +45,12 @@ export function getMessagePreview(message: Message, folder: MessageFolderConfig[
 }
 
 export function formatMessageListTimestamp(createdAt: string): string {
-	const date = dayjs(createdAt);
-	if (date.isSame(dayjs(), "day")) return date.format("hh:mm A");
-	if (date.isSame(dayjs(), "year")) return date.format("MMM DD");
-	return date.format("MMM DD, YYYY");
+	const zone = getUserTimeZone();
+	const date = zonedDateFields(new Date(createdAt), zone);
+	const today = zonedDateFields(new Date(), zone);
+	if (date.toISOString().slice(0, 10) === today.toISOString().slice(0, 10)) return formatUserDate(createdAt, { hour: "2-digit", minute: "2-digit" });
+	if (date.getUTCFullYear() === today.getUTCFullYear()) return formatUserDate(createdAt, { month: "short", day: "2-digit" });
+	return formatUserDate(createdAt, { month: "short", day: "2-digit", year: "numeric" });
 }
 
 export function getPageRange(offset: number, count: number, total: number): PageRange {

@@ -8,8 +8,8 @@ import { buildFtsMatch, parseSearchQuery } from "./query-utils";
  * the FTS5 index by rowid; everything else is a plain column predicate, so the
  * caller ANDs these with its own scope (mailbox access, folder, status).
  */
-export function buildSearchConditions(raw: string): SQL[] {
-	const parsed = parseSearchQuery(raw);
+export function buildSearchConditions(raw: string, timeZone = "UTC"): SQL[] {
+	const parsed = parseSearchQuery(raw, timeZone);
 	const conditions: SQL[] = [];
 
 	const match = buildFtsMatch(parsed);

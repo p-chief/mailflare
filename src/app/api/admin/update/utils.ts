@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { assertAdmin } from "@/lib/auth/admin";
+import { assertPrimaryAdmin } from "@/lib/auth/admin";
 import { requireUser } from "@/lib/auth/cookies";
 import { getEnv } from "@/lib/cloudflare";
 import type {
@@ -31,7 +31,7 @@ export async function authorizeAdminRequest(request: Request) {
   }
 
   try {
-    assertAdmin(user);
+    assertPrimaryAdmin(user);
   } catch {
     return {
       error: NextResponse.json({ error: "Forbidden" }, { status: 403 }),

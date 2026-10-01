@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { authFetch } from "@/lib/auth/client";
+import { formatUserDate } from "@/lib/time/utils";
 import { htmlToPlainText } from "@/components/compose/rich-text-utils";
 import type { SendReviewProps } from "./send-review-types";
 
@@ -30,7 +31,7 @@ export function SendReview({ approvalId, snapshot, onClose, onSent }: SendReview
 				{snapshot.cc && <><dt className="text-neutral-500">Cc</dt><dd>{snapshot.cc}</dd></>}
 				{snapshot.bcc && <><dt className="text-neutral-500">Bcc</dt><dd>{snapshot.bcc}</dd></>}
 				<dt className="text-neutral-500">Subject</dt><dd>{snapshot.subject}</dd>
-				{snapshot.scheduledAt && <><dt className="text-neutral-500">Send at</dt><dd>{new Date(snapshot.scheduledAt).toLocaleString()}</dd></>}
+				{snapshot.scheduledAt && <><dt className="text-neutral-500">Send at</dt><dd>{formatUserDate(snapshot.scheduledAt, { dateStyle: "medium", timeStyle: "short" })}</dd></>}
 			</dl>
 			<pre className="mt-4 max-h-72 overflow-auto whitespace-pre-wrap rounded-lg border border-neutral-200 p-3 text-sm">{snapshot.text || htmlToPlainText(snapshot.html || "")}</pre>
 			{snapshot.attachments.length > 0 && <p className="mt-3 text-sm">Attachments: {snapshot.attachments.map((item) => item.filename).join(", ")}</p>}

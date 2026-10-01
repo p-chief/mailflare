@@ -4,10 +4,12 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Check, ChevronDown, X } from "lucide-react";
 import {
 	formatDateTimeLocal,
+	formatScheduledSend,
 	getScheduleSendOptions,
 	parseDateTimeLocal,
 } from "./schedule-send-utils";
 import type { ScheduleSendMenuProps } from "./schedule-send-types";
+import { getUserTimeZone } from "@/lib/time/utils";
 
 export function ScheduleSendMenu({ disabled, value, onChange }: ScheduleSendMenuProps) {
 	const options = getScheduleSendOptions();
@@ -49,13 +51,13 @@ export function ScheduleSendMenu({ disabled, value, onChange }: ScheduleSendMenu
 						>
 							{option.label}
 							<span className="ml-2 text-xs text-neutral-400">
-								{option.value?.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}
+								{option.value && formatScheduledSend(option.value)}
 							</span>
 						</DropdownMenu.Item>
 					))}
 					<DropdownMenu.Separator className="my-1 h-px bg-neutral-100" />
 					<DropdownMenu.Label className="px-3 pb-1 pt-2 text-xs font-medium text-neutral-500">
-						Pick date &amp; time
+						Pick date &amp; time ({getUserTimeZone()})
 					</DropdownMenu.Label>
 					<input
 						type="datetime-local"

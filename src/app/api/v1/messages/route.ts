@@ -7,6 +7,7 @@ import { getDb } from "@/db";
 import { messages, users } from "@/db/schema";
 import { getMailboxAccessLevel, listAccessibleMailboxIds } from "@/lib/mailboxes/access";
 import { buildSearchConditions } from "@/lib/search/conditions";
+import { getRequestTimeZone } from "@/lib/time/utils";
 
 export async function GET(request: Request) {
 	const env = getEnv();
@@ -49,7 +50,7 @@ export async function GET(request: Request) {
 	if (direction === "inbound" || direction === "outbound") {
 		conditions.push(eq(messages.direction, direction));
 	}
-	if (query) conditions.push(...buildSearchConditions(query));
+	if (query) conditions.push(...buildSearchConditions(query, getRequestTimeZone(request, user.timeZone)));
 
 	const rows = await db
 		.select()

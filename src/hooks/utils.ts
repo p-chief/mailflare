@@ -1,5 +1,6 @@
 import { authFetch } from "@/lib/auth/client";
 import { parseSearchQuery } from "@/lib/search/query-utils";
+import { getUserTimeZone } from "@/lib/time/utils";
 import type { MessageFilterOptions, MessageFolder } from "./types";
 import type { MessageCounts, MessageListResponse } from "./types";
 
@@ -24,6 +25,7 @@ export function getMessageQueryParams(
 	folderId?: string | null,
 ) {
 	const params = new URLSearchParams();
+	params.set("timeZone", getUserTimeZone());
 
 	if (folder === "inbox") {
 		params.set("direction", "inbound");

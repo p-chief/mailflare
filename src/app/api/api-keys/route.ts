@@ -14,7 +14,7 @@ import { hasValidSessionMutationOrigin } from "@/lib/auth/origin";
 const createKeySchema = z.object({
 	name: z.string().trim().min(1).max(100),
 	scopes: z.array(z.enum([...API_KEY_SCOPES])).min(1),
-	mailboxIds: z.array(z.string().min(1)).min(1).max(30),
+	mailboxIds: z.array(z.string().min(1)).max(30),
 });
 
 export async function GET(request: Request) {
@@ -51,6 +51,7 @@ export async function POST(request: Request) {
 	const { fullKey, prefix, hash } = generateApiKey();
 	const db = getDb(env);
 	const mailboxIds = [...new Set(parsed.data.mailboxIds)];
+	if (!mailboxIds.length && parsed.data.scopes.some((scope) => !scope.startsWith("calendar:"))) return NextResponse.json({ error: "Choose a mailbox for mail permissions" }, { status: 400 });
 	for (const mailboxId of mailboxIds) if (!(await getMailboxAccessLevel(db, user, mailboxId))?.canRead) return NextResponse.json({ error: "Mailbox not found" }, { status: 403 });
 	const id = newId("key");
 	await db.insert(apiKeys).values({
@@ -62,7 +63,7 @@ export async function POST(request: Request) {
 		scopes: scopesToJson([...new Set(parsed.data.scopes)]),
 		mailboxScopeEnabled: true,
 	});
-	await db.insert(mcpKeyMailboxes).values(mailboxIds.map((mailboxId) => ({ keyId: id, mailboxId })));
+	if (mailboxIds.length) await db.insert(mcpKeyMailboxes).values(mailboxIds.map((mailboxId) => ({ keyId: id, mailboxId })));
 
 	return NextResponse.json({ id, name: parsed.data.name, prefix, key: fullKey, mailboxIds });
 }

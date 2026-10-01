@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { assertAdmin } from "@/lib/auth/admin";
+import { assertPrimaryAdmin } from "@/lib/auth/admin";
 import { requireUser } from "@/lib/auth/cookies";
 import { getBranding, updateBranding } from "@/lib/branding/service";
 import { getEnv } from "@/lib/cloudflare";
@@ -14,7 +14,7 @@ export async function GET() {
 export async function PUT(request: Request) {
 	const env = getEnv();
 	try {
-		assertAdmin(await requireUser(env, request));
+		assertPrimaryAdmin(await requireUser(env, request));
 	} catch {
 		return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 	}

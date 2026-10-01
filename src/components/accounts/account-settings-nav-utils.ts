@@ -2,6 +2,7 @@ import type { AccountSettingsNavItem } from "./account-settings-nav-types";
 
 export const accountSettingsNavItems: AccountSettingsNavItem[] = [
 	{ segment: "", label: "Details" },
+	{ segment: "password", label: "Password" },
 	{ segment: "permissions", label: "Permissions" },
 	{ segment: "mailboxes", label: "Mailboxes" },
 ];

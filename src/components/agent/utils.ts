@@ -158,14 +158,35 @@ export const AGENT_TOOL_LABELS: Record<string, { running: string; completed: str
 	list_emails: { running: "Listing emails...", completed: "Listed emails", description: "Listed email in the selected mailbox folder." },
 	get_email: { running: "Reading email...", completed: "Read email", description: "Read an email and its attachment details." },
 	get_thread: { running: "Reading thread...", completed: "Read thread", description: "Read the conversation containing an email." },
-	search_emails: { running: "Searching email...", completed: "Searched email", description: "Searched email subjects and bodies in this mailbox." },
+	search_emails: { running: "Searching emails...", completed: "Searched email", description: "Searched email subjects and bodies in this mailbox." },
 	draft_email: { running: "Drafting email...", completed: "Drafted email", description: "Saved a new email draft for review. No email was sent." },
 	draft_reply: { running: "Drafting reply...", completed: "Drafted reply", description: "Saved a reply draft for review. No email was sent." },
 	mark_email_read: { running: "Preparing read status...", completed: "Prepared read status", description: "Prepared an email read status change for approval." },
 	move_email: { running: "Preparing email move...", completed: "Prepared email move", description: "Prepared an email move for approval." },
 	move_emails: { running: "Preparing email moves...", completed: "Prepared email moves", description: "Prepared email moves for approval." },
 	discard_draft: { running: "Preparing draft removal...", completed: "Prepared draft removal", description: "Prepared an assistant draft removal for approval." },
+	get_schedule: { running: "Getting schedule...", completed: "Got schedule", description: "Read calendar events in the requested range." },
+	search_events: { running: "Searching events...", completed: "Searched events", description: "Searched calendar events." },
+	get_event: { running: "Reading event...", completed: "Read event", description: "Read a calendar event." },
+	create_event: { running: "Creating event...", completed: "Created event", description: "Created a calendar event." },
+	update_events: { running: "Updating events...", completed: "Updated events", description: "Updated calendar events." },
+	delete_events: { running: "Deleting events...", completed: "Deleted events", description: "Deleted calendar events." },
+	find_free_time: { running: "Finding free time...", completed: "Found free time", description: "Checked calendar availability." },
+	get_calendars: { running: "Getting calendars...", completed: "Got calendars", description: "Listed available calendars." },
 };
+
+export function activeAgentTool(messages: AgentMessage[]): AgentMessage | null {
+	for (let index = messages.length - 1; index >= 0; index--) {
+		const item = messages[index]!;
+		if (item.role === "user") break;
+		if (item.role === "tool" && item.toolState === "running") return item;
+	}
+	return null;
+}
+
+export function activeAgentToolLabel(name: string | null | undefined): string {
+	return AGENT_TOOL_LABELS[name ?? ""]?.running ?? "Using tool...";
+}
 
 export function agentEmailHref(email: Pick<AgentEmailReference, "id" | "status" | "url">): string {
 	if (email.url?.startsWith("/") && !email.url.startsWith("//")) return email.url;

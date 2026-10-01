@@ -1,4 +1,5 @@
 import { authFetch } from "@/lib/auth/client";
+import { formatUserDate } from "@/lib/time/utils";
 import type {
 	CreateWebhookInput,
 	UpdateWebhookInput,
@@ -85,7 +86,7 @@ export function formatTimestamp(value: string | number | null | undefined): stri
 	const numeric = typeof value === "number" ? value : Date.parse(String(value));
 	if (!Number.isFinite(numeric)) return "—";
 	const ms = numeric < 1e12 ? numeric * 1000 : numeric;
-	return new Date(ms).toLocaleString();
+	return formatUserDate(new Date(ms), { dateStyle: "medium", timeStyle: "short" });
 }
 
 export function formatDuration(ms: number | null): string {

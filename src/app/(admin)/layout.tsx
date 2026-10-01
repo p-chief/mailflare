@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { HelpCircle, Search } from "lucide-react";
 import { AuthGuard } from "@/components/auth/auth-guard";
 import { ComposeProvider } from "@/components/compose/compose-context";
@@ -13,13 +14,31 @@ import { SidebarProvider } from "@/components/sidebar-state";
 import { SidebarResizeBoundary } from "@/components/sidebar-resize-boundary";
 import { ShortcutsProvider } from "@/components/shortcuts";
 
+const primaryOnlyPrefixes = [
+  "/agent",
+  "/api-keys",
+  "/webhooks",
+  "/backups",
+  "/branding",
+  "/licenses",
+  "/activity",
+  "/audit-logs",
+  "/general",
+  "/ai-usage",
+];
+
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+  const requirePrimary = primaryOnlyPrefixes.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
+
   return (
-    <AuthGuard requireMailbox requireRole="admin">
+    <AuthGuard requireMailbox requireRole="admin" requirePrimary={requirePrimary}>
       <SidebarProvider expandedWidth={256}>
       <MailboxProvider>
         <ComposeProvider>
@@ -32,7 +51,7 @@ export default function DashboardLayout({
               <SidebarResizeBoundary />
             </aside>
             <div className="flex min-h-0 min-w-0 flex-col">
-              <span className="fixed top-2 right-4 flex items-center gap-4">
+              <span className="fixed top-2 right-4 flex items-center gap-4 z-90">
                 <LicenseIndicator />
                 <MailboxSelector />
               </span>
