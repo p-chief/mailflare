@@ -1,0 +1,1058 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "architecture",
+  "quality": "showcase",
+  "startedAt": "2026-10-01T05:03:55.150Z",
+  "specification": {
+    "path": "/Users/pvhieuit/open-repo/mailflare/.archify/architecture-mailflare-detailed-20261001-113615/candidate.json",
+    "sha256": "60b8db59fcaf6200e7313dfa7edb85db28b21db080b9de27f300604303632490",
+    "bytes": 55901
+  },
+  "artifact": {
+    "path": "/Users/pvhieuit/open-repo/mailflare/.archify/architecture-mailflare-detailed-20261001-113615/mailflare-detailed.html",
+    "sha256": "ca87d4b5f212abf885766937739e3bd6208b542763b35983d75d9098980df6f1",
+    "bytes": 829836
+  },
+  "stages": {
+    "validate": {
+      "status": "pass",
+      "exitCode": 0,
+      "durationMs": null,
+      "execution": "embedded-in-deliver",
+      "command": [
+        "/opt/homebrew/Cellar/node/26.8.1/bin/node",
+        "/Users/pvhieuit/open-repo/mailflare/.agents/skills/archify/bin/archify.mjs",
+        "deliver",
+        "architecture",
+        "/Users/pvhieuit/open-repo/mailflare/.archify/architecture-mailflare-detailed-20261001-113615/candidate.json",
+        "/Users/pvhieuit/open-repo/mailflare/.archify/architecture-mailflare-detailed-20261001-113615/mailflare-detailed.html",
+        "--quality",
+        "showcase",
+        "--repo-root",
+        "/Users/pvhieuit/open-repo/mailflare",
+        "--json"
+      ],
+      "receipt": {
+        "schemaVersion": 1,
+        "ok": true,
+        "command": "validate",
+        "specification": {
+          "sha256": "60b8db59fcaf6200e7313dfa7edb85db28b21db080b9de27f300604303632490",
+          "bytes": 55901
+        },
+        "validation": {
+          "checksPassed": 9,
+          "checkCount": 9,
+          "compositionProfile": "showcase",
+          "compositionStatus": "pass",
+          "errors": 0,
+          "warnings": 0
+        }
+      }
+    },
+    "deliver": {
+      "status": "pass",
+      "exitCode": 0,
+      "durationMs": 292,
+      "command": [
+        "/opt/homebrew/Cellar/node/26.8.1/bin/node",
+        "/Users/pvhieuit/open-repo/mailflare/.agents/skills/archify/bin/archify.mjs",
+        "deliver",
+        "architecture",
+        "/Users/pvhieuit/open-repo/mailflare/.archify/architecture-mailflare-detailed-20261001-113615/candidate.json",
+        "/Users/pvhieuit/open-repo/mailflare/.archify/architecture-mailflare-detailed-20261001-113615/mailflare-detailed.html",
+        "--quality",
+        "showcase",
+        "--repo-root",
+        "/Users/pvhieuit/open-repo/mailflare",
+        "--json"
+      ],
+      "receipt": {
+        "schemaVersion": 1,
+        "receiptId": "12892680-f59f-4507-aa3e-434bacd097ce",
+        "ok": true,
+        "command": "deliver",
+        "type": "architecture",
+        "input": "/Users/pvhieuit/open-repo/mailflare/.archify/architecture-mailflare-detailed-20261001-113615/candidate.json",
+        "output": "/Users/pvhieuit/open-repo/mailflare/.archify/architecture-mailflare-detailed-20261001-113615/mailflare-detailed.html",
+        "specification": {
+          "sha256": "60b8db59fcaf6200e7313dfa7edb85db28b21db080b9de27f300604303632490",
+          "bytes": 55901
+        },
+        "artifact": {
+          "sha256": "ca87d4b5f212abf885766937739e3bd6208b542763b35983d75d9098980df6f1",
+          "bytes": 829836
+        },
+        "validation": {
+          "checksPassed": 9,
+          "checkCount": 9,
+          "compositionProfile": "showcase",
+          "compositionStatus": "pass",
+          "errors": 0,
+          "warnings": 0
+        },
+        "evidence": {
+          "verified": true,
+          "repository": "https://github.com/p-chief/mailflare",
+          "revision": "7c605c3c9523bc7f0e0a92ab718f174ecb4de1d6",
+          "references": 60
+        },
+        "update": {
+          "status": "unavailable",
+          "installedVersion": null,
+          "availableVersion": null,
+          "releaseNotes": null,
+          "checkedAt": null,
+          "source": null,
+          "noticeRequired": false,
+          "noticeText": null,
+          "reason": "disabled"
+        }
+      }
+    },
+    "check": {
+      "status": "pass",
+      "exitCode": 0,
+      "durationMs": 200,
+      "command": [
+        "/opt/homebrew/Cellar/node/26.8.1/bin/node",
+        "/Users/pvhieuit/open-repo/mailflare/.agents/skills/archify/bin/archify.mjs",
+        "check",
+        "/Users/pvhieuit/open-repo/mailflare/.archify/architecture-mailflare-detailed-20261001-113615/mailflare-detailed.html",
+        "--require-provenance"
+      ],
+      "receipt": {
+        "ok": true,
+        "file": "/Users/pvhieuit/open-repo/mailflare/.archify/architecture-mailflare-detailed-20261001-113615/mailflare-detailed.html",
+        "artifact": {
+          "sha256": "ca87d4b5f212abf885766937739e3bd6208b542763b35983d75d9098980df6f1",
+          "bytes": 829836
+        },
+        "checks": [
+          {
+            "name": "single_svg",
+            "ok": true,
+            "details": [
+              "found 1 <svg> block(s)"
+            ]
+          },
+          {
+            "name": "finite_svg",
+            "ok": true,
+            "details": []
+          },
+          {
+            "name": "orthogonal_arrows",
+            "ok": true,
+            "details": []
+          },
+          {
+            "name": "label_route_clearance",
+            "ok": true,
+            "details": []
+          },
+          {
+            "name": "relationship_crossings",
+            "ok": true,
+            "details": []
+          },
+          {
+            "name": "relationship_corridors",
+            "ok": true,
+            "details": []
+          },
+          {
+            "name": "container_border_runs",
+            "ok": true,
+            "details": []
+          },
+          {
+            "name": "route_rhythm",
+            "ok": true,
+            "details": []
+          },
+          {
+            "name": "legend_clearance",
+            "ok": true,
+            "details": []
+          }
+        ],
+        "composition": {
+          "schemaVersion": 1,
+          "profile": "showcase",
+          "status": "pass",
+          "summary": {
+            "errors": 0,
+            "warnings": 0
+          },
+          "metrics": {
+            "properCrossings": 0,
+            "resolvedCrossovers": 0,
+            "ambiguousCorridors": 0,
+            "arrowheadCollisions": 0,
+            "containerBorderRuns": 0,
+            "labelRouteClearanceIssues": 0,
+            "labelCanvasOverflowIssues": 0,
+            "minLabelRouteClearance": 9,
+            "desktopReadabilityIssues": 0,
+            "viewportHeightIssues": 0,
+            "minProjectedNodeTextPx": 6.35655253837072,
+            "maxBends": 3,
+            "routesOverSuggestedBends": 3,
+            "maxStretch": 1.159,
+            "routesOverSuggestedStretch": 0,
+            "minSegmentPx": 22,
+            "minInteriorSegmentPx": 22,
+            "shortSegmentCount": 0,
+            "shortEndpointSegmentCount": 0,
+            "shortInteriorSegmentCount": 0,
+            "microSegmentCount": 0
+          },
+          "suggestedLimits": {
+            "bendsPerRelationship": 2,
+            "stretch": 1.35,
+            "segmentPx": 16,
+            "microSegmentPx": 8
+          },
+          "routeReview": {
+            "crossings": [],
+            "detours": [
+              {
+                "relationship": {
+                  "id": "push-ws",
+                  "from": "realtime",
+                  "to": "browser",
+                  "label": "WebSocket",
+                  "collectionIndex": 6,
+                  "artifactIndex": 7
+                },
+                "bends": 3,
+                "stretch": 1
+              },
+              {
+                "relationship": {
+                  "id": "api-send",
+                  "from": "dashApi",
+                  "to": "sendService",
+                  "label": "/api/send",
+                  "collectionIndex": 21,
+                  "artifactIndex": 22
+                },
+                "bends": 3,
+                "stretch": 1
+              },
+              {
+                "relationship": {
+                  "id": "connect-hub",
+                  "from": "fetchHandler",
+                  "to": "realtime",
+                  "label": "/connect",
+                  "collectionIndex": 27,
+                  "artifactIndex": 28
+                },
+                "bends": 3,
+                "stretch": 1
+              }
+            ]
+          },
+          "leadingSpace": {
+            "measured": true,
+            "emptyTopPx": 50,
+            "emptyTopRatio": 0.05,
+            "occupiedTop": 50,
+            "viewBoxTop": 0,
+            "canvasHeight": 1008,
+            "typicalNodeHeight": 70,
+            "reviewSuggested": false
+          },
+          "desktopReadability": {
+            "budgetBasis": "recognized-declared-wide",
+            "readerContract": "declared-wide-v1",
+            "availableDiagramWidth": 1346,
+            "actualBudgetPx": 1346,
+            "actualReaderWidth": 1376,
+            "desiredReaderWidth": 1618.125,
+            "viewportCap": 1376,
+            "limit": "viewport-cap",
+            "requestedTargetPx": 7.5,
+            "requestedTargetMet": false,
+            "hardFloorPx": 6,
+            "hardFloorMet": true,
+            "minimumOwner": {
+              "kind": "edge",
+              "id": "smtp-in",
+              "from": "sender",
+              "to": "cfRouting"
+            },
+            "minimumSourceTextPx": 8,
+            "minimumProjectedTextPx": 6.35655253837072,
+            "semanticTextCount": 81
+          },
+          "issues": []
+        },
+        "provenance": "current",
+        "deliveryReceiptId": "12892680-f59f-4507-aa3e-434bacd097ce"
+      }
+    },
+    "browser-check": {
+      "status": "pass",
+      "exitCode": 0,
+      "durationMs": 974,
+      "command": [
+        "/opt/homebrew/Cellar/node/26.8.1/bin/node",
+        "/Users/pvhieuit/open-repo/mailflare/.agents/skills/archify/bin/archify.mjs",
+        "browser-check",
+        "/Users/pvhieuit/open-repo/mailflare/.archify/architecture-mailflare-detailed-20261001-113615/mailflare-detailed.html",
+        "--json",
+        "--require-provenance",
+        "--out-dir",
+        "/Users/pvhieuit/open-repo/mailflare/.archify/architecture-mailflare-detailed-20261001-113615/review-2"
+      ],
+      "execution": "in-process",
+      "receipt": {
+        "schemaVersion": 1,
+        "ok": true,
+        "command": "browser-check",
+        "evidenceKind": "automated-browser",
+        "status": "pass",
+        "visualReview": "not-requested",
+        "provenance": "current",
+        "deliveryReceiptId": "12892680-f59f-4507-aa3e-434bacd097ce",
+        "artifact": {
+          "path": "/Users/pvhieuit/open-repo/mailflare/.archify/architecture-mailflare-detailed-20261001-113615/mailflare-detailed.html",
+          "sha256": "ca87d4b5f212abf885766937739e3bd6208b542763b35983d75d9098980df6f1",
+          "bytes": 829836
+        },
+        "state": {
+          "detail": "read",
+          "motion": "still"
+        },
+        "chrome": {
+          "status": "available",
+          "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+        },
+        "diagnostics": [],
+        "containment": {
+          "status": "pass",
+          "policy": "fit-or-reader-declared-readable-vertical-scroll",
+          "viewports": [
+            {
+              "width": 1440,
+              "height": 900,
+              "theme": "light",
+              "innerWidth": 1440,
+              "innerHeight": 900,
+              "scrollWidth": 1440,
+              "scrollHeight": 944,
+              "overflowX": false,
+              "overflowY": true,
+              "verticalScrollAccepted": true,
+              "overflowDisposition": "readable-vertical-scroll",
+              "readerLayout": "adaptive",
+              "readerOverflow": "authored",
+              "readerFit": "intrinsic-height",
+              "ok": true,
+              "readerWidth": 1376,
+              "diagramWidth": 1346,
+              "pageComposition": {
+                "bodyPaddingPx": 12,
+                "headerPx": 52,
+                "diagramChromePx": 78,
+                "svgPx": 801,
+                "cardsPx": 0,
+                "viewBoxHeight": 1008
+              },
+              "viewBoxWidth": 1694,
+              "minimumProjectedNodeTextPx": 6.35655253837072,
+              "minimumProjectedNonEdgeTextPx": 6.436009445100354,
+              "minimumProjectedEdgeTextPx": 6.35655253837072,
+              "minimumProjectedNodeText": "SMTP (MX)",
+              "minimumProjectedNodeTextDetail": "edge",
+              "minimumProjectedNodeTextOwner": {
+                "kind": "edge",
+                "id": "smtp-in",
+                "from": "sender",
+                "to": "cfRouting"
+              },
+              "minimumRequiredNodeTextPx": 6,
+              "readabilityOk": true,
+              "hasLegend": true,
+              "hasNavigationDock": true,
+              "legendDockIntersectionArea": 0,
+              "dockStageIntersectionArea": 0,
+              "dockStageGap": 10,
+              "requiredDockStageGap": 10,
+              "viewerChromeStageOk": true,
+              "viewerChromeReserve": 54,
+              "viewerChromeActive": true,
+              "viewerChromeOk": true,
+              "resolvedTheme": "light"
+            },
+            {
+              "width": 1600,
+              "height": 1000,
+              "theme": "light",
+              "innerWidth": 1600,
+              "innerHeight": 1000,
+              "scrollWidth": 1600,
+              "scrollHeight": 1105,
+              "overflowX": false,
+              "overflowY": true,
+              "verticalScrollAccepted": true,
+              "overflowDisposition": "readable-vertical-scroll",
+              "readerLayout": "adaptive",
+              "readerOverflow": "authored",
+              "readerFit": "intrinsic-height",
+              "ok": true,
+              "readerWidth": 1536,
+              "diagramWidth": 1506,
+              "pageComposition": {
+                "bodyPaddingPx": 64,
+                "headerPx": 60,
+                "diagramChromePx": 84,
+                "svgPx": 896,
+                "cardsPx": 0,
+                "viewBoxHeight": 1008
+              },
+              "viewBoxWidth": 1694,
+              "minimumProjectedNodeTextPx": 7.112160566706021,
+              "minimumProjectedNonEdgeTextPx": 7.201062573789846,
+              "minimumProjectedEdgeTextPx": 7.112160566706021,
+              "minimumProjectedNodeText": "SMTP (MX)",
+              "minimumProjectedNodeTextDetail": "edge",
+              "minimumProjectedNodeTextOwner": {
+                "kind": "edge",
+                "id": "smtp-in",
+                "from": "sender",
+                "to": "cfRouting"
+              },
+              "minimumRequiredNodeTextPx": 6,
+              "readabilityOk": true,
+              "hasLegend": true,
+              "hasNavigationDock": true,
+              "legendDockIntersectionArea": 0,
+              "dockStageIntersectionArea": 0,
+              "dockStageGap": 10,
+              "requiredDockStageGap": 10,
+              "viewerChromeStageOk": true,
+              "viewerChromeReserve": 54,
+              "viewerChromeActive": true,
+              "viewerChromeOk": true,
+              "resolvedTheme": "light"
+            },
+            {
+              "width": 1920,
+              "height": 1080,
+              "theme": "light",
+              "innerWidth": 1920,
+              "innerHeight": 1080,
+              "scrollWidth": 1920,
+              "scrollHeight": 1154,
+              "overflowX": false,
+              "overflowY": true,
+              "verticalScrollAccepted": true,
+              "overflowDisposition": "readable-vertical-scroll",
+              "readerLayout": "adaptive",
+              "readerOverflow": "authored",
+              "readerFit": "intrinsic-height",
+              "ok": true,
+              "readerWidth": 1619,
+              "diagramWidth": 1589,
+              "pageComposition": {
+                "bodyPaddingPx": 64,
+                "headerPx": 60,
+                "diagramChromePx": 84,
+                "svgPx": 946,
+                "cardsPx": 0,
+                "viewBoxHeight": 1008
+              },
+              "viewBoxWidth": 1694,
+              "minimumProjectedNodeTextPx": 7.5041322314049586,
+              "minimumProjectedNonEdgeTextPx": 7.59793388429752,
+              "minimumProjectedEdgeTextPx": 7.5041322314049586,
+              "minimumProjectedNodeText": "SMTP (MX)",
+              "minimumProjectedNodeTextDetail": "edge",
+              "minimumProjectedNodeTextOwner": {
+                "kind": "edge",
+                "id": "smtp-in",
+                "from": "sender",
+                "to": "cfRouting"
+              },
+              "minimumRequiredNodeTextPx": 6,
+              "readabilityOk": true,
+              "hasLegend": true,
+              "hasNavigationDock": true,
+              "legendDockIntersectionArea": 0,
+              "dockStageIntersectionArea": 0,
+              "dockStageGap": 10,
+              "requiredDockStageGap": 10,
+              "viewerChromeStageOk": true,
+              "viewerChromeReserve": 54,
+              "viewerChromeActive": true,
+              "viewerChromeOk": true,
+              "resolvedTheme": "light"
+            },
+            {
+              "width": 2048,
+              "height": 1320,
+              "theme": "light",
+              "innerWidth": 2048,
+              "innerHeight": 1320,
+              "scrollWidth": 2048,
+              "scrollHeight": 1320,
+              "overflowX": false,
+              "overflowY": false,
+              "verticalScrollAccepted": false,
+              "overflowDisposition": "contained",
+              "readerLayout": "adaptive",
+              "readerOverflow": null,
+              "readerFit": "intrinsic-height",
+              "ok": true,
+              "readerWidth": 1868,
+              "diagramWidth": 1818,
+              "pageComposition": {
+                "bodyPaddingPx": 64,
+                "headerPx": 68,
+                "diagramChromePx": 94,
+                "svgPx": 1082,
+                "cardsPx": 0,
+                "viewBoxHeight": 1008
+              },
+              "viewBoxWidth": 1694,
+              "minimumProjectedNodeTextPx": 8,
+              "minimumProjectedNonEdgeTextPx": 8.1,
+              "minimumProjectedEdgeTextPx": 8,
+              "minimumProjectedNodeText": "SMTP (MX)",
+              "minimumProjectedNodeTextDetail": "edge",
+              "minimumProjectedNodeTextOwner": {
+                "kind": "edge",
+                "id": "smtp-in",
+                "from": "sender",
+                "to": "cfRouting"
+              },
+              "minimumRequiredNodeTextPx": 6,
+              "readabilityOk": true,
+              "hasLegend": true,
+              "hasNavigationDock": true,
+              "legendDockIntersectionArea": 0,
+              "dockStageIntersectionArea": 0,
+              "dockStageGap": 10,
+              "requiredDockStageGap": 10,
+              "viewerChromeStageOk": true,
+              "viewerChromeReserve": 44,
+              "viewerChromeActive": true,
+              "viewerChromeOk": true,
+              "resolvedTheme": "light"
+            }
+          ]
+        },
+        "themeStates": {
+          "status": "pass",
+          "viewports": [
+            {
+              "width": 1440,
+              "height": 900,
+              "requestedTheme": "light",
+              "resolvedTheme": "light",
+              "ok": true
+            },
+            {
+              "width": 1600,
+              "height": 1000,
+              "requestedTheme": "light",
+              "resolvedTheme": "light",
+              "ok": true
+            },
+            {
+              "width": 1920,
+              "height": 1080,
+              "requestedTheme": "light",
+              "resolvedTheme": "light",
+              "ok": true
+            },
+            {
+              "width": 2048,
+              "height": 1320,
+              "requestedTheme": "light",
+              "resolvedTheme": "light",
+              "ok": true
+            },
+            {
+              "width": 1440,
+              "height": 900,
+              "requestedTheme": "dark",
+              "resolvedTheme": "dark",
+              "ok": true
+            },
+            {
+              "width": 2048,
+              "height": 1320,
+              "requestedTheme": "dark",
+              "resolvedTheme": "dark",
+              "ok": true
+            }
+          ]
+        },
+        "readability": {
+          "status": "pass",
+          "minimumProjectedNodeTextPx": 6,
+          "viewports": [
+            {
+              "width": 1440,
+              "height": 900,
+              "theme": "light",
+              "innerWidth": 1440,
+              "innerHeight": 900,
+              "scrollWidth": 1440,
+              "scrollHeight": 944,
+              "overflowX": false,
+              "overflowY": true,
+              "verticalScrollAccepted": true,
+              "overflowDisposition": "readable-vertical-scroll",
+              "readerLayout": "adaptive",
+              "readerOverflow": "authored",
+              "readerFit": "intrinsic-height",
+              "ok": true,
+              "readerWidth": 1376,
+              "diagramWidth": 1346,
+              "pageComposition": {
+                "bodyPaddingPx": 12,
+                "headerPx": 52,
+                "diagramChromePx": 78,
+                "svgPx": 801,
+                "cardsPx": 0,
+                "viewBoxHeight": 1008
+              },
+              "viewBoxWidth": 1694,
+              "minimumProjectedNodeTextPx": 6.35655253837072,
+              "minimumProjectedNonEdgeTextPx": 6.436009445100354,
+              "minimumProjectedEdgeTextPx": 6.35655253837072,
+              "minimumProjectedNodeText": "SMTP (MX)",
+              "minimumProjectedNodeTextDetail": "edge",
+              "minimumProjectedNodeTextOwner": {
+                "kind": "edge",
+                "id": "smtp-in",
+                "from": "sender",
+                "to": "cfRouting"
+              },
+              "minimumRequiredNodeTextPx": 6,
+              "readabilityOk": true,
+              "hasLegend": true,
+              "hasNavigationDock": true,
+              "legendDockIntersectionArea": 0,
+              "dockStageIntersectionArea": 0,
+              "dockStageGap": 10,
+              "requiredDockStageGap": 10,
+              "viewerChromeStageOk": true,
+              "viewerChromeReserve": 54,
+              "viewerChromeActive": true,
+              "viewerChromeOk": true,
+              "resolvedTheme": "light"
+            },
+            {
+              "width": 1600,
+              "height": 1000,
+              "theme": "light",
+              "innerWidth": 1600,
+              "innerHeight": 1000,
+              "scrollWidth": 1600,
+              "scrollHeight": 1105,
+              "overflowX": false,
+              "overflowY": true,
+              "verticalScrollAccepted": true,
+              "overflowDisposition": "readable-vertical-scroll",
+              "readerLayout": "adaptive",
+              "readerOverflow": "authored",
+              "readerFit": "intrinsic-height",
+              "ok": true,
+              "readerWidth": 1536,
+              "diagramWidth": 1506,
+              "pageComposition": {
+                "bodyPaddingPx": 64,
+                "headerPx": 60,
+                "diagramChromePx": 84,
+                "svgPx": 896,
+                "cardsPx": 0,
+                "viewBoxHeight": 1008
+              },
+              "viewBoxWidth": 1694,
+              "minimumProjectedNodeTextPx": 7.112160566706021,
+              "minimumProjectedNonEdgeTextPx": 7.201062573789846,
+              "minimumProjectedEdgeTextPx": 7.112160566706021,
+              "minimumProjectedNodeText": "SMTP (MX)",
+              "minimumProjectedNodeTextDetail": "edge",
+              "minimumProjectedNodeTextOwner": {
+                "kind": "edge",
+                "id": "smtp-in",
+                "from": "sender",
+                "to": "cfRouting"
+              },
+              "minimumRequiredNodeTextPx": 6,
+              "readabilityOk": true,
+              "hasLegend": true,
+              "hasNavigationDock": true,
+              "legendDockIntersectionArea": 0,
+              "dockStageIntersectionArea": 0,
+              "dockStageGap": 10,
+              "requiredDockStageGap": 10,
+              "viewerChromeStageOk": true,
+              "viewerChromeReserve": 54,
+              "viewerChromeActive": true,
+              "viewerChromeOk": true,
+              "resolvedTheme": "light"
+            },
+            {
+              "width": 1920,
+              "height": 1080,
+              "theme": "light",
+              "innerWidth": 1920,
+              "innerHeight": 1080,
+              "scrollWidth": 1920,
+              "scrollHeight": 1154,
+              "overflowX": false,
+              "overflowY": true,
+              "verticalScrollAccepted": true,
+              "overflowDisposition": "readable-vertical-scroll",
+              "readerLayout": "adaptive",
+              "readerOverflow": "authored",
+              "readerFit": "intrinsic-height",
+              "ok": true,
+              "readerWidth": 1619,
+              "diagramWidth": 1589,
+              "pageComposition": {
+                "bodyPaddingPx": 64,
+                "headerPx": 60,
+                "diagramChromePx": 84,
+                "svgPx": 946,
+                "cardsPx": 0,
+                "viewBoxHeight": 1008
+              },
+              "viewBoxWidth": 1694,
+              "minimumProjectedNodeTextPx": 7.5041322314049586,
+              "minimumProjectedNonEdgeTextPx": 7.59793388429752,
+              "minimumProjectedEdgeTextPx": 7.5041322314049586,
+              "minimumProjectedNodeText": "SMTP (MX)",
+              "minimumProjectedNodeTextDetail": "edge",
+              "minimumProjectedNodeTextOwner": {
+                "kind": "edge",
+                "id": "smtp-in",
+                "from": "sender",
+                "to": "cfRouting"
+              },
+              "minimumRequiredNodeTextPx": 6,
+              "readabilityOk": true,
+              "hasLegend": true,
+              "hasNavigationDock": true,
+              "legendDockIntersectionArea": 0,
+              "dockStageIntersectionArea": 0,
+              "dockStageGap": 10,
+              "requiredDockStageGap": 10,
+              "viewerChromeStageOk": true,
+              "viewerChromeReserve": 54,
+              "viewerChromeActive": true,
+              "viewerChromeOk": true,
+              "resolvedTheme": "light"
+            },
+            {
+              "width": 2048,
+              "height": 1320,
+              "theme": "light",
+              "innerWidth": 2048,
+              "innerHeight": 1320,
+              "scrollWidth": 2048,
+              "scrollHeight": 1320,
+              "overflowX": false,
+              "overflowY": false,
+              "verticalScrollAccepted": false,
+              "overflowDisposition": "contained",
+              "readerLayout": "adaptive",
+              "readerOverflow": null,
+              "readerFit": "intrinsic-height",
+              "ok": true,
+              "readerWidth": 1868,
+              "diagramWidth": 1818,
+              "pageComposition": {
+                "bodyPaddingPx": 64,
+                "headerPx": 68,
+                "diagramChromePx": 94,
+                "svgPx": 1082,
+                "cardsPx": 0,
+                "viewBoxHeight": 1008
+              },
+              "viewBoxWidth": 1694,
+              "minimumProjectedNodeTextPx": 8,
+              "minimumProjectedNonEdgeTextPx": 8.1,
+              "minimumProjectedEdgeTextPx": 8,
+              "minimumProjectedNodeText": "SMTP (MX)",
+              "minimumProjectedNodeTextDetail": "edge",
+              "minimumProjectedNodeTextOwner": {
+                "kind": "edge",
+                "id": "smtp-in",
+                "from": "sender",
+                "to": "cfRouting"
+              },
+              "minimumRequiredNodeTextPx": 6,
+              "readabilityOk": true,
+              "hasLegend": true,
+              "hasNavigationDock": true,
+              "legendDockIntersectionArea": 0,
+              "dockStageIntersectionArea": 0,
+              "dockStageGap": 10,
+              "requiredDockStageGap": 10,
+              "viewerChromeStageOk": true,
+              "viewerChromeReserve": 44,
+              "viewerChromeActive": true,
+              "viewerChromeOk": true,
+              "resolvedTheme": "light"
+            }
+          ]
+        },
+        "viewerChrome": {
+          "status": "pass",
+          "viewports": [
+            {
+              "width": 1440,
+              "height": 900,
+              "theme": "light",
+              "innerWidth": 1440,
+              "innerHeight": 900,
+              "scrollWidth": 1440,
+              "scrollHeight": 944,
+              "overflowX": false,
+              "overflowY": true,
+              "verticalScrollAccepted": true,
+              "overflowDisposition": "readable-vertical-scroll",
+              "readerLayout": "adaptive",
+              "readerOverflow": "authored",
+              "readerFit": "intrinsic-height",
+              "ok": true,
+              "readerWidth": 1376,
+              "diagramWidth": 1346,
+              "pageComposition": {
+                "bodyPaddingPx": 12,
+                "headerPx": 52,
+                "diagramChromePx": 78,
+                "svgPx": 801,
+                "cardsPx": 0,
+                "viewBoxHeight": 1008
+              },
+              "viewBoxWidth": 1694,
+              "minimumProjectedNodeTextPx": 6.35655253837072,
+              "minimumProjectedNonEdgeTextPx": 6.436009445100354,
+              "minimumProjectedEdgeTextPx": 6.35655253837072,
+              "minimumProjectedNodeText": "SMTP (MX)",
+              "minimumProjectedNodeTextDetail": "edge",
+              "minimumProjectedNodeTextOwner": {
+                "kind": "edge",
+                "id": "smtp-in",
+                "from": "sender",
+                "to": "cfRouting"
+              },
+              "minimumRequiredNodeTextPx": 6,
+              "readabilityOk": true,
+              "hasLegend": true,
+              "hasNavigationDock": true,
+              "legendDockIntersectionArea": 0,
+              "dockStageIntersectionArea": 0,
+              "dockStageGap": 10,
+              "requiredDockStageGap": 10,
+              "viewerChromeStageOk": true,
+              "viewerChromeReserve": 54,
+              "viewerChromeActive": true,
+              "viewerChromeOk": true,
+              "resolvedTheme": "light"
+            },
+            {
+              "width": 1600,
+              "height": 1000,
+              "theme": "light",
+              "innerWidth": 1600,
+              "innerHeight": 1000,
+              "scrollWidth": 1600,
+              "scrollHeight": 1105,
+              "overflowX": false,
+              "overflowY": true,
+              "verticalScrollAccepted": true,
+              "overflowDisposition": "readable-vertical-scroll",
+              "readerLayout": "adaptive",
+              "readerOverflow": "authored",
+              "readerFit": "intrinsic-height",
+              "ok": true,
+              "readerWidth": 1536,
+              "diagramWidth": 1506,
+              "pageComposition": {
+                "bodyPaddingPx": 64,
+                "headerPx": 60,
+                "diagramChromePx": 84,
+                "svgPx": 896,
+                "cardsPx": 0,
+                "viewBoxHeight": 1008
+              },
+              "viewBoxWidth": 1694,
+              "minimumProjectedNodeTextPx": 7.112160566706021,
+              "minimumProjectedNonEdgeTextPx": 7.201062573789846,
+              "minimumProjectedEdgeTextPx": 7.112160566706021,
+              "minimumProjectedNodeText": "SMTP (MX)",
+              "minimumProjectedNodeTextDetail": "edge",
+              "minimumProjectedNodeTextOwner": {
+                "kind": "edge",
+                "id": "smtp-in",
+                "from": "sender",
+                "to": "cfRouting"
+              },
+              "minimumRequiredNodeTextPx": 6,
+              "readabilityOk": true,
+              "hasLegend": true,
+              "hasNavigationDock": true,
+              "legendDockIntersectionArea": 0,
+              "dockStageIntersectionArea": 0,
+              "dockStageGap": 10,
+              "requiredDockStageGap": 10,
+              "viewerChromeStageOk": true,
+              "viewerChromeReserve": 54,
+              "viewerChromeActive": true,
+              "viewerChromeOk": true,
+              "resolvedTheme": "light"
+            },
+            {
+              "width": 1920,
+              "height": 1080,
+              "theme": "light",
+              "innerWidth": 1920,
+              "innerHeight": 1080,
+              "scrollWidth": 1920,
+              "scrollHeight": 1154,
+              "overflowX": false,
+              "overflowY": true,
+              "verticalScrollAccepted": true,
+              "overflowDisposition": "readable-vertical-scroll",
+              "readerLayout": "adaptive",
+              "readerOverflow": "authored",
+              "readerFit": "intrinsic-height",
+              "ok": true,
+              "readerWidth": 1619,
+              "diagramWidth": 1589,
+              "pageComposition": {
+                "bodyPaddingPx": 64,
+                "headerPx": 60,
+                "diagramChromePx": 84,
+                "svgPx": 946,
+                "cardsPx": 0,
+                "viewBoxHeight": 1008
+              },
+              "viewBoxWidth": 1694,
+              "minimumProjectedNodeTextPx": 7.5041322314049586,
+              "minimumProjectedNonEdgeTextPx": 7.59793388429752,
+              "minimumProjectedEdgeTextPx": 7.5041322314049586,
+              "minimumProjectedNodeText": "SMTP (MX)",
+              "minimumProjectedNodeTextDetail": "edge",
+              "minimumProjectedNodeTextOwner": {
+                "kind": "edge",
+                "id": "smtp-in",
+                "from": "sender",
+                "to": "cfRouting"
+              },
+              "minimumRequiredNodeTextPx": 6,
+              "readabilityOk": true,
+              "hasLegend": true,
+              "hasNavigationDock": true,
+              "legendDockIntersectionArea": 0,
+              "dockStageIntersectionArea": 0,
+              "dockStageGap": 10,
+              "requiredDockStageGap": 10,
+              "viewerChromeStageOk": true,
+              "viewerChromeReserve": 54,
+              "viewerChromeActive": true,
+              "viewerChromeOk": true,
+              "resolvedTheme": "light"
+            },
+            {
+              "width": 2048,
+              "height": 1320,
+              "theme": "light",
+              "innerWidth": 2048,
+              "innerHeight": 1320,
+              "scrollWidth": 2048,
+              "scrollHeight": 1320,
+              "overflowX": false,
+              "overflowY": false,
+              "verticalScrollAccepted": false,
+              "overflowDisposition": "contained",
+              "readerLayout": "adaptive",
+              "readerOverflow": null,
+              "readerFit": "intrinsic-height",
+              "ok": true,
+              "readerWidth": 1868,
+              "diagramWidth": 1818,
+              "pageComposition": {
+                "bodyPaddingPx": 64,
+                "headerPx": 68,
+                "diagramChromePx": 94,
+                "svgPx": 1082,
+                "cardsPx": 0,
+                "viewBoxHeight": 1008
+              },
+              "viewBoxWidth": 1694,
+              "minimumProjectedNodeTextPx": 8,
+              "minimumProjectedNonEdgeTextPx": 8.1,
+              "minimumProjectedEdgeTextPx": 8,
+              "minimumProjectedNodeText": "SMTP (MX)",
+              "minimumProjectedNodeTextDetail": "edge",
+              "minimumProjectedNodeTextOwner": {
+                "kind": "edge",
+                "id": "smtp-in",
+                "from": "sender",
+                "to": "cfRouting"
+              },
+              "minimumRequiredNodeTextPx": 6,
+              "readabilityOk": true,
+              "hasLegend": true,
+              "hasNavigationDock": true,
+              "legendDockIntersectionArea": 0,
+              "dockStageIntersectionArea": 0,
+              "dockStageGap": 10,
+              "requiredDockStageGap": 10,
+              "viewerChromeStageOk": true,
+              "viewerChromeReserve": 44,
+              "viewerChromeActive": true,
+              "viewerChromeOk": true,
+              "resolvedTheme": "light"
+            }
+          ]
+        },
+        "captures": {
+          "status": "not-requested",
+          "screenshots": [],
+          "contactSheet": null
+        },
+        "sidecars": {
+          "directory": "/Users/pvhieuit/open-repo/mailflare/.archify/architecture-mailflare-detailed-20261001-113615/review-2",
+          "receipt": "mailflare-detailed.browser-check.json",
+          "files": []
+        }
+      }
+    }
+  },
+  "diagnostics": [],
+  "evidence": {
+    "receipt": "/Users/pvhieuit/open-repo/mailflare/.archify/architecture-mailflare-detailed-20261001-113615/review-2/mailflare-detailed.finalize.json",
+    "summaryReceipt": "/Users/pvhieuit/open-repo/mailflare/.archify/architecture-mailflare-detailed-20261001-113615/review-2/mailflare-detailed.finalize-summary.json",
+    "browserCheckReceipt": "/Users/pvhieuit/open-repo/mailflare/.archify/architecture-mailflare-detailed-20261001-113615/review-2/mailflare-detailed.browser-check.json"
+  },
+  "visualReview": "not-requested",
+  "finishedAt": "2026-10-01T05:03:56.739Z",
+  "durationMs": 1589,
+  "update": {
+    "status": "current",
+    "installedVersion": "3.0.1",
+    "availableVersion": "3.0.1",
+    "releaseNotes": null,
+    "checkedAt": "2026-10-01T04:31:08.684Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  }
+}

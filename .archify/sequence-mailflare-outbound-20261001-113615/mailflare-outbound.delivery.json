@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "171a17a4-8dfb-4f42-b801-12b835e27c0a",
+  "status": "current",
+  "command": "deliver",
+  "type": "sequence",
+  "input": "/Users/pvhieuit/open-repo/mailflare/.archify/sequence-mailflare-outbound-20261001-113615/candidate.json",
+  "output": "/Users/pvhieuit/open-repo/mailflare/.archify/sequence-mailflare-outbound-20261001-113615/mailflare-outbound.html",
+  "specification": {
+    "sha256": "54b6495a48a39d42cb273bbfd75d4cf73000e98448fbfabcf6fc9769e68deccd",
+    "bytes": 46615
+  },
+  "artifact": {
+    "sha256": "719fae1376186f194712eb4da78d9ce5ec9ad89c914fb7579125dab5c760dc45",
+    "bytes": 800041
+  }
+}

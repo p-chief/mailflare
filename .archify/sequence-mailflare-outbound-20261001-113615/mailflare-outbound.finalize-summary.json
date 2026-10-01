@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "ok": false,
+  "command": "finalize",
+  "status": "fail",
+  "type": "sequence",
+  "quality": "showcase",
+  "specification": {
+    "path": "/Users/pvhieuit/open-repo/mailflare/.archify/sequence-mailflare-outbound-20261001-113615/candidate.json",
+    "sha256": "54b6495a48a39d42cb273bbfd75d4cf73000e98448fbfabcf6fc9769e68deccd",
+    "bytes": 46615
+  },
+  "artifact": {
+    "path": "/Users/pvhieuit/open-repo/mailflare/.archify/sequence-mailflare-outbound-20261001-113615/mailflare-outbound.html",
+    "sha256": "719fae1376186f194712eb4da78d9ce5ec9ad89c914fb7579125dab5c760dc45",
+    "bytes": 800041
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "fail"
+  },
+  "failedStage": "browser-check",
+  "diagnostics": [
+    {
+      "code": "viewer/evidence-path-conflict",
+      "severity": "error",
+      "message": "browser-check will not replace the existing unowned evidence path \"/Users/pvhieuit/open-repo/mailflare/.archify/sequence-mailflare-outbound-20261001-113615/mailflare-outbound.browser-check.json\".",
+      "subject": {
+        "artifact": "/Users/pvhieuit/open-repo/mailflare/.archify/sequence-mailflare-outbound-20261001-113615/mailflare-outbound.html",
+        "evidencePath": "/Users/pvhieuit/open-repo/mailflare/.archify/sequence-mailflare-outbound-20261001-113615/mailflare-outbound.browser-check.json"
+      },
+      "evidence": {
+        "reason": {
+          "code": "ownership-artifact-mismatch"
+        }
+      },
+      "supportedFixes": [
+        "move the conflicting file aside, or choose a separate --out-dir, then rerun browser-check"
+      ]
+    }
+  ],
+  "diagnosticSummary": {
+    "total": 1,
+    "shown": 1,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "/Users/pvhieuit/open-repo/mailflare/.archify/sequence-mailflare-outbound-20261001-113615/mailflare-outbound.finalize.json",
+    "summaryReceipt": "/Users/pvhieuit/open-repo/mailflare/.archify/sequence-mailflare-outbound-20261001-113615/mailflare-outbound.finalize-summary.json",
+    "browserCheckReceipt": "/Users/pvhieuit/open-repo/mailflare/.archify/sequence-mailflare-outbound-20261001-113615/mailflare-outbound.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.0.1",
+    "availableVersion": "3.0.1",
+    "releaseNotes": null,
+    "checkedAt": "2026-10-01T04:31:08.684Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 600
+}

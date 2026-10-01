@@ -1,0 +1,1555 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Kiến trúc chi tiết Mailflare trên Cloudflare Workers",
+    "output": ".archify/architecture-mailflare-detailed-20261001-113615/mailflare-detailed.html",
+    "quality_profile": "showcase",
+    "locale": "vi",
+    "translations": {
+      "page.title": "Sơ đồ {title}",
+      "diagram.description.architecture": "Sơ đồ kiến trúc được tạo bởi Archify.",
+      "diagram.description.workflow": "Sơ đồ quy trình được tạo bởi Archify.",
+      "diagram.description.sequence": "Sơ đồ tuần tự được tạo bởi Archify.",
+      "diagram.description.dataflow": "Sơ đồ luồng dữ liệu được tạo bởi Archify.",
+      "diagram.description.lifecycle": "Sơ đồ vòng đời được tạo bởi Archify.",
+      "node.focus": "Tập trung vào {label}",
+      "node.focus.detail": "Tập trung vào {label}, {detail}",
+      "node.context.architecture": "Thành phần kiến trúc",
+      "node.context.workflow": "Nút quy trình",
+      "node.context.sequence": "Thành phần tham gia tuần tự",
+      "node.context.dataflow": "Nút luồng dữ liệu",
+      "node.context.lifecycle": "Trạng thái vòng đời",
+      "legend.title": "Chú giải",
+      "legend.architecture.frontend": "Frontend",
+      "legend.architecture.backend": "Backend",
+      "legend.architecture.database": "Cơ sở dữ liệu",
+      "legend.architecture.cloud": "Đám mây",
+      "legend.architecture.security": "Bảo mật",
+      "legend.architecture.messagebus": "Hàng đợi thông điệp",
+      "legend.architecture.external": "Bên ngoài",
+      "legend.workflow.frontend": "Giao diện người dùng",
+      "legend.workflow.backend": "Logic tác tử",
+      "legend.workflow.security": "Chính sách",
+      "legend.workflow.messagebus": "Hành động công cụ",
+      "legend.workflow.database": "Ngữ cảnh / vết",
+      "legend.workflow.cloud": "Dịch vụ đám mây",
+      "legend.workflow.external": "Hệ thống bên ngoài",
+      "legend.sequence.emphasis": "yêu cầu chính",
+      "legend.sequence.return": "phản hồi",
+      "legend.sequence.security": "bảo mật",
+      "legend.sequence.dashed": "vết bất đồng bộ",
+      "legend.sequence.default": "thông điệp",
+      "legend.dataflow.emphasis": "dữ liệu chính",
+      "legend.dataflow.security": "chính sách / PII",
+      "legend.dataflow.dashed": "lô bất đồng bộ",
+      "legend.dataflow.database": "kho dữ liệu",
+      "legend.dataflow.default": "luồng dữ liệu",
+      "legend.lifecycle.start": "trạng thái khởi đầu",
+      "legend.lifecycle.active": "đang hoạt động",
+      "legend.lifecycle.waiting": "đang chờ",
+      "legend.lifecycle.decision": "quyết định",
+      "legend.lifecycle.success": "thành công",
+      "legend.lifecycle.failure": "thất bại / thoát",
+      "legend.lifecycle.neutral": "trung tính",
+      "legend.lifecycle.external": "bên ngoài",
+      "legend.lifecycle.final": "trạng thái kết thúc",
+      "viewer.kind.frontend": "Frontend",
+      "viewer.kind.backend": "Backend",
+      "viewer.kind.database": "Cơ sở dữ liệu",
+      "viewer.kind.cloud": "Đám mây",
+      "viewer.kind.security": "Bảo mật",
+      "viewer.kind.messagebus": "Hàng đợi thông điệp",
+      "viewer.kind.external": "Bên ngoài",
+      "viewer.kind.neutral": "Trung tính",
+      "viewer.kind.node": "Nút",
+      "viewer.kind.start": "Bắt đầu",
+      "viewer.kind.active": "Hoạt động",
+      "viewer.kind.waiting": "Đang chờ",
+      "viewer.kind.decision": "Quyết định",
+      "viewer.kind.success": "Thành công",
+      "viewer.kind.failure": "Thất bại",
+      "viewer.toolbar.actions": "Thao tác sơ đồ",
+      "viewer.theme.toggle.title": "Đổi chủ đề (T)",
+      "viewer.theme.toggle": "Đổi chủ đề màu",
+      "viewer.theme.dark": "Tối",
+      "viewer.theme.light": "Sáng",
+      "viewer.preset.choose.title": "Chọn phong cách hiển thị (S để chuyển)",
+      "viewer.preset.choose": "Chọn phong cách hiển thị",
+      "viewer.preset.style": "Phong cách",
+      "viewer.preset.menu": "Phong cách hiển thị",
+      "viewer.preset.identity": "Nhận diện hình ảnh",
+      "viewer.preset.cycles": "để chuyển",
+      "viewer.preset.classic": "Cổ điển",
+      "viewer.preset.classic.short": "Cổ điển",
+      "viewer.preset.classic.hint": "Mặc định kỹ thuật ổn định",
+      "viewer.preset.flow": "Luồng tín hiệu",
+      "viewer.preset.flow.short": "Luồng",
+      "viewer.preset.flow.hint": "Trình bày nhấn mạnh chuyển động",
+      "viewer.preset.blueprint": "Bản thiết kế",
+      "viewer.preset.blueprint.hint": "Đánh giá kỹ thuật",
+      "viewer.preset.editorial": "Biên tập",
+      "viewer.preset.editorial.hint": "Ấn phẩm và ghi chú phát hành",
+      "viewer.preset.badge.signalFlow": "LUỒNG TÍN HIỆU",
+      "viewer.preset.badge.blueprint": "BẢN THIẾT KẾ / REV 01",
+      "viewer.preset.badge.editorial": "BIÊN TẬP / GHI CHÚ THỰC ĐỊA",
+      "viewer.preset.badge.editorialPlate": "ARCHIFY / BẢN 04",
+      "viewer.preset.current": "Phong cách hiển thị: {style}. Chọn phong cách hiển thị",
+      "viewer.motion.live": "Động",
+      "viewer.motion.still": "Tĩnh",
+      "viewer.motion.pause": "Tạm dừng chuyển động",
+      "viewer.motion.resume": "Tiếp tục chuyển động",
+      "viewer.motion.reduced": "Chuyển động đã tạm dừng theo tùy chọn giảm chuyển động",
+      "viewer.motion.hidden": "Chuyển động tạm dừng khi trang bị ẩn",
+      "viewer.motion.yielding": "Tạm dừng chuyển động; hiện đang nhường cho {owner}",
+      "viewer.motion.yielding.title": "Đã bật xem trước trực tiếp · đang nhường cho {owner}",
+      "viewer.owner.route": "Dò đường đi",
+      "viewer.owner.lens": "Lăng kính ngữ nghĩa",
+      "viewer.owner.relationship": "Xem trước quan hệ",
+      "viewer.owner.intent": "Vết ý định",
+      "viewer.owner.focus": "tiêu điểm ngữ nghĩa",
+      "viewer.owner.legend": "xem trước chú giải",
+      "viewer.owner.reader": "tương tác của người đọc",
+      "viewer.present.enter": "Vào chế độ trình chiếu",
+      "viewer.present.enter.title": "Chế độ trình chiếu (F)",
+      "viewer.present.exit": "Thoát chế độ trình chiếu",
+      "viewer.present.exit.title": "Thoát chế độ trình chiếu (F hoặc Escape)",
+      "viewer.present.present": "Trình chiếu",
+      "viewer.present.exit.label": "Thoát",
+      "viewer.export.button": "Xuất",
+      "viewer.export.button.title": "Xuất sơ đồ (E)",
+      "viewer.export.diagram": "Xuất sơ đồ",
+      "viewer.export.menu": "Xuất",
+      "viewer.export.subtitle": "Kết quả gọn gàng, dễ chia sẻ",
+      "viewer.export.share": "Chia sẻ",
+      "viewer.export.shareCard": "Thẻ chia sẻ",
+      "viewer.export.routeShareCard": "Thẻ chia sẻ đường đi",
+      "viewer.export.reachShareCard": "Thẻ chia sẻ phạm vi",
+      "viewer.export.copyDiagram": "Sao chép sơ đồ",
+      "viewer.export.clipboardPng": "PNG vào bộ nhớ tạm",
+      "viewer.export.raster": "Ảnh raster",
+      "viewer.export.image": "Hình ảnh",
+      "viewer.export.lossless": "Ảnh không nén mất dữ liệu",
+      "viewer.export.compact": "Ảnh dung lượng nhỏ",
+      "viewer.export.modern": "Ảnh định dạng hiện đại",
+      "viewer.export.vectorMotion": "Vector và chuyển động",
+      "viewer.export.vectorMotion.heading": "Vector & chuyển động",
+      "viewer.export.editable": "Vector có thể chỉnh sửa",
+      "viewer.export.svg.auto": "SVG · Tự động",
+      "viewer.export.svg.auto.hint": "Theo chủ đề của trang chứa",
+      "viewer.export.svg.light": "SVG · Sáng",
+      "viewer.export.svg.light.hint": "Luôn sáng",
+      "viewer.export.svg.dark": "SVG · Tối",
+      "viewer.export.svg.dark.hint": "Luôn tối",
+      "viewer.export.motion6s": "Chuyển động 6 giây",
+      "viewer.export.unsupported": "Trình duyệt này không hỗ trợ",
+      "viewer.export.clipboardUnsupported": "Trình duyệt này không hỗ trợ ghi ảnh vào bộ nhớ tạm",
+      "viewer.export.clipboardUnsupported.short": "Trình duyệt này không hỗ trợ ghi ảnh vào bộ nhớ tạm.",
+      "viewer.export.motionUnavailable": "Trình duyệt này không hỗ trợ ghi chuyển động",
+      "viewer.export.webmUnavailable": "Trình duyệt này không hỗ trợ WebM",
+      "viewer.export.failed": "Xuất thất bại: {message}",
+      "viewer.export.unknownVariant": "Biến thể Thẻ chia sẻ không xác định: {variant}",
+      "viewer.export.routeRequired": "Hãy dò một đường đi trước khi xuất Thẻ chia sẻ đường đi",
+      "viewer.export.reachRequired": "Hãy dò phạm vi khai báo trước khi xuất Thẻ chia sẻ phạm vi",
+      "viewer.export.unknown": "không xác định",
+      "viewer.export.routeFailed": "Thẻ chia sẻ đường đi thất bại: {message}",
+      "viewer.export.reachFailed": "Thẻ chia sẻ phạm vi thất bại: {message}",
+      "viewer.export.copyFailed": "Sao chép thất bại: {message}",
+      "viewer.export.copiedPng": "Đã sao chép PNG vào bộ nhớ tạm",
+      "viewer.export.downloadedRoute": "Đã tải Thẻ chia sẻ đường đi",
+      "viewer.export.downloadedReach": "Đã tải Thẻ chia sẻ phạm vi",
+      "viewer.export.downloadedWebm": "Đã tải WebM",
+      "viewer.export.recording": "Đang ghi 6 giây chuyển động…",
+      "viewer.export.card.routeSummary.one": "Đường đi: {source} → {target} · {count} bước",
+      "viewer.export.card.routeSummary.other": "Đường đi: {source} → {target} · {count} bước",
+      "viewer.export.card.reachSummary": "Phạm vi {direction} từ {origin} · {nodes} · {links} · tối đa {hops}",
+      "viewer.export.card.node.one": "{count} nút",
+      "viewer.export.card.node.other": "{count} nút",
+      "viewer.export.card.link.one": "{count} liên kết",
+      "viewer.export.card.link.other": "{count} liên kết",
+      "viewer.export.card.hop.one": "{count} bước nhảy",
+      "viewer.export.card.hop.other": "{count} bước nhảy",
+      "viewer.export.card.routeBadge": "ARCHIFY · ĐƯỜNG ĐI · {hops}",
+      "viewer.export.card.reachBadge": "ARCHIFY · PHẠM VI {direction}",
+      "viewer.export.direction.upstream": "Thượng nguồn",
+      "viewer.export.direction.downstream": "Hạ nguồn",
+      "viewer.export.error.canvasUnavailable": "Không có canvas cho {label}",
+      "viewer.export.error.contextUnavailable": "Không có ngữ cảnh canvas 2D cho {label}",
+      "viewer.export.error.toBlobUnavailable": "Không có canvas.toBlob cho {label}",
+      "viewer.export.error.toBlobNull": "canvas.toBlob không trả về dữ liệu cho {label}",
+      "viewer.export.error.variantsCombined": "Không thể kết hợp các biến thể Thẻ chia sẻ",
+      "viewer.export.error.viewerState": "Thẻ chia sẻ không thể xóa trạng thái tạm của trình xem",
+      "viewer.export.error.routeState": "Thẻ đường đi không thể giữ an toàn đường đi đã xác định",
+      "viewer.export.error.reachState": "Thẻ phạm vi không thể giữ an toàn phạm vi khai báo",
+      "viewer.export.error.webmRequirements": "Chuyển động WebM cần hoạt ảnh vết và trình duyệt hỗ trợ MediaRecorder",
+      "viewer.export.error.mediaRecorder": "MediaRecorder thất bại",
+      "viewer.export.error.emptyWebm": "MediaRecorder tạo ra tệp WebM rỗng",
+      "viewer.export.error.webmBackground": "Không thể tải nền SVG để xuất WebM",
+      "viewer.guide.title": "Khám phá hệ thống này",
+      "viewer.focus.selectedNodes": "{count} nút đã chọn",
+      "viewer.guide.eyebrow": "Hướng dẫn sơ đồ",
+      "viewer.guide.close": "Đóng hướng dẫn sơ đồ",
+      "viewer.guide.inspecting": "Đang xem ngữ nghĩa đã biên dịch",
+      "viewer.guide.actions": "Thao tác khám phá sơ đồ",
+      "viewer.guide.find": "Tìm bất kỳ nút nào",
+      "viewer.guide.find.hint": "Tìm theo nhãn, trách nhiệm, loại và ID cố định.",
+      "viewer.guide.route": "Dò đường đi",
+      "viewer.guide.route.aria": "Dò đường đi có hướng",
+      "viewer.guide.route.hint": "Xem hai nút ngữ nghĩa kết nối với nhau thế nào theo hướng đã khai báo.",
+      "viewer.guide.map": "Xem toàn bộ hệ thống",
+      "viewer.guide.map.hint": "Mở Radar ngữ nghĩa với khung nhìn trực tiếp và các nút cố định.",
+      "viewer.guide.lens": "So sánh các loại ngữ nghĩa",
+      "viewer.guide.lens.hint": "Đếm vai trò, hiển thị lưu lượng và so sánh các liên kết khai báo trực tiếp.",
+      "viewer.guide.present": "Vào chế độ trình chiếu",
+      "viewer.guide.present.hint": "Dành toàn bộ khung nhìn cho sơ đồ mà không ảnh hưởng đến bản xuất.",
+      "viewer.guide.shortcuts": "Phím tắt bổ sung",
+      "viewer.guide.shortcut.export": "Xuất",
+      "viewer.guide.shortcut.theme": "Chủ đề",
+      "viewer.guide.shortcut.style": "Phong cách",
+      "viewer.guide.shortcut.reset": "Đặt lại",
+      "viewer.guide.shortcut.zoomIn": "Phóng to",
+      "viewer.guide.shortcut.zoomOut": "Thu nhỏ",
+      "viewer.guide.shortcut.close": "Đóng",
+      "viewer.guide.facts": "{nodes} · {relationships}",
+      "viewer.guide.fact.node.one": "{count} nút ngữ nghĩa",
+      "viewer.guide.fact.node.other": "{count} nút ngữ nghĩa",
+      "viewer.guide.fact.relationship.one": "{count} quan hệ",
+      "viewer.guide.fact.relationship.other": "{count} quan hệ",
+      "viewer.guide.open": "Mở hướng dẫn sơ đồ",
+      "viewer.finder.title": "Tìm nút",
+      "viewer.finder.close": "Đóng trình tìm nút",
+      "viewer.finder.placeholder": "Tìm theo nhãn hoặc ID",
+      "viewer.finder.search": "Tìm nút trong sơ đồ",
+      "viewer.finder.results": "Các nút sơ đồ",
+      "viewer.finder.empty": "Không có nút phù hợp",
+      "viewer.finder.result.focus": "Tập trung vào {label}",
+      "viewer.finder.result.routeStart": "Chọn {label} làm điểm bắt đầu",
+      "viewer.finder.result.routeTarget": "Chọn {label} làm điểm đích, {links}",
+      "viewer.finder.status.empty": "Không có nút phù hợp",
+      "viewer.finder.status.count.one": "{count} nút phù hợp",
+      "viewer.finder.status.count.other": "{count} nút phù hợp",
+      "viewer.finder.noun.nodes": "nút",
+      "viewer.finder.link.one": "{count} liên kết",
+      "viewer.finder.link.other": "{count} liên kết",
+      "viewer.finder.result.focus.one": "Tập trung vào {label}, {count} kết nối liên quan",
+      "viewer.finder.result.focus.other": "Tập trung vào {label}, {count} kết nối liên quan",
+      "viewer.finder.status.filtered": "{visible} trên {available} {noun}",
+      "viewer.finder.status.all": "{available} {noun}",
+      "viewer.passport.eyebrow": "Hộ chiếu ngữ nghĩa",
+      "viewer.passport.metadata": "Siêu dữ liệu nút",
+      "viewer.passport.evidence": "Bằng chứng mã nguồn đã xác minh",
+      "viewer.passport.verified": "Nguồn đã xác minh",
+      "viewer.passport.verificationScope": "Đã xác minh với Git cục bộ tại revision được ghim. Chưa kiểm tra truy cập từ xa.",
+      "viewer.passport.reach": "Phạm vi khai báo",
+      "viewer.passport.reach.trace": "Dò khả năng tiếp cận đã khai báo",
+      "viewer.passport.upstream": "Thượng nguồn",
+      "viewer.passport.downstream": "Hạ nguồn",
+      "viewer.passport.upstream.trace": "Dò khả năng tiếp cận thượng nguồn đã khai báo",
+      "viewer.passport.downstream.trace": "Dò khả năng tiếp cận hạ nguồn đã khai báo",
+      "viewer.passport.close": "Đóng hộ chiếu ngữ nghĩa",
+      "viewer.passport.move": "Di chuyển hộ chiếu ngữ nghĩa. Kéo, dùng phím mũi tên hoặc nhấn Home để đặt lại.",
+      "viewer.passport.copy": "Sao chép liên kết",
+      "viewer.passport.copy.focus": "Sao chép liên kết đến nút đang chọn",
+      "viewer.passport.relations": "Quan hệ",
+      "viewer.passport.relations.show": "Hiện các quan hệ kết nối",
+      "viewer.passport.relations.hide": "Ẩn các quan hệ kết nối",
+      "viewer.passport.relations.list": "Các quan hệ kết nối",
+      "viewer.passport.copyRelation": "Sao chép quan hệ",
+      "viewer.passport.copyNode": "Sao chép nút",
+      "viewer.passport.copyPinned": "Sao chép liên kết đến quan hệ đã ghim",
+      "viewer.passport.copySource": "Sao chép liên kết đến nút nguồn",
+      "viewer.passport.copy.focused.success": "Đã sao chép liên kết nút đang chọn",
+      "viewer.passport.copy.pinned.success": "Đã sao chép liên kết quan hệ đã ghim",
+      "viewer.passport.copy.focused.failed": "Không thể sao chép liên kết nút đang chọn",
+      "viewer.passport.copy.pinned.failed": "Không thể sao chép liên kết quan hệ đã ghim",
+      "viewer.passport.relationship.none": "Không có quan hệ kết nối",
+      "viewer.passport.relationship.count.one": "{count} quan hệ",
+      "viewer.passport.relationship.count.other": "{count} quan hệ",
+      "viewer.passport.relationship.show.one": "Hiện {count} quan hệ kết nối",
+      "viewer.passport.relationship.show.other": "Hiện {count} quan hệ kết nối",
+      "viewer.passport.relationship.summary": "{out} đi ra · {in} đi vào{loops}",
+      "viewer.passport.relationship.loops": " · {count} vòng lặp",
+      "viewer.passport.relationship.explorer": "Trình khám phá quan hệ trực tiếp",
+      "viewer.passport.relationship.help": "Dùng phím mũi tên để khám phá quan hệ. Nhấn Enter hoặc Space để ghim chi tiết; Escape để xóa.",
+      "viewer.passport.relationship.loopsBack": "quay lại chính nó",
+      "viewer.passport.relationship.connectsTo": "kết nối đến",
+      "viewer.passport.relationship.connectsFrom": "kết nối từ",
+      "viewer.passport.relationship.pinned": "Quan hệ đã ghim · {from} → {to} · {label}",
+      "viewer.passport.relationship.inspect": "Xem quan hệ {index} trên {total}: {from} đến {to}, {label}. Nhấn Enter để xem chi tiết.",
+      "viewer.passport.relationship.group.out": "Đi ra",
+      "viewer.passport.relationship.group.in": "Đi vào",
+      "viewer.passport.relationship.group.loop": "Tự lặp",
+      "viewer.passport.relationship.row": "{group}: {relationship}, {neighbor}",
+      "viewer.passport.relationship.direction.out": "RA →",
+      "viewer.passport.relationship.direction.in": "← VÀO",
+      "viewer.passport.relationship.direction.loop": "LẶP",
+      "viewer.passport.sourceCount.one": "{count} tham chiếu nguồn đã xác minh",
+      "viewer.passport.sourceCount.other": "{count} tham chiếu nguồn đã xác minh",
+      "viewer.passport.sourceMarker": "NGUỒN",
+      "viewer.passport.beacon.one": "{count} nguồn đã xác minh; chọn nút này để xem",
+      "viewer.passport.beacon.other": "{count} nguồn đã xác minh; chọn nút này để xem",
+      "viewer.passport.repository.open": "Mở revision {revision} đã xác minh của kho mã",
+      "viewer.passport.source.open": "Mở nguồn đã xác minh {path} tại revision {revision}",
+      "viewer.passport.source.openLink": "Mở ↗",
+      "viewer.passport.reach.upstream.one": "Dò {count} nút thượng nguồn đã khai báo",
+      "viewer.passport.reach.upstream.other": "Dò {count} nút thượng nguồn đã khai báo",
+      "viewer.passport.reach.downstream.one": "Dò {count} nút hạ nguồn đã khai báo",
+      "viewer.passport.reach.downstream.other": "Dò {count} nút hạ nguồn đã khai báo",
+      "viewer.passport.reach.noUpstream": "Không có nút thượng nguồn đã khai báo",
+      "viewer.passport.reach.noDownstream": "Không có nút hạ nguồn đã khai báo",
+      "viewer.passport.reach.status": "{direction} · {nodes} nút · {links} liên kết · tối đa {hops} bước nhảy",
+      "viewer.route.eyebrow": "Đường đi",
+      "viewer.route.start": "Nhấp vào điểm bắt đầu đường đi",
+      "viewer.route.start.find": "Tìm điểm đầu",
+      "viewer.route.start.find.aria": "Tìm điểm bắt đầu đường đi",
+      "viewer.route.copy": "Sao chép liên kết",
+      "viewer.route.copy.aria": "Sao chép liên kết đến đường đi đã dò",
+      "viewer.route.clear": "Xóa",
+      "viewer.route.clear.aria": "Xóa dò đường đi",
+      "viewer.route.traced": "Đường đi",
+      "viewer.route.pickTwo": "Nhấp vào hai nút trên sơ đồ",
+      "viewer.route.pickOne": "Nhấp vào một nút trên sơ đồ",
+      "viewer.route.controls": "Điều khiển hành trình đường đi",
+      "viewer.route.previous": "Vị trí trước trên đường đi",
+      "viewer.route.play": "Phát hành trình đường đi",
+      "viewer.route.pause": "Tạm dừng hành trình đường đi",
+      "viewer.route.replay": "Phát lại hành trình đường đi",
+      "viewer.route.next": "Vị trí tiếp theo trên đường đi",
+      "viewer.route.journey": "Hành trình",
+      "viewer.route.pause.label": "Tạm dừng",
+      "viewer.route.replay.label": "Phát lại",
+      "viewer.route.overview": "Tổng quan",
+      "viewer.route.overview.aria": "Hiện tổng quan toàn bộ đường đi",
+      "viewer.route.instructions": "Nhấp điểm đầu, rồi điểm cuối. Đường đi theo hướng mũi tên.",
+      "viewer.route.destination": "Đường đi từ {label} kết thúc ở đâu?",
+      "viewer.route.destination.find": "Tìm đích",
+      "viewer.route.destination.find.aria": "Tìm điểm đích có thể tới được",
+      "viewer.route.differentDestination": "Chọn một điểm đích khác",
+      "viewer.route.distinct": "Hãy chọn hai nút khác nhau.",
+      "viewer.route.unreachable": "Không thể tới {label} từ đây",
+      "viewer.route.unreachable.detail": "Không thể tới {target} từ {source} theo hướng mũi tên. Hãy chọn một nút được làm nổi bật.",
+      "viewer.route.start.instructions": "Tiếp theo, chọn điểm cuối. Chỉ những nút có thể tới được mới sáng lên.",
+      "viewer.route.copy.success": "Đã sao chép liên kết đường đi",
+      "viewer.route.copy.failed": "Không thể sao chép liên kết đường đi",
+      "viewer.route.position": "Vị trí {index} trên {total} của đường đi: {label}",
+      "viewer.route.step": "Bước {index} trên {total} · {phase} · {label}",
+      "viewer.route.motionRequired": "Hành trình tự động cần bật chuyển động Động",
+      "viewer.route.trigger.clear": "Xóa đường đi đã dò",
+      "viewer.route.overview.status": "{nodes} · {hops} · đường ngắn nhất",
+      "viewer.route.overview.node.one": "{count} nút",
+      "viewer.route.overview.node.other": "{count} nút",
+      "viewer.route.overview.hop.one": "{count} bước",
+      "viewer.route.overview.hop.other": "{count} bước",
+      "viewer.route.phase.playing": "Đang phát",
+      "viewer.route.phase.complete": "Hoàn tất",
+      "viewer.route.phase.inspecting": "Đang xem",
+      "viewer.route.destination.count.one": "{count} nút có thể tới được đang được làm nổi bật. Hãy nhấp vào nó.",
+      "viewer.route.destination.count.other": "{count} nút có thể tới được đang được làm nổi bật. Hãy nhấp vào một nút.",
+      "viewer.route.noOutgoing": "Không có mũi tên nào đi ra từ nút này. Hãy xóa và chọn điểm đầu khác.",
+      "viewer.route.result.title": "{source} đến {target}",
+      "viewer.route.finder.source.title": "Chọn điểm bắt đầu",
+      "viewer.route.finder.source.placeholder": "Tìm điểm bắt đầu",
+      "viewer.route.finder.source.empty": "Không có điểm bắt đầu phù hợp",
+      "viewer.route.finder.source.results": "Các nút có thể bắt đầu đường đi",
+      "viewer.route.finder.source.noun": "điểm bắt đầu",
+      "viewer.route.finder.source.badge": "đầu",
+      "viewer.route.finder.target.title": "Điểm đích từ {label}",
+      "viewer.route.finder.target.placeholder": "Tìm điểm đích có thể tới được",
+      "viewer.route.finder.target.empty": "Không có điểm đích phù hợp",
+      "viewer.route.finder.target.results": "Các điểm đích có thể tới được",
+      "viewer.route.finder.target.noun": "điểm đích có thể tới được",
+      "viewer.route.hop.one": "{count} bước nhảy",
+      "viewer.route.hop.other": "{count} bước nhảy",
+      "viewer.lens.eyebrow": "Lăng kính ngữ nghĩa",
+      "viewer.lens.title": "So sánh vai trò hệ thống",
+      "viewer.lens.close": "Đóng lăng kính ngữ nghĩa",
+      "viewer.lens.instruction": "Chọn tối đa hai loại ngữ nghĩa. Một loại sẽ hiện lưu lượng thực của nó; hai loại chỉ so sánh các quan hệ khai báo trực tiếp.",
+      "viewer.lens.kinds": "Các loại ngữ nghĩa",
+      "viewer.lens.choose": "Chọn một loại để xem các nút và quan hệ liên quan.",
+      "viewer.lens.copy": "Sao chép liên kết đến lăng kính ngữ nghĩa",
+      "viewer.lens.clear": "Xóa lăng kính ngữ nghĩa",
+      "viewer.lens.open": "Mở lăng kính ngữ nghĩa",
+      "viewer.lens.openActive": "Mở lăng kính ngữ nghĩa đang dùng",
+      "viewer.lens.legend": "Chú giải ngữ nghĩa",
+      "viewer.lens.legend.inspect.one": "Xem {label}, {count} nút",
+      "viewer.lens.legend.inspect.other": "Xem {label}, {count} nút",
+      "viewer.lens.kind.count.one": "{label}, {count} nút",
+      "viewer.lens.kind.count.other": "{label}, {count} nút",
+      "viewer.lens.compare.one": "{first} → {second}: {forward} · {second} → {first}: {reverse} · {count} quan hệ trực tiếp",
+      "viewer.lens.compare.other": "{first} → {second}: {forward} · {second} → {first}: {reverse} · {count} quan hệ trực tiếp",
+      "viewer.lens.single": "{nodes} · {relationships} · các nút kết nối vẫn hiển thị",
+      "viewer.lens.node.one": "{count} nút {label}",
+      "viewer.lens.node.other": "{count} nút {label}",
+      "viewer.lens.relationship.one": "{count} quan hệ liên quan",
+      "viewer.lens.relationship.other": "{count} quan hệ liên quan",
+      "viewer.radar.title": "Radar ngữ nghĩa",
+      "viewer.radar.building": "Đang dựng tổng quan",
+      "viewer.radar.openFull": "Mở radar ngữ nghĩa đầy đủ",
+      "viewer.radar.open": "Mở radar",
+      "viewer.radar.close": "Đóng radar ngữ nghĩa",
+      "viewer.radar.surface": "Tổng quan sơ đồ. Nhấp vào một nút để tập trung, hoặc dùng phím mũi tên để di chuyển.",
+      "viewer.radar.click": "Nhấp vào nút",
+      "viewer.radar.drag": "Kéo để di chuyển",
+      "viewer.radar.space": "Radar ngữ nghĩa cần thêm không gian ở mức MAP.",
+      "viewer.radar.nodes": "Các nút radar của sơ đồ ngữ nghĩa",
+      "viewer.radar.focus": "Tập trung vào {label} từ Radar ngữ nghĩa",
+      "viewer.radar.status": "{count} nút · {viewport}",
+      "viewer.radar.fullMap": "{count} nút · toàn bản đồ",
+      "viewer.radar.compacted": "Radar đã thu gọn để không che Hộ chiếu ngữ nghĩa hoặc các điều khiển MAP.",
+      "viewer.radar.cancelWaiting": "Hủy chờ thêm không gian MAP cho radar ngữ nghĩa",
+      "viewer.radar.needsSpace": "Radar ngữ nghĩa cần thêm không gian MAP hiển thị",
+      "viewer.radar.viewport.full": "toàn bản đồ",
+      "viewer.radar.viewport.width": "{percent}% chiều rộng",
+      "viewer.radar.viewport.scale": "{percent}% khung nhìn",
+      "viewer.nav.controls": "Điều khiển khung nhìn sơ đồ",
+      "viewer.nav.route": "Dò đường đi có hướng",
+      "viewer.nav.route.title": "Dò đường đi (R)",
+      "viewer.nav.route.short": "ĐƯỜNG",
+      "viewer.nav.radar": "Mở radar ngữ nghĩa",
+      "viewer.nav.radar.title": "Radar ngữ nghĩa (M)",
+      "viewer.nav.radar.short": "MAP",
+      "viewer.nav.lens": "Mở lăng kính ngữ nghĩa",
+      "viewer.nav.lens.title": "Lăng kính ngữ nghĩa (L)",
+      "viewer.nav.lens.short": "LĂNG KÍNH",
+      "viewer.nav.find": "Tìm nút",
+      "viewer.nav.find.title": "Tìm nút (/)",
+      "viewer.outline.title": "Mục lục nút",
+      "viewer.rail.show": "Ghi chú & mục lục",
+      "viewer.rail.controls": "Bảng bên",
+      "viewer.rail.collapse": "Thu gọn bảng bên",
+      "viewer.rail.bottom": "Chuyển bảng xuống dưới sơ đồ",
+      "viewer.rail.right": "Chuyển bảng sang cạnh sơ đồ",
+      "viewer.nav.guide": "Mở hướng dẫn sơ đồ",
+      "viewer.nav.guide.title": "Hướng dẫn sơ đồ (?)",
+      "viewer.nav.zoomOut": "Thu nhỏ",
+      "viewer.nav.zoomOut.title": "Thu nhỏ (-)",
+      "viewer.nav.reset": "Đặt lại khung nhìn sơ đồ",
+      "viewer.nav.reset.title": "Đặt lại khung nhìn (0)",
+      "viewer.nav.read": "ĐỌC",
+      "viewer.nav.zoomIn": "Phóng to",
+      "viewer.nav.zoomIn.title": "Phóng to (+)",
+      "viewer.nav.camera": "{hint}. Đặt lại khung nhìn sơ đồ",
+      "viewer.nav.camera.title": "{semantic}{hint} · đặt lại khung nhìn (0)",
+      "viewer.nav.camera.semantic": "Camera ngữ nghĩa đang bật · ",
+      "viewer.nav.level.map": "MAP",
+      "viewer.nav.level.read": "ĐỌC",
+      "viewer.nav.level.full": "ĐẦY ĐỦ",
+      "viewer.nav.level.auto": "TỰ ĐỘNG",
+      "viewer.nav.detail.map": "Phóng to để hiện nhãn quan hệ và ngữ cảnh nút",
+      "viewer.nav.detail.read": "Phóng to thêm để hiện thẻ và chú thích",
+      "viewer.nav.detail.full": "Chi tiết đầy đủ của sơ đồ",
+      "viewer.intent.summary": "{label}. {out} đi ra, {in} đi vào{loops}. {total} kết nối. Nhấn Enter để xem chi tiết.",
+      "viewer.intent.loops": ", {count} tự lặp",
+      "viewer.common.copied": "Đã sao chép",
+      "viewer.common.copyFailed": "Sao chép thất bại",
+      "viewer.common.copyLink": "Sao chép liên kết",
+      "viewer.common.clear": "Xóa",
+      "viewer.common.close": "Đóng"
+    },
+    "repository": {
+      "url": "https://github.com/p-chief/mailflare.git",
+      "revision": "7c605c3c9523bc7f0e0a92ab718f174ecb4de1d6"
+    }
+  },
+  "components": [
+    {
+      "id": "sender",
+      "type": "external",
+      "label": "Máy chủ thư gửi (MTA)",
+      "sublabel": "SMTP từ Internet",
+      "pos": [
+        60,
+        396
+      ],
+      "size": [
+        160,
+        70
+      ]
+    },
+    {
+      "id": "cfRouting",
+      "type": "cloud",
+      "label": "Email Routing",
+      "sublabel": "rule worker → mailflare",
+      "pos": [
+        60,
+        238
+      ],
+      "size": [
+        160,
+        70
+      ],
+      "sources": [
+        {
+          "path": "src/lib/cloudflare-api.ts",
+          "line": 183,
+          "end_line": 202,
+          "label": "rule action worker"
+        },
+        {
+          "path": "src/lib/cloudflare-api-utils.ts",
+          "line": 61,
+          "end_line": 63,
+          "label": "tên Worker cố định"
+        }
+      ]
+    },
+    {
+      "id": "aiModel",
+      "type": "cloud",
+      "label": "Workers AI",
+      "sublabel": "binding AI · mặc định",
+      "pos": [
+        60,
+        80
+      ],
+      "size": [
+        160,
+        70
+      ],
+      "sources": [
+        {
+          "path": "wrangler.jsonc",
+          "line": 68,
+          "end_line": 68,
+          "label": "binding AI"
+        },
+        {
+          "path": "src/lib/agent/model.ts",
+          "line": 6,
+          "end_line": 16,
+          "label": "getAgentModel"
+        },
+        {
+          "path": "src/lib/agent/provider.ts",
+          "line": 21,
+          "end_line": 37,
+          "label": "chọn provider"
+        }
+      ]
+    },
+    {
+      "id": "emailHandler",
+      "type": "backend",
+      "label": "worker.ts · email()",
+      "sublabel": "≤ 25 MiB · reject · forward",
+      "pos": [
+        295,
+        238
+      ],
+      "size": [
+        160,
+        70
+      ],
+      "sources": [
+        {
+          "path": "worker.ts",
+          "line": 49,
+          "end_line": 95,
+          "label": "email handler"
+        },
+        {
+          "path": "src/lib/email/incoming.ts",
+          "line": 11,
+          "end_line": 48,
+          "label": "resolve + forward"
+        },
+        {
+          "path": "src/lib/email/inbound-attachments.ts",
+          "line": 9,
+          "end_line": 30,
+          "label": "giới hạn đính kèm"
+        }
+      ]
+    },
+    {
+      "id": "r2",
+      "type": "database",
+      "label": "R2 · BUCKET",
+      "sublabel": "MIME thô · đính kèm · sao lưu",
+      "pos": [
+        295,
+        360
+      ],
+      "size": [
+        160,
+        70
+      ],
+      "sources": [
+        {
+          "path": "wrangler.jsonc",
+          "line": 76,
+          "end_line": 81,
+          "label": "binding BUCKET"
+        },
+        {
+          "path": "src/lib/email/inbound.ts",
+          "line": 246,
+          "end_line": 258,
+          "label": "storeRawToR2"
+        },
+        {
+          "path": "src/lib/email/attachments.ts",
+          "line": 62,
+          "end_line": 96,
+          "label": "lưu đính kèm"
+        }
+      ]
+    },
+    {
+      "id": "scheduledHandler",
+      "type": "backend",
+      "label": "worker.ts · scheduled()",
+      "sublabel": "cron 0 2 * * * · */5 phút",
+      "pos": [
+        295,
+        554
+      ],
+      "size": [
+        160,
+        70
+      ],
+      "sources": [
+        {
+          "path": "worker.ts",
+          "line": 124,
+          "end_line": 127,
+          "label": "scheduled handler"
+        },
+        {
+          "path": "wrangler.jsonc",
+          "line": 40,
+          "end_line": 42,
+          "label": "cron triggers"
+        },
+        {
+          "path": "src/lib/backups/runner.ts",
+          "line": 8,
+          "end_line": 23,
+          "label": "sao lưu vào R2"
+        }
+      ]
+    },
+    {
+      "id": "agentJob",
+      "type": "backend",
+      "label": "processAgentDraftJob",
+      "sublabel": "nháp trả lời bằng AI",
+      "pos": [
+        530,
+        80
+      ],
+      "size": [
+        160,
+        70
+      ],
+      "sources": [
+        {
+          "path": "src/lib/agent/jobs/utils.ts",
+          "line": 43,
+          "end_line": 96,
+          "label": "xử lý job nháp"
+        },
+        {
+          "path": "src/lib/agent/maintenance.ts",
+          "line": 6,
+          "end_line": 13,
+          "label": "bảo trì định kỳ"
+        },
+        {
+          "path": "src/lib/agent/chat.ts",
+          "line": 34,
+          "end_line": 64,
+          "label": "chat: getAgentModel + streamText"
+        }
+      ]
+    },
+    {
+      "id": "inboundQueue",
+      "type": "messagebus",
+      "label": "INBOUND_QUEUE",
+      "sublabel": "{from, to, rawR2Key}",
+      "pos": [
+        530,
+        238
+      ],
+      "size": [
+        160,
+        70
+      ],
+      "sources": [
+        {
+          "path": "wrangler.jsonc",
+          "line": 84,
+          "end_line": 87,
+          "label": "producer"
+        },
+        {
+          "path": "wrangler.jsonc",
+          "line": 98,
+          "end_line": 102,
+          "label": "consumer"
+        },
+        {
+          "path": "src/lib/email/inbound.ts",
+          "line": 28,
+          "end_line": 33,
+          "label": "payload"
+        }
+      ]
+    },
+    {
+      "id": "webhookDispatch",
+      "type": "backend",
+      "label": "dispatchWebhooks",
+      "sublabel": "webhook_deliveries · HMAC",
+      "pos": [
+        530,
+        554
+      ],
+      "size": [
+        160,
+        70
+      ],
+      "sources": [
+        {
+          "path": "src/lib/email/webhooks.ts",
+          "line": 43,
+          "end_line": 64,
+          "label": "dispatchWebhooks"
+        },
+        {
+          "path": "src/lib/email/webhooks.ts",
+          "line": 87,
+          "end_line": 147,
+          "label": "attemptDelivery"
+        },
+        {
+          "path": "src/lib/email/webhooks.ts",
+          "line": 220,
+          "end_line": 232,
+          "label": "ký HMAC-SHA-256"
+        }
+      ]
+    },
+    {
+      "id": "webhookReceiver",
+      "type": "external",
+      "label": "Endpoint webhook",
+      "sublabel": "URL do người dùng cấu hình",
+      "pos": [
+        530,
+        870
+      ],
+      "size": [
+        160,
+        70
+      ],
+      "sources": [
+        {
+          "path": "src/lib/email/webhooks.ts",
+          "line": 100,
+          "end_line": 114,
+          "label": "POST tới hook.url"
+        }
+      ]
+    },
+    {
+      "id": "queueHandler",
+      "type": "backend",
+      "label": "worker.ts · queue()",
+      "sublabel": "1 consumer · retry 10 giây",
+      "pos": [
+        765,
+        238
+      ],
+      "size": [
+        160,
+        70
+      ],
+      "sources": [
+        {
+          "path": "worker.ts",
+          "line": 97,
+          "end_line": 122,
+          "label": "queue consumer"
+        },
+        {
+          "path": "worker-utils.ts",
+          "line": 4,
+          "end_line": 21,
+          "label": "phân loại payload"
+        },
+        {
+          "path": "wrangler.jsonc",
+          "line": 97,
+          "end_line": 113,
+          "label": "consumers, max_retries"
+        }
+      ]
+    },
+    {
+      "id": "pipeline",
+      "type": "backend",
+      "label": "processInboundMessage",
+      "sublabel": "route · parse · spam · thread",
+      "pos": [
+        765,
+        396
+      ],
+      "size": [
+        160,
+        70
+      ],
+      "sources": [
+        {
+          "path": "src/lib/email/inbound.ts",
+          "line": 35,
+          "end_line": 101,
+          "label": "định tuyến, đọc R2, parse"
+        },
+        {
+          "path": "src/lib/email/inbound.ts",
+          "line": 102,
+          "end_line": 199,
+          "label": "spam, thread, INSERT"
+        },
+        {
+          "path": "src/lib/email/inbound.ts",
+          "line": 201,
+          "end_line": 244,
+          "label": "reply, notify, webhook"
+        }
+      ]
+    },
+    {
+      "id": "d1",
+      "type": "database",
+      "label": "D1 · Drizzle",
+      "sublabel": "messages + FTS5",
+      "pos": [
+        765,
+        554
+      ],
+      "size": [
+        160,
+        70
+      ],
+      "sources": [
+        {
+          "path": "src/db/index.ts",
+          "line": 1,
+          "end_line": 17,
+          "label": "getDb"
+        },
+        {
+          "path": "wrangler.jsonc",
+          "line": 69,
+          "end_line": 75,
+          "label": "binding DB"
+        },
+        {
+          "path": "drizzle/migrations/0030_add_message_search_index.sql",
+          "line": 1,
+          "end_line": 29,
+          "label": "messages_fts"
+        }
+      ]
+    },
+    {
+      "id": "realtime",
+      "type": "backend",
+      "label": "RealtimeHub",
+      "sublabel": "Durable Object theo user",
+      "pos": [
+        765,
+        712
+      ],
+      "size": [
+        160,
+        70
+      ],
+      "sources": [
+        {
+          "path": "src/lib/realtime/hub.ts",
+          "line": 5,
+          "end_line": 38,
+          "label": "connect + notify"
+        },
+        {
+          "path": "src/lib/realtime/utils.ts",
+          "line": 51,
+          "end_line": 68,
+          "label": "notifyUsersOfNewMessage"
+        },
+        {
+          "path": "wrangler.jsonc",
+          "line": 24,
+          "end_line": 39,
+          "label": "binding REALTIME"
+        }
+      ]
+    },
+    {
+      "id": "outboundQueue",
+      "type": "messagebus",
+      "label": "OUTBOUND_QUEUE",
+      "sublabel": "email.scheduled · webhook.retry",
+      "pos": [
+        1000,
+        80
+      ],
+      "size": [
+        160,
+        70
+      ],
+      "sources": [
+        {
+          "path": "wrangler.jsonc",
+          "line": 88,
+          "end_line": 91,
+          "label": "producer"
+        },
+        {
+          "path": "env.d.ts",
+          "line": 11,
+          "end_line": 15,
+          "label": "hai loại payload"
+        },
+        {
+          "path": "src/lib/email/webhooks.ts",
+          "line": 149,
+          "end_line": 156,
+          "label": "webhook.retry"
+        }
+      ]
+    },
+    {
+      "id": "sendService",
+      "type": "backend",
+      "label": "sendEmail",
+      "sublabel": "outbound_jobs · deliverEmail",
+      "pos": [
+        1000,
+        238
+      ],
+      "size": [
+        160,
+        70
+      ],
+      "sources": [
+        {
+          "path": "src/lib/email/send.ts",
+          "line": 142,
+          "end_line": 257,
+          "label": "outbound_jobs, EMAIL.send, webhook"
+        },
+        {
+          "path": "src/lib/email/send.ts",
+          "line": 287,
+          "end_line": 328,
+          "label": "processOutboundQueue"
+        },
+        {
+          "path": "src/app/api/send/route.ts",
+          "line": 15,
+          "end_line": 56,
+          "label": "/api/send"
+        }
+      ]
+    },
+    {
+      "id": "agentQueue",
+      "type": "messagebus",
+      "label": "AGENT_QUEUE",
+      "sublabel": "agent.draft {jobId}",
+      "pos": [
+        1000,
+        396
+      ],
+      "size": [
+        160,
+        70
+      ],
+      "sources": [
+        {
+          "path": "wrangler.jsonc",
+          "line": 92,
+          "end_line": 95,
+          "label": "producer"
+        },
+        {
+          "path": "wrangler.jsonc",
+          "line": 108,
+          "end_line": 112,
+          "label": "consumer lô 1"
+        },
+        {
+          "path": "src/lib/agent/jobs/utils.ts",
+          "line": 26,
+          "end_line": 41,
+          "label": "scheduleAutoDraft"
+        }
+      ]
+    },
+    {
+      "id": "publicApi",
+      "type": "frontend",
+      "label": "/api/v1 · /jmap · /mcp",
+      "sublabel": "API key + scope",
+      "pos": [
+        1000,
+        554
+      ],
+      "size": [
+        160,
+        70
+      ],
+      "sources": [
+        {
+          "path": "src/app/api/v1/send/route.ts",
+          "line": 11,
+          "end_line": 45,
+          "label": "scope send → sendEmail"
+        },
+        {
+          "path": "src/lib/jmap/handler.ts",
+          "line": 17,
+          "end_line": 36,
+          "label": "JMAP, scope jmap"
+        },
+        {
+          "path": "src/app/mcp/route.ts",
+          "line": 6,
+          "end_line": 17,
+          "label": "/mcp: Origin, host, key, rate limit"
+        }
+      ]
+    },
+    {
+      "id": "browser",
+      "type": "external",
+      "label": "Trình duyệt người dùng",
+      "sublabel": "dashboard · WebSocket",
+      "pos": [
+        1000,
+        870
+      ],
+      "size": [
+        160,
+        70
+      ],
+      "sources": [
+        {
+          "path": "src/hooks/use-message-polling.ts",
+          "line": 108,
+          "end_line": 116,
+          "label": "mở WebSocket"
+        },
+        {
+          "path": "src/hooks/message-realtime-utils.ts",
+          "line": 20,
+          "end_line": 23,
+          "label": "URL /api/realtime"
+        },
+        {
+          "path": "src/lib/auth/client.ts",
+          "line": 41,
+          "end_line": 58,
+          "label": "authFetch gắn Bearer phiên"
+        }
+      ]
+    },
+    {
+      "id": "dashApi",
+      "type": "frontend",
+      "label": "Dashboard · /api/*",
+      "sublabel": "phiên Bearer / cookie · admin",
+      "pos": [
+        1235,
+        396
+      ],
+      "size": [
+        160,
+        70
+      ],
+      "sources": [
+        {
+          "path": "src/app/api/messages/route.ts",
+          "line": 17,
+          "end_line": 54,
+          "label": "phiên + phạm vi mailbox"
+        },
+        {
+          "path": "src/lib/auth/cookies.ts",
+          "line": 11,
+          "end_line": 22,
+          "label": "Bearer trước, cookie sau"
+        },
+        {
+          "path": "src/app/api/admin/migrations/POST.ts",
+          "line": 5,
+          "end_line": 17,
+          "label": "migrations"
+        }
+      ]
+    },
+    {
+      "id": "fetchHandler",
+      "type": "backend",
+      "label": "worker.ts · fetch()",
+      "sublabel": "/api/realtime · vinext",
+      "pos": [
+        1235,
+        554
+      ],
+      "size": [
+        160,
+        70
+      ],
+      "sources": [
+        {
+          "path": "worker.ts",
+          "line": 25,
+          "end_line": 47,
+          "label": "fetch handler"
+        },
+        {
+          "path": "worker.ts",
+          "line": 1,
+          "end_line": 1,
+          "label": "vinextHandler"
+        },
+        {
+          "path": "src/lib/realtime/utils.ts",
+          "line": 7,
+          "end_line": 20,
+          "label": "WebSocket: chỉ cookie ep_session"
+        }
+      ]
+    },
+    {
+      "id": "sendBinding",
+      "type": "cloud",
+      "label": "Email Sending",
+      "sublabel": "binding EMAIL (send_email)",
+      "pos": [
+        1470,
+        238
+      ],
+      "size": [
+        160,
+        70
+      ],
+      "sources": [
+        {
+          "path": "wrangler.jsonc",
+          "line": 62,
+          "end_line": 67,
+          "label": "send_email"
+        },
+        {
+          "path": "src/lib/email/send.ts",
+          "line": 196,
+          "end_line": 221,
+          "label": "env.EMAIL.send"
+        }
+      ]
+    },
+    {
+      "id": "cfApi",
+      "type": "cloud",
+      "label": "Cloudflare REST API",
+      "sublabel": "CF_TOKEN · DNS, routing rule",
+      "pos": [
+        1470,
+        396
+      ],
+      "size": [
+        160,
+        70
+      ],
+      "sources": [
+        {
+          "path": "src/lib/cloudflare-api.ts",
+          "line": 19,
+          "end_line": 44,
+          "label": "cfRequest"
+        },
+        {
+          "path": "src/lib/cloudflare-api-utils.ts",
+          "line": 3,
+          "end_line": 34,
+          "label": "xác thực"
+        },
+        {
+          "path": "src/lib/domains/service.ts",
+          "line": 65,
+          "end_line": 65,
+          "label": "cấp phát domain"
+        }
+      ]
+    },
+    {
+      "id": "apiClients",
+      "type": "external",
+      "label": "Client API / JMAP / MCP",
+      "sublabel": "Bearer · JMAP thêm Basic",
+      "pos": [
+        1470,
+        554
+      ],
+      "size": [
+        160,
+        70
+      ],
+      "sources": [
+        {
+          "path": "src/lib/api/key-auth.ts",
+          "line": 47,
+          "end_line": 65,
+          "label": "Bearer / Basic"
+        },
+        {
+          "path": "src/app/api/v1/messages/route.ts",
+          "line": 12,
+          "end_line": 17,
+          "label": "API key + scope read"
+        },
+        {
+          "path": "src/lib/mcp/auth.ts",
+          "line": 12,
+          "end_line": 24,
+          "label": "key loại mcp + scope mcp:*"
+        }
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Worker mailflare · tài khoản Cloudflare của bạn",
+      "wraps": [
+        "emailHandler",
+        "r2",
+        "scheduledHandler",
+        "agentJob",
+        "inboundQueue",
+        "webhookDispatch",
+        "queueHandler",
+        "pipeline",
+        "d1",
+        "realtime",
+        "outboundQueue",
+        "sendService",
+        "agentQueue",
+        "publicApi",
+        "dashApi",
+        "fetchHandler"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "Nền tảng Cloudflare",
+      "wraps": [
+        "aiModel",
+        "cfRouting"
+      ],
+      "pad": 24
+    },
+    {
+      "kind": "region",
+      "label": "Nền tảng Cloudflare",
+      "wraps": [
+        "sendBinding",
+        "cfApi"
+      ],
+      "pad": 24
+    }
+  ],
+  "connections": [
+    {
+      "id": "smtp-in",
+      "from": "sender",
+      "to": "cfRouting",
+      "label": "SMTP (MX)",
+      "variant": "emphasis"
+    },
+    {
+      "id": "routing-to-worker",
+      "from": "cfRouting",
+      "to": "emailHandler",
+      "label": "email()",
+      "variant": "emphasis"
+    },
+    {
+      "id": "enqueue-inbound",
+      "from": "emailHandler",
+      "to": "inboundQueue",
+      "label": "send()",
+      "variant": "emphasis"
+    },
+    {
+      "id": "consume-inbound",
+      "from": "inboundQueue",
+      "to": "queueHandler",
+      "label": "lô ≤ 5",
+      "variant": "emphasis"
+    },
+    {
+      "id": "dispatch-inbound",
+      "from": "queueHandler",
+      "to": "pipeline",
+      "label": "thư đến",
+      "variant": "emphasis"
+    },
+    {
+      "id": "notify-hub",
+      "from": "pipeline",
+      "to": "realtime",
+      "label": "POST /notify",
+      "variant": "emphasis",
+      "fromSide": "left",
+      "toSide": "left"
+    },
+    {
+      "id": "push-ws",
+      "from": "realtime",
+      "to": "browser",
+      "label": "WebSocket",
+      "variant": "emphasis",
+      "fromSide": "bottom",
+      "toSide": "left"
+    },
+    {
+      "id": "put-raw",
+      "from": "emailHandler",
+      "to": "r2",
+      "label": "put .eml"
+    },
+    {
+      "id": "raw-and-attachments",
+      "from": "pipeline",
+      "to": "r2",
+      "label": "đọc .eml · ghi đính kèm"
+    },
+    {
+      "id": "backup-json",
+      "from": "scheduledHandler",
+      "to": "r2",
+      "label": "sao lưu JSON"
+    },
+    {
+      "id": "insert-message",
+      "from": "pipeline",
+      "to": "d1",
+      "label": "INSERT messages"
+    },
+    {
+      "id": "webhook-event",
+      "from": "pipeline",
+      "to": "webhookDispatch",
+      "label": "message.inbound",
+      "fromSide": "left",
+      "toSide": "top"
+    },
+    {
+      "id": "webhook-post",
+      "from": "webhookDispatch",
+      "to": "webhookReceiver",
+      "label": "POST ký HMAC",
+      "variant": "security"
+    },
+    {
+      "id": "schedule-draft",
+      "from": "pipeline",
+      "to": "agentQueue",
+      "label": "agent.draft",
+      "variant": "dashed"
+    },
+    {
+      "id": "consume-agent",
+      "from": "agentQueue",
+      "to": "queueHandler",
+      "label": "lô 1",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "run-draft",
+      "from": "queueHandler",
+      "to": "agentJob",
+      "label": "agent.draft",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "generate-text",
+      "from": "agentJob",
+      "to": "aiModel",
+      "label": "generateText"
+    },
+    {
+      "id": "consume-outbound",
+      "from": "outboundQueue",
+      "to": "queueHandler",
+      "label": "lô ≤ 5",
+      "fromSide": "left",
+      "toSide": "top"
+    },
+    {
+      "id": "dispatch-scheduled",
+      "from": "queueHandler",
+      "to": "sendService",
+      "label": "gửi hẹn giờ"
+    },
+    {
+      "id": "enqueue-scheduled",
+      "from": "sendService",
+      "to": "outboundQueue",
+      "label": "email.scheduled",
+      "variant": "dashed"
+    },
+    {
+      "id": "send-binding",
+      "from": "sendService",
+      "to": "sendBinding",
+      "label": "EMAIL.send()"
+    },
+    {
+      "id": "api-send",
+      "from": "dashApi",
+      "to": "sendService",
+      "label": "/api/send",
+      "fromSide": "top",
+      "toSide": "right"
+    },
+    {
+      "id": "provision",
+      "from": "dashApi",
+      "to": "cfApi",
+      "label": "cấp phát",
+      "variant": "dashed"
+    },
+    {
+      "id": "dash-sql",
+      "from": "dashApi",
+      "to": "d1",
+      "label": "SQL theo mailbox",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "public-sql",
+      "from": "publicApi",
+      "to": "d1",
+      "label": "SQL"
+    },
+    {
+      "id": "delegate-public",
+      "from": "fetchHandler",
+      "to": "publicApi",
+      "label": "vinext"
+    },
+    {
+      "id": "delegate-dash",
+      "from": "fetchHandler",
+      "to": "dashApi",
+      "label": "vinext"
+    },
+    {
+      "id": "connect-hub",
+      "from": "fetchHandler",
+      "to": "realtime",
+      "label": "/connect",
+      "fromSide": "bottom",
+      "toSide": "right"
+    },
+    {
+      "id": "browser-http",
+      "from": "browser",
+      "to": "fetchHandler",
+      "label": "HTTPS + Bearer phiên · WSS + cookie",
+      "variant": "security",
+      "fromSide": "right",
+      "toSide": "bottom"
+    },
+    {
+      "id": "api-http",
+      "from": "apiClients",
+      "to": "fetchHandler",
+      "label": "API key",
+      "variant": "security"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Luồng chính: thư đến → trình duyệt",
+      "items": [
+        "Email Routing gọi email(); handler chỉ parse để kiểm tra giới hạn, put MIME thô vào R2 rồi send() lên INBOUND_QUEUE",
+        "queue() nhận lô và gọi processInboundMessage; lỗi → retry sau 10 giây, tối đa 3 lần",
+        "Sau INSERT: notifyUsersOfNewMessage → RealtimeHub của từng user → đẩy qua WebSocket (bỏ qua nếu là spam)"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Các bước trong processInboundMessage",
+      "items": [
+        "resolveInboundAddress: rule reject → mailbox/alias → catch-all; chống trùng theo (mailboxId, rawR2Key)",
+        "Đọc .eml từ R2, parseRawMime (postal-mime), kiểm tra giới hạn đính kèm",
+        "resolveInboxRuleDestination + analyzeSpam → status received/spam/trash và folder",
+        "upsertContactFromAddress, rồi resolveThreadId theo In-Reply-To/References",
+        "INSERT messages → storeMessageAttachments (R2 + D1); lỗi thì xoá hàng và ném lại để retry",
+        "Auto-reply (nếu received) → notify → dispatchWebhooks → scheduleAutoDraft"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Ba hàng đợi, một consumer",
+      "items": [
+        "INBOUND_QUEUE: {from, to, rawR2Key, headers}, lô 5",
+        "OUTBOUND_QUEUE: email.scheduled (delaySeconds) và webhook.retry, lô 5",
+        "AGENT_QUEUE: agent.draft {jobId}, lô 1",
+        "queue() phân loại theo payload; loại không nhận ra → ném lỗi rồi retry"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Gửi thư và webhook",
+      "items": [
+        "sendEmail: kiểm tra người gửi và giới hạn, INSERT messages (queued), lưu đính kèm, ghi outbound_jobs",
+        "Không hẹn giờ → EMAIL.send() ngay; hẹn giờ → OUTBOUND_QUEUE rồi processOutboundQueue",
+        "/api/v1/send: API key scope send (có thể giới hạn mailbox) → cùng sendEmail với /api/send",
+        "deliverEmail cũng gọi dispatchWebhooks: message.outbound khi gửi xong, message.failed khi lỗi",
+        "dispatchWebhooks: POST JSON, timeout 10 giây, mỗi lần thử ghi vào webhook_deliveries",
+        "Thất bại → webhook.retry lên OUTBOUND_QUEUE (backoff mũ, tối đa 1 giờ) → queue() gọi processWebhookRetry; hai cạnh này không vẽ"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Ranh giới tin cậy và xác thực",
+      "items": [
+        "email(): từ chối thư > 25 MiB, quá 10 tệp hoặc quá 25 MB đính kèm; rule reject chạy trước khi tra mailbox",
+        "/api/realtime: Upgrade WebSocket + Origin hợp lệ; phiên chỉ đọc từ cookie ep_session",
+        "Dashboard /api/*: phiên đăng nhập — Bearer token phiên (authFetch) được kiểm tra trước, cookie ep_session là dự phòng; dữ liệu thư lọc theo mailbox truy cập được",
+        "/api/v1: Bearer API key + scope; /jmap: Bearer hoặc Basic, scope jmap",
+        "/mcp: Bearer API key loại mcp + scope mcp:* (hoặc scope admin), giới hạn mailbox theo key, kiểm tra Origin/host, rate limit",
+        "/api/admin/migrations: admin chính + cùng Origin; /api/setup/prepare: chỉ khi chưa có admin",
+        "Webhook đi: chữ ký HMAC-SHA-256 trong X-Email-Platform-Signature"
+      ]
+    },
+    {
+      "dot": "slate",
+      "title": "Cron, AI và lưu trữ",
+      "items": [
+        "Cron 0 2 * * *: xuất bản ghi D1 thành JSON vào R2 (backups/database/…) nếu đến hạn",
+        "Mọi lần cron (*/5 phút): runAgentMaintenance — hết hạn phê duyệt gửi, dọn hội thoại cũ, khôi phục job nháp",
+        "processAgentDraftJob gọi generateText; mặc định Workers AI, có thể cấu hình API tương thích OpenAI",
+        "/api/agent/chat (phiên, Origin, rate limit) → createAgentChatStream cũng gọi model qua streamText; cạnh này không vẽ",
+        "R2: inbound/*.eml, attachments/…, backups/database/…, drafts/*.eml (JMAP import)",
+        "D1: messages_fts là chỉ mục FTS5, đồng bộ bằng trigger"
+      ]
+    }
+  ]
+}

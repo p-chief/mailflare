@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "sequence",
+  "quality": "showcase",
+  "specification": {
+    "path": "/Users/pvhieuit/open-repo/mailflare/.archify/sequence-mailflare-inbound-20261001-113615/candidate.json",
+    "sha256": "4f84dcd2a7c175b7b88621822991f53e344a04ab8ce9e3fbf18255a67c4752be",
+    "bytes": 47057
+  },
+  "artifact": {
+    "path": "/Users/pvhieuit/open-repo/mailflare/.archify/sequence-mailflare-inbound-20261001-113615/mailflare-inbound.html",
+    "sha256": "8bf030595a45fca79b3dccaacaa7b2675048b53b00f162d89602299a38ec40dc",
+    "bytes": 794342
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "/Users/pvhieuit/open-repo/mailflare/.archify/sequence-mailflare-inbound-20261001-113615/review-2/mailflare-inbound.finalize.json",
+    "summaryReceipt": "/Users/pvhieuit/open-repo/mailflare/.archify/sequence-mailflare-inbound-20261001-113615/review-2/mailflare-inbound.finalize-summary.json",
+    "browserCheckReceipt": "/Users/pvhieuit/open-repo/mailflare/.archify/sequence-mailflare-inbound-20261001-113615/review-2/mailflare-inbound.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.0.1",
+    "availableVersion": "3.0.1",
+    "releaseNotes": null,
+    "checkedAt": "2026-10-01T04:31:08.684Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 1411
+}

@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "command": "finalize",
+  "status": "pass",
+  "type": "architecture",
+  "quality": "showcase",
+  "specification": {
+    "path": "/Users/pvhieuit/open-repo/mailflare/.archify/architecture-mailflare-detailed-20261001-113615/candidate.json",
+    "sha256": "899b48c9b00c6cf8a9b3d0a49f7e347fe5c450b965fcd1e83a7c4731262f30cb",
+    "bytes": 57418
+  },
+  "artifact": {
+    "path": "/Users/pvhieuit/open-repo/mailflare/.archify/architecture-mailflare-detailed-20261001-113615/mailflare-detailed.html",
+    "sha256": "b0b7d4d88ef2488c779a5743490d6d68dc3ac8dd2ca8fa4ca3982e918f558c38",
+    "bytes": 831731
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "pass"
+  },
+  "diagnostics": [],
+  "diagnosticSummary": {
+    "total": 0,
+    "shown": 0,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "/Users/pvhieuit/open-repo/mailflare/.archify/architecture-mailflare-detailed-20261001-113615/review-3/mailflare-detailed.finalize.json",
+    "summaryReceipt": "/Users/pvhieuit/open-repo/mailflare/.archify/architecture-mailflare-detailed-20261001-113615/review-3/mailflare-detailed.finalize-summary.json",
+    "browserCheckReceipt": "/Users/pvhieuit/open-repo/mailflare/.archify/architecture-mailflare-detailed-20261001-113615/review-3/mailflare-detailed.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.0.1",
+    "availableVersion": "3.0.1",
+    "releaseNotes": null,
+    "checkedAt": "2026-10-01T04:31:08.684Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 1606,
+  "visualReviewRecommendation": {
+    "action": "inspect-route-readability",
+    "signals": {
+      "routesOverSuggestedBends": 3
+    },
+    "reason": "Automated gates passed, but crossings or detours still need perceptual review before claiming visual quality.",
+    "affectedRoutes": {
+      "crossings": [],
+      "detours": [
+        {
+          "relationship": {
+            "id": "push-ws",
+            "from": "realtime",
+            "to": "browser",
+            "label": "WebSocket",
+            "collectionIndex": 6,
+            "artifactIndex": 7
+          },
+          "bends": 3,
+          "stretch": 1
+        },
+        {
+          "relationship": {
+            "id": "api-send",
+            "from": "dashApi",
+            "to": "sendService",
+            "label": "/api/send",
+            "collectionIndex": 21,
+            "artifactIndex": 22
+          },
+          "bends": 3,
+          "stretch": 1
+        },
+        {
+          "relationship": {
+            "id": "connect-hub",
+            "from": "fetchHandler",
+            "to": "realtime",
+            "label": "/connect",
+            "collectionIndex": 27,
+            "artifactIndex": 28
+          },
+          "bends": 3,
+          "stretch": 1
+        }
+      ],
+      "truncated": false
+    },
+    "hints": [
+      "realtime → browser needs 3 bends: move node realtime or browser so they share a row or column with matching centers, or sit diagonally with a clear corner.",
+      "dashApi → sendService needs 3 bends: move node dashApi or sendService so they share a row or column with matching centers, or sit diagonally with a clear corner.",
+      "fetchHandler → realtime needs 3 bends: move node fetchHandler or realtime so they share a row or column with matching centers, or sit diagonally with a clear corner."
+    ],
+    "repair": "Trace these relationships at the desktop viewport. For Architecture, use references/architecture-layout-repair.md: reflow a blocked main path or tangled connected scene, and repair an isolated defect locally only when the surrounding composition is accepted. Preserve all semantic content and user-fixed geometry. Rerun finalize once after the edit."
+  }
+}

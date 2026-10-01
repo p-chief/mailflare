@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "973eb935-c685-43ca-862b-16779b69c7dd",
+  "status": "current",
+  "command": "deliver",
+  "type": "lifecycle",
+  "input": "/Users/pvhieuit/open-repo/mailflare/.archify/lifecycle-mailflare-webhook-20261001-113615/candidate.json",
+  "output": "/Users/pvhieuit/open-repo/mailflare/.archify/lifecycle-mailflare-webhook-20261001-113615/mailflare-webhook-delivery.html",
+  "specification": {
+    "sha256": "0fd58ab63e7ad79014abcd83e77433571caa9fdda42db8f4e3e38785b9cc3b4d",
+    "bytes": 38617
+  },
+  "artifact": {
+    "sha256": "5edc02c89353158b163bf5c7dea28ec2af439a6e3ce85df19469b4550cbb55b4",
+    "bytes": 781232
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "2a6294b2-de57-429c-80eb-04346b1734bb",
+  "status": "current",
+  "command": "deliver",
+  "type": "architecture",
+  "input": "/Users/pvhieuit/open-repo/mailflare/.archify/architecture-mailflare-detailed-20261001-113615/candidate.json",
+  "output": "/Users/pvhieuit/open-repo/mailflare/.archify/architecture-mailflare-detailed-20261001-113615/mailflare-detailed.html",
+  "specification": {
+    "sha256": "899b48c9b00c6cf8a9b3d0a49f7e347fe5c450b965fcd1e83a7c4731262f30cb",
+    "bytes": 57418
+  },
+  "artifact": {
+    "sha256": "b0b7d4d88ef2488c779a5743490d6d68dc3ac8dd2ca8fa4ca3982e918f558c38",
+    "bytes": 831731
+  }
+}

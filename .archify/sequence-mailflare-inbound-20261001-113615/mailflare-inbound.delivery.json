@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "receiptId": "8f9faf71-9cea-40d2-8837-1ea113b82c3b",
+  "status": "current",
+  "command": "deliver",
+  "type": "sequence",
+  "input": "/Users/pvhieuit/open-repo/mailflare/.archify/sequence-mailflare-inbound-20261001-113615/candidate.json",
+  "output": "/Users/pvhieuit/open-repo/mailflare/.archify/sequence-mailflare-inbound-20261001-113615/mailflare-inbound.html",
+  "specification": {
+    "sha256": "4f84dcd2a7c175b7b88621822991f53e344a04ab8ce9e3fbf18255a67c4752be",
+    "bytes": 47057
+  },
+  "artifact": {
+    "sha256": "8bf030595a45fca79b3dccaacaa7b2675048b53b00f162d89602299a38ec40dc",
+    "bytes": 794342
+  }
+}
