@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { LicenseIndicator } from "@/components/license-indicator";
 import { DashboardNav } from "@/components/dashboard-nav";
 import { SidebarProvider } from "@/components/sidebar-state";
+import { SidebarAside, MobileMenuButton, MobileBrandIcon } from "@/components/sidebar-aside";
 import { SidebarResizeBoundary } from "@/components/sidebar-resize-boundary";
 import { ShortcutsProvider } from "@/components/shortcuts";
 import clsx from "clsx";
@@ -39,20 +40,22 @@ export default function DashboardLayout({
 
   return (
     <AuthGuard>
-      <SidebarProvider>
+      <SidebarProvider mobileOverlay>
         <MailboxProvider>
           <ComposeProvider>
             <MailSearchProvider>
               <ShortcutsProvider>
-                <div className="grid h-dvh grid-cols-[72px_minmax(0,1fr)] overflow-hidden bg-[#f6f8fc] transition-[grid-template-columns] md:grid-cols-[var(--sidebar-width)_minmax(0,1fr)]" style={{ transitionDuration: "var(--sidebar-transition-duration)" }}>
-                  <aside className="relative z-30 w-[var(--sidebar-width)] min-h-0 min-w-0 bg-[#f6f8fc]">
-                    <div className="h-full overflow-y-auto overscroll-contain px-3 py-4 scrollbar-gutter-stable">
+                <div className="grid h-dvh grid-cols-[minmax(0,1fr)] overflow-hidden bg-[#f6f8fc] transition-[grid-template-columns] md:grid-cols-[var(--sidebar-width)_minmax(0,1fr)]" style={{ transitionDuration: "var(--sidebar-transition-duration)" }}>
+                  <SidebarAside>
+                    <div className="h-full">
                       <DashboardNav />
                     </div>
                     <SidebarResizeBoundary />
-                  </aside>
+                  </SidebarAside>
                   <div className="flex min-h-0 min-w-0 flex-col">
                     <header className="flex h-16 w-full shrink-0 items-center gap-3 pr-4 text-sm">
+                      <MobileMenuButton className="ml-2" />
+                  <MobileBrandIcon />
                       <MailSearchInput />
                       {/* <Link
                         href="/settings/account"
@@ -71,7 +74,7 @@ export default function DashboardLayout({
                           {children}
                         </main>
                       </AssistantOpenContext.Provider>
-                      <aside className={clsx(assistantFullSize ? "pl-0" : "pl-4", `min-h-0 min-w-0 shrink-0 overflow-hidden transition-[width] duration-300 ease-in-out motion-reduce:transition-none pr-2 pb-2`, assistantVisible ? "" : "opacity-0")} style={{ width: assistantVisible ? assistantFullSize ? "100%" : "min(390px, 100%)" : "0px" }} aria-hidden={!assistantVisible} inert={!assistantVisible}>
+                      <aside className={clsx(assistantFullSize ? "pl-0" : "pl-4", `min-h-0 min-w-0 shrink-0 overflow-hidden transition-[width] duration-300 ease-in-out motion-reduce:transition-none pr-2 pb-2 max-md:p-0`, assistantVisible ? "" : "opacity-0")} style={{ width: assistantVisible ? assistantFullSize ? "100%" : "min(390px, 100%)" : "0px" }} aria-hidden={!assistantVisible} inert={!assistantVisible}>
                         {assistantEnabled && <AgentPanel open={assistantVisible} fullSize={assistantFullSize} onToggleFullSize={() => setAssistantFullSize((current) => !current)} onClose={() => { setAssistantOpen(false); setAssistantFullSize(false); }} />}
                       </aside>
                     </div>

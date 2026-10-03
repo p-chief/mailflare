@@ -1,5 +1,6 @@
 "use client";
 
+import { mobilePrimaryActionClass } from "@/components/page-header-utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -121,10 +122,10 @@ export default function MailboxesPage() {
 	return (
 		<div className="space-y-6">
 			<div className="flex items-center justify-between gap-4">
-				<h1 className="text-3xl font-medium">Mailboxes</h1>
+				<h1 className="text-2xl md:text-3xl font-medium">Mailboxes</h1>
 				<Dialog open={createOpen} onOpenChange={setCreateOpen}>
 					<DialogTrigger asChild>
-						<Button>
+						<Button className={mobilePrimaryActionClass}>
 							<Plus className="h-4 w-4" />
 							New mailbox
 						</Button>

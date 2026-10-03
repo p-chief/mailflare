@@ -185,7 +185,7 @@ export default function SettingsImportPage() {
   return (
     <div className="space-y-6">
       {/* <div>
-        <h1 className="text-3xl font-medium text-neutral-900">Import</h1>
+        <h1 className="text-2xl md:text-3xl font-medium text-neutral-900">Import</h1>
         <p className="mt-1 text-sm text-neutral-500">
           Move mail from selected source sections into the matching sections of
           the current mailbox.

@@ -25,7 +25,7 @@ export default function AccountPasswordPage() {
 	return (
 		<div className="space-y-6">
 			<div>
-				<h1 className="text-3xl font-medium text-neutral-900">Password</h1>
+				<h1 className="text-2xl md:text-3xl font-medium text-neutral-900">Password</h1>
 				<p className="mt-2 text-sm text-neutral-500">Reset the password for {account?.name ?? "this account"}.</p>
 			</div>
 			<form

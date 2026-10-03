@@ -20,7 +20,7 @@ export default function ActivityPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-medium text-neutral-900">Activity</h1>
+        <h1 className="text-2xl md:text-3xl font-medium text-neutral-900">Activity</h1>
         <p className="mt-1 text-sm text-neutral-500">
           Login and logout activity across user accounts.
         </p>

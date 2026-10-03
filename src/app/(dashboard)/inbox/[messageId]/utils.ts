@@ -1,6 +1,7 @@
 import { authFetch } from "@/lib/auth/client";
 import { fetchCachedMessageDetail, getCachedMessageDetail } from "@/lib/messages/detail-cache";
 import { getEmailAddress, getEmailAddressList, normalizeEmailAddress } from "@/lib/email/address";
+import { formatRecipientAddressList } from "@/lib/email/recipient-display";
 import { getDisplayNameForAddress } from "@/lib/contacts/utils";
 import { htmlToReadableText, splitRepliedEmailContent } from "@/lib/email/reply-content-utils";
 import { splitQuotedHtml } from "@/components/compose/rich-text-utils";
@@ -28,7 +29,7 @@ export function getMessageHeaderParties(message: Message, currentAccountName?: s
 		fromAddress: getEmailAddress(message.fromAddr),
 		toName:
 			message.direction === "inbound"
-				? "me"
+				? formatRecipientAddressList(message.toAddr, "address") || "—"
 				: getDisplayNameForAddress(message.toAddr, message.toContactName),
 	};
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,8 @@ import type { LicenseStatus } from "@/lib/licenses/types";
 import type { ActivatableLicensePlan, LicenseAction } from "./types";
 import { formatLicensePlan, loadLicenseStatus, runLicenseAction } from "./utils";
 
-export function LicenseActivation() {
+// children is the pricing grid: the activated card goes above it, the key form below.
+export function LicenseActivation({ children }: { children?: ReactNode }) {
 	const [license, setLicense] = useState<LicenseStatus | null>(null);
 	const [licenseKey, setLicenseKey] = useState("");
 	const [selectedPlan, setSelectedPlan] = useState<ActivatableLicensePlan>("pro");
@@ -63,12 +65,13 @@ export function LicenseActivation() {
 		}
 	}
 
-	if (loading) return <Skeleton className="h-64 w-full rounded-3xl" />;
+	if (loading) return <>{children}<Skeleton className="h-64 w-full rounded-3xl" /></>;
 
 	const hasActivation = !!license?.activatedAt && license.state !== "deactivated";
 
 	if (license?.active) {
 		return (
+			<>
 			<Card className="rounded-3xl border-0 bg-white px-6">
 				<CardContent className="flex items-start gap-4 py-8">
 					<span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-700">
@@ -86,10 +89,14 @@ export function LicenseActivation() {
 					</div>
 				</CardContent>
 			</Card>
+			{children}
+			</>
 		);
 	}
 
 	return (
+		<>
+		{children}
 		<Card className="rounded-3xl border-0 bg-white px-6">
 			<CardContent className="space-y-5 pb-6">
 				{hasActivation && license && (
@@ -165,5 +172,6 @@ export function LicenseActivation() {
 				</div>
 			</CardContent>
 		</Card>
+		</>
 	);
 }

@@ -65,7 +65,7 @@ export default async function HomePage() {
             <HomeHeroActions />
           </div>
 
-          <div className="relative min-h-[520px] overflow-hidden rounded-[2rem] border border-white bg-white shadow-[0_24px_70px_-45px_rgba(30,64,175,0.55)]">
+          <div className="relative min-h-[520px] overflow-hidden rounded-[2rem] border border-neutral-100 shadow-[0_24px_70px_-45px_rgba(30,64,175,0.55)]">
             <div className="grid h-full min-h-[520px] grid-cols-[176px_1fr] bg-white">
               <aside className="hidden flex-col gap-2 bg-[#f6f8fc] px-3 py-5 sm:flex">
                 <div className="mb-4 flex items-center gap-3 px-3 text-neutral-700">

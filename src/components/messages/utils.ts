@@ -27,7 +27,7 @@ export function formatRecipientSummary(toAddr: string, firstContactName?: string
 }
 
 export function getMessagePartyClassName(message: Message, folder: MessageFolderConfig["folder"]) {
-	if (folder === "drafts") return "truncate font-semibold text-red-600";
+	if (folder === "drafts") return "truncate font-medium text-red-600";
 
 	const unread = isMessageListRowUnread(message);
 	return `truncate ${unread ? "font-bold text-neutral-900" : "text-neutral-800"}`;
@@ -79,11 +79,11 @@ export function formatEmailPageTitle({ location, total, unread, emailAddress }: 
 	return `${location} (${count})${suffix}`;
 }
 
-export async function runBulkMessageAction(messageIds: string[], action: string, notify = true) {
+export async function runBulkMessageAction(messageIds: string[], action: string, notify = true, folderId?: string) {
 	const response = await authFetch("/api/messages/bulk", {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({ messageIds, action }),
+		body: JSON.stringify({ messageIds, action, folderId }),
 	});
 
 	if (!response.ok) throw new Error("Unable to update selected messages");

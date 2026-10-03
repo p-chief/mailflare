@@ -23,30 +23,35 @@ export function ContactDetailsTrigger({
 	mailboxId,
 	address,
 	name,
+	label,
 	className,
 }: ContactDetailsTriggerProps) {
 	const [open, setOpen] = useState(false);
-	const [shownName, setShownName] = useState(name);
+	const visibleLabel = label ?? name;
+	const [renamed, setRenamed] = useState<{ from: string; value: string } | null>(null);
+	const shownName = renamed?.from === visibleLabel ? renamed.value : visibleLabel;
 	const [contact, setContact] = useState<ContactDetailsRecord | null>(null);
 	const [displayName, setDisplayName] = useState(name);
 	const [loading, setLoading] = useState(false);
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	useEffect(() => {
-		setShownName(name);
-	}, [name]);
+	function handleOpenChange(next: boolean) {
+		if (next) {
+			setLoading(true);
+			setError(null);
+		}
+		setOpen(next);
+	}
 
 	useEffect(() => {
 		if (!open || !mailboxId) return;
 		let cancelled = false;
-		setLoading(true);
-		setError(null);
 		fetchContactDetails(mailboxId, address)
 			.then((nextContact) => {
 				if (cancelled) return;
 				setContact(nextContact);
-				setDisplayName(nextContact.displayName ?? shownName);
+				setDisplayName(nextContact.displayName ?? name);
 			})
 			.catch((loadError) => {
 				if (!cancelled) setError(loadError instanceof Error ? loadError.message : "Unable to load contact");
@@ -57,7 +62,7 @@ export function ContactDetailsTrigger({
 		return () => {
 			cancelled = true;
 		};
-	}, [address, mailboxId, open, shownName]);
+	}, [address, mailboxId, name, open]);
 
 	async function saveContact() {
 		if (!mailboxId || !displayName.trim()) return;
@@ -67,7 +72,7 @@ export function ContactDetailsTrigger({
 			const updated = await updateContactName(mailboxId, address, displayName);
 			const nextName = updated.displayName ?? displayName.trim();
 			setContact(updated);
-			setShownName(nextName);
+			if (!label) setRenamed({ from: visibleLabel, value: nextName });
 			setOpen(false);
 			window.dispatchEvent(new CustomEvent("mailflare:contact-changed", {
 				detail: { email: updated.email, displayName: nextName },
@@ -85,12 +90,12 @@ export function ContactDetailsTrigger({
 		<>
 			<button
 				type="button"
-				onClick={() => setOpen(true)}
+				onClick={() => handleOpenChange(true)}
 				className={`${className ?? ""} rounded-sm text-left hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-200`}
 			>
 				{shownName}
 			</button>
-			<Dialog open={open} onOpenChange={setOpen}>
+			<Dialog open={open} onOpenChange={handleOpenChange}>
 				<DialogContent>
 					<DialogHeader>
 						<DialogTitle>Contact details</DialogTitle>
@@ -101,7 +106,7 @@ export function ContactDetailsTrigger({
 							<ContactAvatarForm
 								mailboxId={mailboxId}
 								address={address}
-								name={shownName}
+								name={displayName}
 								hasAvatar={contact?.hasAvatar ?? false}
 								onAvatarChange={(hasAvatar) => setContact((current) => current ? { ...current, hasAvatar } : current)}
 							/>

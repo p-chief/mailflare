@@ -59,7 +59,7 @@ export default function AccountDetailsPage() {
 	return (
 		<div className="space-y-6">
 			<div>
-				<h1 className="text-3xl font-medium text-neutral-900">Details</h1>
+				<h1 className="text-2xl md:text-3xl font-medium text-neutral-900">Details</h1>
 				<p className="mt-2 text-sm text-neutral-500">Update this account&apos;s profile and status.</p>
 			</div>
 			<section className="space-y-5 rounded-3xl bg-white p-6">

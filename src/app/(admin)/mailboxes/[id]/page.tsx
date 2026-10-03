@@ -117,7 +117,7 @@ export default function MailboxSettingsPage() {
     <div className="space-y-6">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <h1 className="truncate text-3xl font-medium text-neutral-900">
+          <h1 className="truncate text-2xl md:text-3xl font-medium text-neutral-900">
             Settings
           </h1>
           {address ? (

@@ -1,5 +1,6 @@
 "use client";
 
+import { mobilePrimaryActionClass } from "@/components/page-header-utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -205,7 +206,7 @@ export default function DomainsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-medium">Domains</h1>
+          <h1 className="text-2xl md:text-3xl font-medium">Domains</h1>
           <p className="mt-1 text-sm text-neutral-500">
             {managesDns
               ? "Domains must be on your Cloudflare account. Email Routing is enabled automatically, and Email Sending can be enabled when available."
@@ -214,7 +215,7 @@ export default function DomainsPage() {
         </div>
         <Dialog open={createOpen} onOpenChange={setCreateOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <Button className={mobilePrimaryActionClass}>
               <Plus className="h-4 w-4" />
               New domain
             </Button>

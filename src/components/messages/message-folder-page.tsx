@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import type { MouseEvent } from "react";
-import { ChevronLeft, ChevronRight, ListFilter } from "lucide-react";
+import { Archive, ChevronLeft, ChevronRight, ListFilter, Mail, MailOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tooltip } from "@/components/ui/tooltip";
@@ -17,12 +17,13 @@ import type { BulkMessageAction } from "@/app/api/messages/bulk/types";
 import type { Message } from "@/hooks/types";
 import { setMessageDragData } from "@/lib/messages/drag-utils";
 import { BulkMessageToolbar } from "./bulk-message-toolbar";
+import { SwipeableRow } from "./swipeable-row";
 import { MessageListRowActions } from "./message-list-row-actions";
 import { dispatchMessageCountsDelta, toggleMessageStar } from "./message-list-row-actions-utils";
 import { MessageNavigationProgress, useMessageNavigation } from "./message-navigation";
 import { rememberOpenedUnreadMessage } from "./message-detail-navigation-utils";
 import { useConversationView } from "./use-conversation-view";
-import type { MessageFolderPageProps, MessageListRowProps } from "./types";
+import type { MessageFolderPageProps, MessageListRowProps, RowMessageAction } from "./types";
 import {
 	formatMessageListTimestamp,
 	getPageRange,
@@ -64,6 +65,32 @@ function MessageListRow({
 	const href = `${config.hrefPrefix}/${message.id}`;
 	const navigation = useMessageNavigation(href, rowMessage);
 
+	async function runRowAction(action: RowMessageAction) {
+		const previousRead = read;
+		const previousThreadUnread = threadUnread;
+		const unreadDelta = action === "read" ? -1 : action === "unread" ? 1 : 0;
+		if (action === "read") setRead(true);
+		if (action === "unread") setRead(false);
+		// Grouped rows derive their unread styling from the thread count, so it must change with the row.
+		if (message.threadMessageIds) {
+			if (action === "read") setThreadUnread(0);
+			if (action === "unread") setThreadUnread(message.threadMessageIds.length);
+		}
+		if (unreadDelta) dispatchMessageCountsDelta({ inboxUnreadDelta: unreadDelta });
+		try {
+			await onMessageAction(message.id, action);
+		} catch (error) {
+			if (action === "read" || action === "unread") {
+				setRead(previousRead);
+				setThreadUnread(previousThreadUnread);
+				if (unreadDelta) dispatchMessageCountsDelta({ inboxUnreadDelta: -unreadDelta });
+			}
+			throw error;
+		}
+	}
+
+	const swipeable = compact && (config.folder === "inbox" || config.folder === "snoozed") && message.direction === "inbound";
+
 	function onMessageNavigate(event: MouseEvent<HTMLAnchorElement>) {
 		if (!read && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
 			rememberOpenedUnreadMessage(message.id);
@@ -81,7 +108,7 @@ function MessageListRow({
 	}
 
 	if (compact && config.folder !== "drafts") {
-		return (
+		const compactRow = (
 			<div
 				className={`group grid grid-cols-[20px_minmax(0,1fr)] gap-3 border-l-2 px-4 py-3 transition-colors ${active
 					? "border-l-blue-600 bg-blue-50"
@@ -104,7 +131,7 @@ function MessageListRow({
 				/>
 				<Link href={href} onClick={onMessageNavigate} className="min-w-0">
 					<span className="flex items-baseline justify-between gap-3">
-						<span className={clsx(unread && "font-semibold",getMessagePartyClassName(message, config.folder))}>
+						<span className={clsx(unread && "font-semibold",getMessagePartyClassName(rowMessage, config.folder))}>
 							{party}
 
 							{(message.threadCount ?? 1) > 1 && (
@@ -126,6 +153,25 @@ function MessageListRow({
 					</span>
 				</Link>
 			</div>
+		);
+		if (!swipeable) return compactRow;
+		return (
+			<SwipeableRow
+				startAction={{
+					label: read ? "Mark unread" : "Mark read",
+					icon: read ? Mail : MailOpen,
+					className: "bg-blue-600",
+					onTrigger: () => void runRowAction(read ? "unread" : "read").catch(() => undefined),
+				}}
+				endAction={{
+					label: "Archive",
+					icon: Archive,
+					className: "bg-emerald-600",
+					onTrigger: () => void runRowAction("archive").catch(() => undefined),
+				}}
+			>
+				{compactRow}
+			</SwipeableRow>
 		);
 	}
 
@@ -215,22 +261,7 @@ function MessageListRow({
 			{(config.folder === "inbox" || config.folder === "snoozed") && message.direction === "inbound" && (
 				<MessageListRowActions
 					message={rowMessage}
-					onAction={async (action) => {
-						const previousRead = read;
-						const unreadDelta = action === "read" ? -1 : action === "unread" ? 1 : 0;
-						if (action === "read") setRead(true);
-						if (action === "unread") setRead(false);
-						if (unreadDelta) dispatchMessageCountsDelta({ inboxUnreadDelta: unreadDelta });
-						try {
-							await onMessageAction(message.id, action);
-						} catch (error) {
-							if (action === "read" || action === "unread") {
-								setRead(previousRead);
-								if (unreadDelta) dispatchMessageCountsDelta({ inboxUnreadDelta: -unreadDelta });
-							}
-							throw error;
-						}
-					}}
+					onAction={runRowAction}
 				/>
 			)}
 		</div>
@@ -333,7 +364,7 @@ export function MessageFolderPage({
 		});
 	}
 
-	async function runSelectedAction(action: BulkMessageAction) {
+	async function runSelectedAction(action: BulkMessageAction, folderId?: string) {
 		if (selectedIds.length === 0) return;
 
 		setPendingBulkAction(true);
@@ -353,7 +384,7 @@ export function MessageFolderPage({
 			if (inboxUnreadDelta) dispatchMessageCountsDelta({ inboxUnreadDelta });
 		}
 		try {
-			await runBulkMessageAction(expandSelectedIds(selectedIds), action);
+			await runBulkMessageAction(expandSelectedIds(selectedIds), action, true, folderId);
 			setSelectedMessages([]);
 		} catch (error) {
 			if (readValue !== null) {
@@ -389,6 +420,7 @@ export function MessageFolderPage({
 							onAction={runSelectedAction}
 							onClearSelection={() => setSelectedMessages([])}
 							pending={pendingBulkAction}
+							folder={config.folderId ? undefined : config.folder}
 						/>
 					) : (
 						compact && (

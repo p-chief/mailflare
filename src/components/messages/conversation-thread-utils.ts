@@ -1,4 +1,5 @@
 import { getEmailAddress, getEmailDisplayName, splitEmailAddressList } from "@/lib/email/address";
+import { formatRecipientAddress, type RecipientAddressStyle } from "@/lib/email/recipient-display";
 import type { ThreadMessage } from "@/hooks/types";
 
 /** Messages on one side of the current one, in chronological order. */
@@ -26,10 +27,10 @@ export function getConversationSenderEmail(message: ThreadMessage): string {
 }
 
 
-/** "to Maya, Sam" style summary for a collapsed card. */
-export function getConversationRecipients(message: ThreadMessage): string {
+/** Recipient summary for a thread card. Same address or full form as the open message. */
+export function getConversationRecipients(message: ThreadMessage, style: RecipientAddressStyle = "address"): string {
 	const names = [...splitEmailAddressList(message.toAddr), ...splitEmailAddressList(message.ccAddr)].map(
-		(entry) => getEmailDisplayName(entry),
+		(entry) => formatRecipientAddress(entry, style),
 	);
 	if (names.length === 0) return "";
 	if (names.length <= 3) return names.join(", ");

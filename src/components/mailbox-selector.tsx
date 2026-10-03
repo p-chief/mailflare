@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { CalendarDays, Check, Inbox, LogOut, Settings, ShieldCheck, UserRound, UsersRound } from "lucide-react";
+import { CalendarDays, Check, ChevronDown, Inbox, LogOut, Settings, ShieldCheck, UserPlus, UserRound, UsersRound } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useSelectedMailbox } from "@/components/mailbox-provider";
 import { ProgressiveAvatarImage } from "@/components/progressive-avatar-image";
@@ -11,6 +11,7 @@ import { useMessageCounts } from "@/hooks/use-message-counts";
 import { authFetch } from "@/lib/auth/client";
 import { getAvatarColorStyle } from "@/lib/avatar-colors";
 import { logoutClientSession } from "@/lib/auth/logout";
+import { fetchBrowserAccounts, switchBrowserAccount, type BrowserAccount } from "@/lib/auth/accounts-client";
 import {
 	PROFILE_AVATAR_CHANGED_EVENT,
 	getProfileAvatarUrl,
@@ -120,6 +121,20 @@ export function MailboxSelector({ initialUser }: MailboxSelectorProps = {}) {
 	const [hasAvatar, setHasAvatar] = useState(!!initialUser?.hasAvatar);
 	const [avatarUrl, setAvatarUrl] = useState("/api/profile/avatar");
 	const [mailboxAvatarUrls, setMailboxAvatarUrls] = useState<Record<string, string>>({});
+	const [inboxesOpen, setInboxesOpen] = useState(false);
+	const [browserAccounts, setBrowserAccounts] = useState<BrowserAccount[]>([]);
+
+	useEffect(() => {
+		if (!open) return;
+		let active = true;
+		void fetchBrowserAccounts().then((accounts) => {
+			if (active) setBrowserAccounts(accounts);
+		});
+		return () => {
+			active = false;
+		};
+	}, [open]);
+	const otherAccounts = browserAccounts.filter((account) => !account.active && account.userId !== user?.id);
 	const ref = useRef<HTMLDivElement>(null);
 	const { counts } = useMessageCounts(null, open);
 
@@ -207,9 +222,20 @@ export function MailboxSelector({ initialUser }: MailboxSelectorProps = {}) {
 	const adminActive = isAdminPath(pathname);
 
 	async function logout() {
-		await logoutClientSession();
+		const switched = await logoutClientSession();
 		setOpen(false);
-		router.replace("/login");
+		router.replace(switched ? "/inbox" : "/login");
+		router.refresh();
+	}
+
+	async function switchAccount(userId: string) {
+		const error = await switchBrowserAccount(userId);
+		setOpen(false);
+		if (error) {
+			router.push("/login?add=1");
+			return;
+		}
+		router.replace("/inbox");
 		router.refresh();
 	}
 
@@ -288,33 +314,73 @@ export function MailboxSelector({ initialUser }: MailboxSelectorProps = {}) {
 							<Settings size={18} className="text-neutral-600" />
 							Settings
 						</Link>
+						{otherMailboxes.length > 0 && (
+							<div className="mt-3 border-t border-neutral-100 pt-2">
+								<button
+									type="button"
+									onClick={() => setInboxesOpen((value) => !value)}
+									aria-expanded={inboxesOpen}
+									className="flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold uppercase tracking-wide text-neutral-500 hover:bg-[#f2f6fc]"
+								>
+									Inboxes ({otherMailboxes.length})
+									<ChevronDown size={16} className={`transition-transform ${inboxesOpen ? "rotate-180" : ""}`} />
+								</button>
+								{inboxesOpen && otherMailboxes.map((mailbox) => {
+									const mailboxCount = counts.mailboxes.find((count) => count.mailboxId === mailbox.id);
+									return (
+										<MailboxAccountRow
+											key={mailbox.id}
+											mailbox={mailbox}
+											unread={mailboxCount?.unread ?? 0}
+											avatarUrl={mailboxAvatarUrls[mailbox.id]}
+											onSelect={() => {
+												setSelectedMailbox(mailbox);
+												setOpen(false);
+												router.push("/inbox");
+											}}
+										/>
+									);
+								})}
+							</div>
+						)}
 					</div>
 
-					{otherMailboxes.length > 0 && (
+					{otherAccounts.length > 0 && (
 						<div className="mt-2 rounded-[22px] bg-white/55 p-1">
 							<p className="px-4 pb-1 pt-3 text-xs font-semibold uppercase tracking-wide text-neutral-500">
 								Other accounts
 							</p>
-							{otherMailboxes.map((mailbox) => {
-								const mailboxCount = counts.mailboxes.find((count) => count.mailboxId === mailbox.id);
-								return (
-									<MailboxAccountRow
-										key={mailbox.id}
-										mailbox={mailbox}
-										unread={mailboxCount?.unread ?? 0}
-										avatarUrl={mailboxAvatarUrls[mailbox.id]}
-										onSelect={() => {
-											setSelectedMailbox(mailbox);
-											setOpen(false);
-											router.push("/inbox");
-										}}
+							{otherAccounts.map((account) => (
+								<button
+									key={account.userId}
+									type="button"
+									onClick={() => void switchAccount(account.userId)}
+									className="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left transition-colors hover:bg-white"
+								>
+									<AccountAvatar
+										name={account.name}
+										colorSeed={account.email}
+										hasAvatar={account.hasAvatar}
+										avatarUrl={`/api/auth/accounts/${account.userId}/avatar`}
 									/>
-								);
-							})}
+									<div className="min-w-0 flex-1">
+										<p className="truncate text-sm font-semibold text-neutral-900">{account.name}</p>
+										<p className="truncate text-xs text-neutral-500">{account.email}</p>
+									</div>
+								</button>
+							))}
 						</div>
 					)}
 
 					<div className="mt-2 overflow-hidden rounded-[22px] bg-white">
+						<Link
+							href="/login?add=1"
+							onClick={() => setOpen(false)}
+							className="flex items-center gap-3 px-5 py-4 text-sm font-medium text-neutral-800 hover:bg-[#f2f6fc]"
+						>
+							<UserPlus size={18} className="text-neutral-600" />
+							Add another account
+						</Link>
 						{user?.role === "admin" && (
 							<Link
 								href="/admin"

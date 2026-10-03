@@ -3,13 +3,15 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { SectionNavSheet } from "../section-nav-sheet";
 import { isActiveSettingsPath, settingsNavSections } from "./settings-nav-utils";
 
 export function SettingsNav() {
 	const pathname = usePathname();
+	const currentLabel = settingsNavSections.flatMap((section) => section.items).find((item) => isActiveSettingsPath(pathname, item.href))?.label ?? "Settings";
 
 	return (
-		<aside className="w-full border-b border-blue-100/70 px-4 py-4 md:min-h-full md:w-64 md:border-b-0 md:border-r md:py-10">
+		<SectionNavSheet title="Settings menu" label={currentLabel} className="w-full px-4 py-4 md:min-h-full md:w-64 md:border-r md:border-blue-100/70 md:py-10">
 			<div className="sticky top-6 space-y-7">
 				{settingsNavSections.map((section) => (
 					<div key={section.label} className="space-y-3">
@@ -38,6 +40,6 @@ export function SettingsNav() {
 					</div>
 				))}
 			</div>
-		</aside>
+		</SectionNavSheet>
 	);
 }

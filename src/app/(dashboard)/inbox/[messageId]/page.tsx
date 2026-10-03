@@ -22,7 +22,9 @@ import { ThreadMessageActions } from "@/components/messages/thread-message-actio
 import { useMessageThread } from "@/components/messages/use-message-thread";
 import { useLatestMessagesFirst } from "@/components/messages/use-latest-messages-first";
 import { useMessageListVisibility } from "@/components/messages/message-list-visibility";
-import { getEmailAddress, getEmailDisplayName, splitEmailAddressList } from "@/lib/email/address";
+import { splitEmailAddressList } from "@/lib/email/address";
+import { RecipientList } from "@/components/messages/recipient-list";
+import { useShowFullRecipientAddresses } from "@/components/messages/use-show-full-recipient-addresses";
 import type { MessageAttachment, MessageDetailResponse } from "./types";
 import {
   fetchMessageDetail,
@@ -50,6 +52,7 @@ export default function MessageDetailPage() {
     useState<MessageAttachment | null>(null);
   const [threadExpanded, setThreadExpanded] = useState(false);
   const [latestMessagesFirst] = useLatestMessagesFirst();
+  const { enabled: showFullRecipientAddresses } = useShowFullRecipientAddresses();
   const { visible: messageListVisible } = useMessageListVisibility();
   usePageLoading(loading);
   const thread = useMessageThread(messageId, data?.message?.threadId);
@@ -115,7 +118,7 @@ export default function MessageDetailPage() {
     mailboxes.find((mailbox) => mailbox.id === message.mailboxId) ?? selectedMailbox;
   const currentAccountName =
     messageMailbox?.displayName ?? messageMailbox?.localPart;
-  const { fromName, fromAddress, toName } = getMessageHeaderParties(
+  const { fromName, fromAddress } = getMessageHeaderParties(
     message,
     currentAccountName,
   );
@@ -200,6 +203,7 @@ export default function MessageDetailPage() {
         ownAddress={ownAddress}
         ownAddresses={ownAddresses}
         latestMessagesFirst={latestMessagesFirst}
+        showFullRecipientAddresses={showFullRecipientAddresses}
         expandedAll={threadExpanded}
         onExpandedAllChange={setThreadExpanded}
       />
@@ -234,24 +238,20 @@ export default function MessageDetailPage() {
                 </p>
                 <p className="text-xs text-neutral-500">
                   to{" "}
-                  {message.direction === "inbound" && toEntries.length <= 1 ? (
-                    toName
-                  ) : (
-                    <RecipientList
-                      entries={toEntries}
-                      mailboxId={message.mailboxId}
-                      firstName={message.direction === "outbound" ? toName : undefined}
-                    />
-                  )}
+                  <RecipientList
+                    entries={toEntries}
+                    mailboxId={message.mailboxId}
+                    style={showFullRecipientAddresses ? "full" : "address"}
+                  />
                 </p>
                 {ccEntries.length > 0 && (
                   <p className="text-xs text-neutral-500">
-                    cc <RecipientList entries={ccEntries} mailboxId={message.mailboxId} />
+                    cc <RecipientList entries={ccEntries} mailboxId={message.mailboxId} style={showFullRecipientAddresses ? "full" : "address"} />
                   </p>
                 )}
                 {bccEntries.length > 0 && (
                   <p className="text-xs text-neutral-500">
-                    bcc <RecipientList entries={bccEntries} mailboxId={message.mailboxId} />
+                    bcc <RecipientList entries={bccEntries} mailboxId={message.mailboxId} style={showFullRecipientAddresses ? "full" : "address"} />
                   </p>
                 )}
               </div>
@@ -342,6 +342,7 @@ export default function MessageDetailPage() {
         ownAddress={ownAddress}
         ownAddresses={ownAddresses}
         latestMessagesFirst={latestMessagesFirst}
+        showFullRecipientAddresses={showFullRecipientAddresses}
         expandedAll={threadExpanded}
         onExpandedAllChange={setThreadExpanded}
       />
@@ -358,29 +359,3 @@ export default function MessageDetailPage() {
   );
 }
 
-function RecipientList({
-  entries,
-  mailboxId,
-  firstName,
-}: {
-  entries: string[];
-  mailboxId: string | null;
-  /** A contact name already resolved for the first entry, when the caller has one. */
-  firstName?: string;
-}) {
-  if (entries.length === 0) return <>—</>;
-  return (
-    <>
-      {entries.map((entry, index) => (
-        <span key={entry} title={getEmailAddress(entry)}>
-          {index > 0 && ", "}
-          <ContactDetailsTrigger
-            mailboxId={mailboxId}
-            address={entry}
-            name={index === 0 && firstName ? firstName : getEmailDisplayName(entry)}
-          />
-        </span>
-      ))}
-    </>
-  );
-}

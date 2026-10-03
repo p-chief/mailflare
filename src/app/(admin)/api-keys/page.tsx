@@ -1,5 +1,6 @@
 "use client";
 
+import { mobilePrimaryActionClass } from "@/components/page-header-utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Copy, KeyRound, Plus, Trash2 } from "lucide-react";
@@ -73,10 +74,10 @@ export default function ApiKeysPage() {
 	return (
 		<div className="space-y-6">
 			<div className="flex items-center justify-between gap-4">
-				<h1 className="text-3xl font-medium">Admin API keys</h1>
+				<h1 className="text-2xl md:text-3xl font-medium">Admin API keys</h1>
 				<Dialog open={createOpen} onOpenChange={(open) => { if (create.isPending) return; setCreateOpen(open); if (!open) { setNewKey(null); setCopied(false); } }}>
 					<DialogTrigger asChild>
-						<Button>
+						<Button className={mobilePrimaryActionClass}>
 							<Plus className="h-4 w-4" />
 							New API key
 						</Button>

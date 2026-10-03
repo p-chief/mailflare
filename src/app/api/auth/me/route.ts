@@ -39,6 +39,7 @@ export async function GET(request: Request) {
 			canManageUsers: user.canManageUsers,
 			keyboardShortcutsEnabled: user.keyboardShortcutsEnabled,
 			spamProtectionEnabled: user.spamProtectionEnabled,
+			showFullRecipientAddresses: user.showFullRecipientAddresses,
 			hasAvatar: !!user.avatarKey,
 			mfaEnabled: user.totpEnabled,
 		},

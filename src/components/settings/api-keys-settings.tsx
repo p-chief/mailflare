@@ -1,5 +1,6 @@
 "use client";
 
+import { mobilePrimaryActionAboveNavClass } from "@/components/page-header-utils";
 import { useEffect, useState } from "react";
 import { Copy, KeyRound, Plus, Trash2 } from "lucide-react";
 import { useSelectedMailbox } from "@/components/mailbox-provider";
@@ -72,9 +73,9 @@ export function ApiKeysSettings() {
 
 	return <div className="space-y-6">
 		<div className="flex items-center justify-between gap-4">
-			<h1 className="text-3xl font-medium">API keys</h1>
+			<h1 className="text-2xl md:text-3xl font-medium">API keys</h1>
 		<Dialog open={createOpen} onOpenChange={(open) => { if (busy) return; setCreateOpen(open); setError(null); if (open && mailboxIds.length === 0) setMailboxIds([selectedMailbox?.id ?? mailboxes[0]?.id].filter((id): id is string => !!id)); if (!open) { setNewKey(null); setCopied(false); } }}>
-			<DialogTrigger asChild><Button type="button"><Plus className="h-4 w-4" />New API key</Button></DialogTrigger>
+			<DialogTrigger asChild><Button type="button" className={mobilePrimaryActionAboveNavClass}><Plus className="h-4 w-4" />New API key</Button></DialogTrigger>
 			<DialogContent className="max-h-[calc(100vh-4rem)] overflow-y-auto">
 				<DialogHeader><DialogTitle>{newKey ? "API key created" : "Create API key"}</DialogTitle><DialogDescription>{newKey ? "Copy this key now. It will only be shown once." : "Name your key and choose the access it needs."}</DialogDescription></DialogHeader>
 		{!newKey && <form onSubmit={(event) => void create(event)} className="space-y-4">

@@ -18,6 +18,7 @@ export const LICENSE_PLANS: LicensePlan[] = [
 	{
 		name: "Team",
 		price: 249,
+		originalPrice: 349,
 		description: "A one-time multi-account license with every Pro capability",
 		features: ["Everything in Pro", "Add and manage other accounts", "Shared mailbox access as available", "Keep the licensed version forever"],
 		icon: Building2,

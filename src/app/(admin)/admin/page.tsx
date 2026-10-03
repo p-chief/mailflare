@@ -90,7 +90,7 @@ export default function AdminSettingsPage() {
 	return (
 		<div>
 			<div className="mb-8">
-				<h1 className="text-3xl font-medium text-neutral-900">Admin settings</h1>
+				<h1 className="text-2xl md:text-3xl font-medium text-neutral-900">Admin settings</h1>
 				<p className="mt-2 text-sm text-neutral-500">
 					Manage workspace-level mail infrastructure and integrations.
 				</p>

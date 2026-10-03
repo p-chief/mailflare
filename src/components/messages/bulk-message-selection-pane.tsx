@@ -8,13 +8,14 @@ import type { BulkMessageSelectionPaneProps } from "./types";
 import { runBulkMessageAction } from "./utils";
 
 export function BulkMessageSelectionPane({
+	folder,
 	selectedMessages,
 	onClearSelection,
 }: BulkMessageSelectionPaneProps) {
 	const [pending, setPending] = useState(false);
 	const hasUnreadSelection = selectedMessages.some((message) => !message.read);
 
-	async function runAction(action: BulkMessageAction) {
+	async function runAction(action: BulkMessageAction, folderId?: string) {
 		if (selectedMessages.length === 0) return;
 
 		setPending(true);
@@ -22,6 +23,8 @@ export function BulkMessageSelectionPane({
 			await runBulkMessageAction(
 				selectedMessages.map((message) => message.id),
 				action,
+				true,
+				folderId,
 			);
 			onClearSelection();
 		} finally {
@@ -48,6 +51,7 @@ export function BulkMessageSelectionPane({
 						onAction={runAction}
 						onClearSelection={onClearSelection}
 						pending={pending}
+						folder={folder}
 						hideSelectedCount
 					/>
 				</div>

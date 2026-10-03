@@ -15,6 +15,9 @@ export type ContactDetailsResponse = {
 export type ContactDetailsTriggerProps = {
 	mailboxId: string | null;
 	address: string;
+	/** Contact name. Not the formatted Name <mailbox> label. */
 	name: string;
+	/** Visible text. Falls back to name. */
+	label?: string;
 	className?: string;
 };

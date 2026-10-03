@@ -1,5 +1,6 @@
 "use client";
 
+import { mobilePrimaryActionClass } from "@/components/page-header-utils";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Plus } from "lucide-react";
@@ -87,7 +88,7 @@ export default function AccountsPage() {
 	}
 
 	return <div className="space-y-6">
-		<div className="flex items-center justify-between gap-4"><div><h1 className="text-3xl font-medium text-neutral-900">Accounts</h1><p className="mt-2 text-sm text-neutral-500">Manage Team accounts and their inboxes.</p></div>{!teamRequired && canManage && <Button onClick={() => setCreateOpen(true)}><Plus className="h-4 w-4" />New account</Button>}</div>
+		<div className="flex items-center justify-between gap-4"><div><h1 className="text-2xl md:text-3xl font-medium text-neutral-900">Accounts</h1><p className="mt-2 text-sm text-neutral-500">Manage Team accounts and their inboxes.</p></div>{!teamRequired && canManage && <Button className={mobilePrimaryActionClass} onClick={() => setCreateOpen(true)}><Plus className="h-4 w-4" />New account</Button>}</div>
 		<div className="relative">{teamRequired && <LicenseRequiredOverlay required="Team"><div className="min-h-48 rounded-3xl bg-white" /></LicenseRequiredOverlay>}<List>
 			{loading && <p className="text-sm text-neutral-500">Loading...</p>}
 			{accounts.map((account) => {

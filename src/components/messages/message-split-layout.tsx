@@ -98,6 +98,7 @@ export function MessageSplitLayout({
 			<section className="min-h-0 min-w-0 overflow-hidden bg-white flex flex-col">
 				{twoColumnReading && selectedMessages.length > 0 ? (
 					<BulkMessageSelectionPane
+						folder={config.folder}
 						selectedMessages={selectedMessages}
 						onClearSelection={() => setSelectedMessages([])}
 					/>

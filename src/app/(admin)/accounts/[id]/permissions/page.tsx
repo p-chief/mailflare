@@ -83,7 +83,7 @@ export default function AccountPermissionsPage() {
 	return (
 		<div className="space-y-6">
 			<div>
-				<h1 className="text-3xl font-medium text-neutral-900">Permissions</h1>
+				<h1 className="text-2xl md:text-3xl font-medium text-neutral-900">Permissions</h1>
 				<p className="mt-2 text-sm text-neutral-500">Control what this account can manage.</p>
 			</div>
 			{account?.isPrimaryAdmin && (

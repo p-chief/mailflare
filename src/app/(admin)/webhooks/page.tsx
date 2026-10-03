@@ -1,5 +1,6 @@
 "use client";
 
+import { mobilePrimaryActionClass } from "@/components/page-header-utils";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Activity, Plus, RefreshCw, Send, Trash2 } from "lucide-react";
@@ -94,6 +95,7 @@ export default function WebhooksPage() {
 					</p>
 				</div>
 				<Button
+					className={mobilePrimaryActionClass}
 					onClick={() => {
 						setError(null);
 						setDialogOpen(true);

@@ -1,5 +1,6 @@
 import { AppearanceSettings } from "@/components/settings/appearance-settings";
 import { InboxThreadingSettings } from "@/components/settings/inbox-threading-settings";
+import { RecipientAddressSettings } from "@/components/settings/recipient-address-settings";
 import { InboxReadingLayoutSettings } from "@/components/settings/inbox-reading-layout-settings";
 import { InboxShortcutsSettings } from "@/components/settings/inbox-shortcuts-settings";
 import { MailboxAutoReplyForm } from "@/components/settings/mailbox-auto-reply-form";
@@ -35,6 +36,13 @@ export default function SettingsInboxPage() {
 							<p className="mt-1 text-sm text-neutral-500">Choose how emails are organized in your inbox.</p>
 						</div>
 						<InboxThreadingSettings />
+					</div>
+					<div className="py-6 first:pt-0 last:pb-0">
+						<div className="mb-4">
+							<h3 className="text-base font-semibold text-neutral-900">Addresses</h3>
+							<p className="mt-1 text-sm text-neutral-500">Choose how recipient addresses appear when you read mail.</p>
+						</div>
+						<RecipientAddressSettings />
 					</div>
 					<div className="py-6 first:pt-0 last:pb-0">
 						<div className="mb-4">

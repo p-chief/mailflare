@@ -13,6 +13,7 @@ export type ConversationThreadProps = {
 	latestMessagesFirst: boolean;
 	expandedAll: boolean;
 	onExpandedAllChange: (expanded: boolean) => void;
+	showFullRecipientAddresses?: boolean;
 };
 
 export type ConversationMessageCardProps = {
@@ -22,6 +23,7 @@ export type ConversationMessageCardProps = {
 	ownAddress?: string | null;
 	ownAddresses?: string[];
 	defaultExpanded?: boolean;
+	showFullRecipientAddresses?: boolean;
 };
 
 export type UseMessageThreadResult = {

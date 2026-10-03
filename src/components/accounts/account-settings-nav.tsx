@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { SectionNavSheet } from "../section-nav-sheet";
 import {
 	accountSettingsNavItems,
 	getAccountSettingsHref,
@@ -12,9 +13,10 @@ import {
 export function AccountSettingsNav() {
 	const { id } = useParams<{ id: string }>();
 	const pathname = usePathname();
+	const currentLabel = accountSettingsNavItems.find((item) => isActiveAccountSettingsPath(pathname, getAccountSettingsHref(id, item.segment)))?.label ?? "Account settings";
 
 	return (
-		<aside className="w-full shrink-0 lg:w-48">
+		<SectionNavSheet title="Account settings menu" label={currentLabel} className="w-full shrink-0 px-4 py-4 md:w-48 md:px-0 md:py-0">
 			<div className="sticky top-6 space-y-3">
 				<h2 className="px-4 text-xs font-semibold uppercase tracking-wide text-neutral-500">
 					Account settings
@@ -39,6 +41,6 @@ export function AccountSettingsNav() {
 					})}
 				</nav>
 			</div>
-		</aside>
+		</SectionNavSheet>
 	);
 }

@@ -15,12 +15,13 @@ export default function LicensesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-medium text-neutral-900">Licenses</h1>
+        <h1 className="text-2xl md:text-3xl font-medium text-neutral-900">Licenses</h1>
         <p className="mt-2 text-sm text-neutral-500">
           Choose a one-time license. Each purchase includes updates released
           during the first year.
         </p>
       </div>
+      <LicenseActivation>
       <div className="grid gap-4 md:grid-cols-2">
         {LICENSE_PLANS.map((plan) => {
           const Icon = plan.icon;
@@ -75,7 +76,7 @@ export default function LicensesPage() {
           );
         })}
       </div>
-      <LicenseActivation />
+      </LicenseActivation>
     </div>
   );
 }

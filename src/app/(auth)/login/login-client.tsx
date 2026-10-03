@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { TurnstileField } from "@/components/auth/turnstile";
 import { submitLogin, submitMfaCode } from "./utils";
 
-export function LoginClient() {
+export function LoginClient({ adding = false }: { adding?: boolean }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -127,8 +127,12 @@ export function LoginClient() {
   return (
     <AuthShell
       icon={Mail}
-      title="Sign in"
-      description="Open your mailbox and continue from the same inbox workspace."
+      title={adding ? "Add another account" : "Sign in"}
+      description={
+        adding
+          ? "Sign in to another account. You can switch between accounts from the account menu."
+          : "Open your mailbox and continue from the same inbox workspace."
+      }
     >
       <form method="post" onSubmit={onSubmit} className="space-y-5">
         <div className="space-y-2">

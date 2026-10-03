@@ -38,6 +38,7 @@ export function ConversationThread({
 	latestMessagesFirst,
 	expandedAll,
 	onExpandedAllChange,
+	showFullRecipientAddresses = false,
 }: ConversationThreadProps) {
 	const slice = partitionThread(messages, currentMessageId, position, latestMessagesFirst);
 	if (slice.length === 0) return null;
@@ -60,6 +61,7 @@ export function ConversationThread({
 						currentAccountName={currentAccountName}
 						ownAddress={ownAddress}
 						ownAddresses={ownAddresses}
+						showFullRecipientAddresses={showFullRecipientAddresses}
 					/>
 				</li>
 				{collapsed ? (
@@ -86,6 +88,7 @@ export function ConversationThread({
 								currentAccountName={currentAccountName}
 								ownAddress={ownAddress}
 								ownAddresses={ownAddresses}
+								showFullRecipientAddresses={showFullRecipientAddresses}
 							/>
 						</li>
 					))
@@ -98,6 +101,7 @@ export function ConversationThread({
 							currentAccountName={currentAccountName}
 							ownAddress={ownAddress}
 							ownAddresses={ownAddresses}
+							showFullRecipientAddresses={showFullRecipientAddresses}
 						/>
 					</li>
 				)}
@@ -113,13 +117,14 @@ export function ConversationMessageCard({
 	ownAddress,
 	ownAddresses,
 	defaultExpanded = false,
+	showFullRecipientAddresses = false,
 }: ConversationMessageCardProps) {
 	const [locallyExpanded, setLocallyExpanded] = useState(defaultExpanded);
 	const [locallyRead, setLocallyRead] = useState(message.read);
 	const expanded = locallyExpanded;
 	const sender = getConversationSender(message, currentAccountName);
 	const senderEmail = getConversationSenderEmail(message);
-	const recipients = getConversationRecipients(message);
+	const recipients = getConversationRecipients(message, showFullRecipientAddresses ? "full" : "address");
 	// const href = `${getMessageBackHref(message.direction, message.status)}/${message.id}`;
 	const outbound = message.direction === "outbound";
 	const attachments = message.attachments.filter((attachment) => attachment.disposition === "attachment");

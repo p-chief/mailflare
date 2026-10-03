@@ -1,8 +1,8 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { Fragment } from "react";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import {
   Archive,
   Clock,
@@ -44,8 +44,12 @@ import {
   moveMessagesToCustomFolder,
   moveMessagesToSystemFolder,
 } from "./dashboard-nav-utils";
+import { NavSectionHeader, useSectionOpen } from "./nav-section-header";
+import { ReorderableList } from "./reorderable-list";
+import { readStorage, writeStorage } from "./reorderable-list-utils";
 import { SidebarFooter } from "./sidebar-footer";
 import { SidebarHeader } from "./sidebar-header";
+import { SidebarScaffold } from "./sidebar-scaffold";
 import { useSidebar } from "./sidebar-state";
 
 const links = [
@@ -65,8 +69,31 @@ const links = [
   { href: "/trash", label: "Trash", icon: Trash2, preloadMessages: true },
 ];
 
+// Drafts, Archived, Spam and Trash start tucked under "More...".
+const MORE_LINK_HREFS = ["/drafts", "/archived", "/spam", "/trash"];
+const MAX_VISIBLE_FOLDERS = 3;
+const MORE_OPEN_KEY = "mailflare:nav:more-open";
+const FOLDERS_OPEN_KEY = "mailflare:nav:folders-open";
+
+function NavToggle({ expanded, onClick, collapsedLabel = "More...", expandedLabel = "Show less..." }: { expanded: boolean; onClick: () => void; collapsedLabel?: string; expandedLabel?: string }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-expanded={expanded}
+      className="flex h-9 w-full items-center rounded-r-full pl-[52px] text-left text-sm text-neutral-700 transition-colors hover:bg-stone-200/60 max-md:min-h-11 max-md:pl-14 max-md:text-base"
+    >
+      {expanded ? expandedLabel : collapsedLabel}
+    </button>
+  );
+}
+
 export function DashboardNav({ className }: { className?: string }) {
   const { minimal } = useSidebar();
+  const pathname = usePathname();
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [foldersOpen, setFoldersOpen] = useState(false);
+  const [foldersSectionOpen, toggleFoldersSection] = useSectionOpen("mailflare:nav:folders-section-open");
   const { selectedMailbox, isLoading } = useSelectedMailbox();
   const { counts } = useMessageCounts(selectedMailbox?.id, !isLoading);
   const [folders, setFolders] = useState<CustomFolder[]>([]);
@@ -117,6 +144,29 @@ export function DashboardNav({ className }: { className?: string }) {
     }
     return link;
   });
+
+  useEffect(() => {
+    setMoreOpen(readStorage(MORE_OPEN_KEY, false));
+    setFoldersOpen(readStorage(FOLDERS_OPEN_KEY, false));
+  }, []);
+
+  function toggleMore() {
+    writeStorage(MORE_OPEN_KEY, !moreOpen);
+    setMoreOpen(!moreOpen);
+  }
+
+  function toggleFolders() {
+    writeStorage(FOLDERS_OPEN_KEY, !foldersOpen);
+    setFoldersOpen(!foldersOpen);
+  }
+
+  const isActiveHref = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+  const composeLink = linksWithCounts.find((link) => link.href === "/compose");
+  const mainLinks = linksWithCounts.filter((link) => link.href !== "/compose" && !MORE_LINK_HREFS.includes(link.href!));
+  const moreLinks = linksWithCounts.filter((link) => MORE_LINK_HREFS.includes(link.href!));
+  // The icon rail has no room for text toggles. When collapsed, the page you are on stays listed on its own.
+  const showAllMoreLinks = minimal || moreOpen;
+  const foldersOverflow = !minimal && folders.length > MAX_VISIBLE_FOLDERS;
 
   useEffect(() => {
     if (!selectedMailbox?.id) {
@@ -171,20 +221,25 @@ export function DashboardNav({ className }: { className?: string }) {
   }
 
   return (
-    <nav className={cn("flex min-h-full flex-col gap-1", className)}>
-      <SidebarHeader href="/inbox" />
-      {linksWithCounts.map((link, i) => (
-        <Fragment key={`nav-${link.href || i}`}>
-          <NavItem link={link} />
-          {minimal && i === 0 && <hr className="mx-3 my-2 border-neutral-200/70" />}
-        </Fragment>
-      ))}
-      {minimal && <hr className="mx-3 my-2 border-neutral-200/70" />}
+    <SidebarScaffold className={className} header={<SidebarHeader href="/inbox" />} footer={<SidebarFooter />}>
+      {composeLink && <NavItem labelClassName="font-medium" link={composeLink} />}
+      {minimal && <hr className="mx-6 my-2 border-neutral-200/70" />}
+      <ReorderableList
+        storageKey="mailflare:nav:layout"
+        enabled={!minimal}
+        lists={[
+          { id: "main", items: mainLinks.map((link) => ({ id: link.href!, node: <NavItem link={link} /> })) },
+          {
+            id: "more",
+            before: minimal ? undefined : <NavToggle expanded={moreOpen} onClick={toggleMore} />,
+            visibleIds: (ordered) => showAllMoreLinks ? ordered : ordered.filter((id) => isActiveHref(id)),
+            items: moreLinks.map((link) => ({ id: link.href!, node: <NavItem link={link} /> })),
+          },
+        ]}
+      />
+      {minimal && <hr className="mx-6 my-2 border-neutral-200/70" />}
       {!minimal && (
-        <div className="mt-2 flex h-8 items-center justify-between px-3">
-          <span className="font-medium tracking-wide text-neutral-900 text-sm">
-            Folders
-          </span>
+        <NavSectionHeader label="Folders" open={foldersSectionOpen} onToggle={toggleFoldersSection}>
           {selectedMailbox && (
             <Dialog open={folderDialogOpen} onOpenChange={setFolderDialogOpen}>
               <DialogTrigger asChild>
@@ -250,30 +305,45 @@ export function DashboardNav({ className }: { className?: string }) {
               </DialogContent>
             </Dialog>
           )}
-        </div>
+        </NavSectionHeader>
       )}
-      {!minimal && folders.length === 0 && (
-        <div className="mx-3 rounded-lg border border-dashed border-neutral-200 px-3 py-3 text-xs text-neutral-400">
+      {!minimal && foldersSectionOpen && folders.length === 0 && (
+        <div className="mx-6 rounded-lg border border-dashed border-neutral-200 px-3 py-3 text-xs text-neutral-400">
           No folders yet
         </div>
       )}
-      {folders.map((folder) => (
-        <NavItem
-          key={folder.id}
-          link={{
-            href: `/folders/${folder.id}`,
-            label: folder.name,
-            icon: Folder,
-            preloadMessages: true,
-            iconColor: folder.color,
-            count: counts.customFolders[folder.id]?.unread,
-            onMessageDrop: (messageIds: string[]) =>
-              void moveMessagesToCustomFolder(messageIds, folder.id),
-          }}
-        />
-      ))}
-      <span className="flex-1" />
-      <SidebarFooter />
-    </nav>
+      {(minimal || foldersSectionOpen) && <ReorderableList
+        storageKey="mailflare:nav:layout:folders"
+        enabled={!minimal}
+        lists={[{
+          id: "folders",
+          visibleIds: (ordered) => {
+            if (!foldersOverflow || foldersOpen) return ordered;
+            const first = ordered.slice(0, MAX_VISIBLE_FOLDERS);
+            const active = ordered.slice(MAX_VISIBLE_FOLDERS).find((id) => isActiveHref(`/folders/${id}`));
+            return active ? [...first, active] : first;
+          },
+          items: folders.map((folder) => ({
+            id: folder.id,
+            node: (
+              <NavItem
+                wrap
+                link={{
+                  href: `/folders/${folder.id}`,
+                  label: folder.name,
+                  icon: Folder,
+                  preloadMessages: true,
+                  iconColor: folder.color,
+                  count: counts.customFolders[folder.id]?.unread,
+                  onMessageDrop: (messageIds: string[]) =>
+                    void moveMessagesToCustomFolder(messageIds, folder.id),
+                }}
+              />
+            ),
+          })),
+        }]}
+      />}
+      {foldersSectionOpen && foldersOverflow && <NavToggle expanded={foldersOpen} onClick={toggleFolders} />}
+    </SidebarScaffold>
   );
 }

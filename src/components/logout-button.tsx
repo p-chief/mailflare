@@ -11,8 +11,8 @@ export function LogoutButton() {
 			variant="outline"
 			className="w-full"
 			onClick={async () => {
-				await logoutClientSession();
-				router.replace("/login");
+				const switched = await logoutClientSession();
+				router.replace(switched ? "/inbox" : "/login");
 				router.refresh();
 			}}
 		>

@@ -35,7 +35,7 @@ export default function GeneralSettingsPage() {
 	}
 
 	return <div className="space-y-6">
-		<div><h1 className="text-3xl font-medium text-neutral-900">General</h1><p className="mt-2 text-sm text-neutral-500">Set limits for outgoing mail.</p></div>
+		<div><h1 className="text-2xl md:text-3xl font-medium text-neutral-900">General</h1><p className="mt-2 text-sm text-neutral-500">Set limits for outgoing mail.</p></div>
 		<Card className="rounded-3xl border-0 bg-white p-6">
 			<CardHeader className="py-0"><CardTitle>File attachments</CardTitle></CardHeader>
 			<CardContent className="pt-6"><form onSubmit={save} className="space-y-4">

@@ -26,7 +26,7 @@ export default function BrandingPage() {
 		return (
 			<div className="space-y-6">
 				<div>
-					<h1 className="text-3xl font-medium text-neutral-900">Branding</h1>
+					<h1 className="text-2xl md:text-3xl font-medium text-neutral-900">Branding</h1>
 					<p className="mt-2 text-sm text-neutral-500">Custom branding is available with a Pro or Team license.</p>
 				</div>
 				<Card className="rounded-3xl border-0 bg-white p-6">
@@ -68,7 +68,7 @@ export default function BrandingPage() {
 	return (
 		<div className="space-y-6">
 			<div>
-				<h1 className="text-3xl font-medium text-neutral-900">Branding</h1>
+				<h1 className="text-2xl md:text-3xl font-medium text-neutral-900">Branding</h1>
 				<p className="mt-2 text-sm text-neutral-500">Customize the app identity shown to everyone using this installation.</p>
 			</div>
 			<Card className="rounded-3xl border-0 bg-white p-6">
